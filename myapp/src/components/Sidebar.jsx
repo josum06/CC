@@ -1,3 +1,4 @@
+import { SignOutButton } from "@clerk/clerk-react";
 import React from "react";
 import { FaTimes } from "react-icons/fa";
 
@@ -17,7 +18,8 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
         <ul>
           <li className="py-2 border-b">Profile</li>
           <li className="py-2 border-b">Settings</li>
-          <li className="py-2 border-b">Logout</li>
+          <SignOutButton redirectUrl="/Signup"/>
+
         </ul>
       </div>
     </div>
