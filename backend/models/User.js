@@ -1,11 +1,11 @@
 const mongoose = require("mongoose");
 
 const UserSchema = new mongoose.Schema({
-  clerkUserId: { type: String, unique: true },
-  enrollmentNumber: { type: String, unique: true },
+  clerkId: { type: String, unique: true },
+  enrollmentNumber: { type: String, unique: true, sparse: true },
   role: {
     type: String,
-    enums: ["admin", "faculty", "student"],
+    enum: ["admin", "faculty", "student"],
     default: "student",
   },
   fullName: { type: String, required: true },

@@ -4,6 +4,6 @@ const User = require("../models/User.js"); // Mongoose model
 const authController = require("../controllers/authController.js");
 const router = express.Router();
 
-app.post("/webhooks/clerk", authController.signUp);
+router.post("/save-user", authController.signUp);
 
 module.exports = router;
