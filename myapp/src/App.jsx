@@ -8,7 +8,7 @@ import Network from './pages/Network';
 import Companies from './pages/Companies';
 import Chats from './pages/Chats';
 import { ClerkProvider } from "@clerk/clerk-react";
-import SignUpPage from './pages/PageSignUp';
+import SignUpPage from './pages/SignUp';
 
 
 
