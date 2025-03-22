@@ -19,11 +19,7 @@ const Footer = () => {
           <span className="text-[8px] sm:text-xs md:text-sm">Events</span>
         </button>
 
-        <button onClick={() => navigate("/Academics")} className="flex flex-col items-center cursor-pointer hover:text-blue-500">
-          <FaBook className="text-sm sm:text-lg md:text-xl" />
-          <span className="text-[8px] sm:text-xs md:text-sm">Academics</span>
-        </button>
-
+        
         {/* Center + Icon with "Post" label */}
         <div className="flex flex-col items-center">
           <button  onClick={() => navigate("/Post")} className="bg-blue-500 text-white rounded-full w-8 cursor-pointer h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 flex items-center justify-center shadow-lg hover:bg-blue-600 transition">
@@ -41,11 +37,6 @@ const Footer = () => {
         <button onClick={() => navigate("/Companies")}  className="flex flex-col items-center cursor-pointer hover:text-blue-500">
           <FaBuilding className="text-sm sm:text-lg md:text-xl" />
           <span className="text-[8px] sm:text-xs md:text-sm">Companies</span>
-        </button>
-
-        <button onClick={() => navigate("/Contact")} className="flex flex-col items-center cursor-pointer hover:text-blue-500">
-          <FaEnvelope className="text-sm sm:text-lg md:text-xl" />
-          <span className="text-[8px] sm:text-xs md:text-sm">Contact</span>
         </button>
 
       </div>

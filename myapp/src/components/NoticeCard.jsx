@@ -1,79 +1,93 @@
 import React, { useState } from "react";
 
-const NoticeCard = ({ date, category, title, description, author, pdfLink }) => {
+const NoticeCard = ({ title, date, postedBy, profilePhoto, role, fileUrl }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const handleDownload = () => {
-    // Trigger PDF download
-    const link = document.createElement('a');
-    link.href = pdfLink;
-    link.download = title + ".pdf";
-    link.click();
-  };
-
-  const toggleModal = () => setIsModalOpen(!isModalOpen);
+  const handleOpenModal = () => setIsModalOpen(true);
+  const handleCloseModal = () => setIsModalOpen(false);
 
   return (
-    <div className="max-w-xs w-full bg-white p-6 rounded-lg shadow-lg dark:bg-gray-800 hover:shadow-xl transition-all duration-300 transform hover:scale-105">
-      <div className="flex items-center justify-between">
-        <span className="text-sm font-light text-gray-600 dark:text-gray-400">{date}</span>
-        <span className="px-3 py-1 text-sm font-semibold text-blue-600 border border-blue-600 rounded-lg cursor-pointer hover:bg-blue-600 hover:text-white transition-colors">
-          {category}
-        </span>
-      </div>
+    <>
+      {/* Notice Card */}
+      <div
+        className="bg-white shadow-lg rounded-2xl p-5 border border-gray-200 hover:shadow-xl transition duration-300 
+                    flex flex-col md:flex-row justify-between items-center md:items-start gap-4"
+      >
+        {/* Left Section */}
+        <div className="flex flex-col justify-center text-center md:text-left">
+          <h2
+            className="text-xl font-semibold text-blue-600 hover:underline cursor-pointer"
+            onClick={handleOpenModal}
+          >
+            {title}
+          </h2>
+          <p className="text-sm text-gray-500">{date}</p>
+        </div>
 
-      <div className="mt-4">
-        <a href="#" className="text-2xl font-semibold text-gray-800 dark:text-white hover:text-gray-600 dark:hover:text-gray-200 transition-all duration-200 hover:underline">
-          {title}
-        </a>
-        <p className="mt-2 text-gray-600 dark:text-gray-300">{description}</p>
-      </div>
-
-      <div className="flex items-center justify-between mt-4">
-        <button
-          onClick={toggleModal}
-          className="text-blue-600 dark:text-blue-400 hover:underline"
-        >
-          View Notice
-        </button>
-
-        <button
-          onClick={handleDownload}
-          className="text-blue-600 dark:text-blue-400 hover:underline"
-        >
-          Download PDF
-        </button>
-
-        <div className="flex items-center">
+        {/* Right Section */}
+        <div className="flex items-center gap-4">
+         
+          <div className="flex flex-col text-right md:text-right">
+            <p className="text-sm font-medium text-gray-700">{postedBy}</p>
+            <p className="text-xs text-gray-500">{role}</p>
+          </div>
           <img
-            className="object-cover w-10 h-10 rounded-full"
-            src="https://images.unsplash.com/photo-1502980426475-b83966705988?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=40&q=80"
-            alt="author-avatar"
+            src={profilePhoto}
+            alt="Profile"
+            className="w-12 h-12 md:w-11 md:h-11 lg:w-12 lg:h-12 xl:w-16 xl:h-16 rounded-full object-cover border border-gray-300"
           />
-          <span className="font-semibold text-gray-700 dark:text-gray-200">{author}</span>
         </div>
       </div>
 
-      {/* Modal Window */}
+      {/* Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-50">
-          <div className="bg-white p-6 rounded-lg w-11/12 sm:w-1/2 md:w-1/3">
-            <iframe
-              src={pdfLink}
-              width="100%"
-              height="500px"
-              title="Notice PDF"
-            ></iframe>
-            <button
-              onClick={toggleModal}
-              className="mt-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
-            >
-              Close
-            </button>
+        <div
+          className="fixed inset-0 backdrop-blur-sm flex justify-center items-center z-50"
+          onClick={handleCloseModal}
+        >
+          <div
+            className="bg-white rounded-lg p-6 w-[90%] md:w-[70%] lg:w-[50%] shadow-lg"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-semibold">{title}</h2>
+              <button
+                className="text-gray-500 hover:text-red-500"
+                onClick={handleCloseModal}
+              >
+                ✖
+              </button>
+            </div>
+
+            {/* PDF or Image */}
+            {fileUrl.endsWith(".pdf") ? (
+              <iframe
+                src={fileUrl}
+                className="w-full h-[60vh] border rounded"
+                title="Notice PDF"
+              />
+            ) : (
+              <img
+                src={fileUrl}
+                alt="Notice"
+                className="w-full h-auto rounded-lg"
+              />
+            )}
+
+            {/* Download Button */}
+            <div className="mt-4 text-right">
+              <a
+                href={fileUrl}
+                download
+                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
+              >
+                Download
+              </a>
+            </div>
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 };
 

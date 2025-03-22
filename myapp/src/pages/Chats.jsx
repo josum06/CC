@@ -2,7 +2,7 @@ import React from 'react'
 
 function Chats() {
   return (
-    <div className='w-screen min-h-screen bg-green-200'>
+    <div className='min-h-screen'>
       hello i am chats
     </div>
   )
