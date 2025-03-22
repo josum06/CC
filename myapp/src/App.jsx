@@ -6,10 +6,10 @@ import Notice from './pages/Notice';
 import Post from './pages/Post';
 import FacultyPost from './pages/FacultyPost';
 import Events from './pages/Events';
-import Academics from './pages/Academics';
+
 import Network from './pages/Network';
 import Companies from './pages/Companies';
-import Contact from './pages/Contact';
+
 import Chats from './pages/Chats';
 
 function App() {
@@ -23,10 +23,10 @@ function App() {
                 <Route path="/Post" element={<Post />} />
                 <Route path="/FacultyPost" element={<FacultyPost />} />
                 <Route path="/Events" element={<Events />} />
-                <Route path="/Academics" element={<Academics />} />
+               
                 <Route path="/Network" element={<Network />} />
                 <Route path="/Companies" element={<Companies/>} />
-                <Route path="/Contact" element={<Contact/>} />
+             
                 <Route path="/Chats" element={<Chats/>} />
                </Route>
               </Routes>
