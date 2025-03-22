@@ -9,6 +9,7 @@ export default function SignUpPage() {
             formFieldLabel: "text-lg font-bold",
           },
         }}
+        signInUrl="/Login"
         additionalFields={[
           {
             name: "enrollmentNumber",
