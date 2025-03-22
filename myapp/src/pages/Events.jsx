@@ -107,7 +107,7 @@ const Event = () => {
 
   return (
     
-    <div className="min-h-screen p-6 bg-gray-100 flex flex-wrap gap-6 justify-center items-center">
+    <div className="min-h-screen p-6  flex flex-wrap gap-6 justify-center items-center">
       
       {eventData.map((event) => (
         <EventCard key={event.id} event={event} openModal={openModal} />

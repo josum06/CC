@@ -58,7 +58,7 @@ const Notice = () => {
   ];
 
   return (
-    <div className="p-4 md:p-10 bg-gray-50 min-h-screen">
+    <div className="p-4 md:p-10  min-h-screen">
       <h1 className="text-3xl font-bold mb-6 text-center">Notices</h1>
       <div className="grid gap-6">
         {notices.map((notice, index) => (

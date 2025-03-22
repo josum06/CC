@@ -33,7 +33,7 @@ const Network = () => {
   ];
 
   return (
-    <div className="bg-gray-100 min-h-screen py-4 px-4 sm:px-6 lg:px-8 ">
+    <div className=" min-h-screen py-4 px-4 sm:px-6 lg:px-8 ">
       <div className="max-w-7xl mx-auto flex flex-col lg:flex-row space-y-8 lg:space-y-0 lg:space-x-8">
         {/* Left Column for Posts */}
         <div className="lg:w-3/4 w-full flex flex-col space-y-6 items-center justify-center">
@@ -53,7 +53,7 @@ const Network = () => {
         </div>
 
         {/* Separator Line */}
-        <div className="w-full lg:w-px bg-gray-300 lg:block hidden"></div>
+        <div className="w-full lg:w-px  lg:block hidden"></div>
 
         {/* Right Column for Groups */}
         <div className="lg:w-1/4 w-full flex flex-col space-y-6">

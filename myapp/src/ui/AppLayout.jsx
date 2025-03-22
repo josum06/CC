@@ -9,9 +9,10 @@ const AppLayout = () => {
       
       <Navbar />
       
-      <main className="flex-1 overflow-y-scroll ">
+      <main className="flex-1 overflow-y-scroll bg-gray-50 overflow-x-hidden ">
         <div className="container mx-auto "><Outlet /></div>
       </main>
+
       <Footer/>
       
 
