@@ -1,5 +1,6 @@
 const express = require("express");
 const dotenv = require("dotenv");
+const bodyParser = require("body-parser");
 dotenv.config({ path: "./config.env" });
 const connectDb = require("./db");
 const authRouter = require('./routes/authRoutes');
@@ -17,6 +18,7 @@ app.use(
   })
 );
 
+app.use("/clerk-webhook", bodyParser.raw({ type: "application/json" }));
 app.use('/api/auth',authRouter);
 
 app.listen(3000, function () {
