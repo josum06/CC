@@ -10,8 +10,8 @@ import Chats from "./pages/Chats";
 import { ClerkProvider, useAuth } from "@clerk/clerk-react";
 import SignUpPage from "./pages/SignUp";
 import Login from "./pages/Login";
-import { SignedIn, SignedOut } from "@clerk/clerk-react";
 import Loader from "./components/Loader";
+import Home from "./pages/Home";
 const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 
 // Protected Route Component
@@ -47,7 +47,7 @@ function App() {
               </ProtectedRoute>
             }
           >
-            <Route path="/" index element={<Navigate to="/Notice" />} />
+            <Route path="/" index element={<Home />} />
             <Route path="/Notice" element={<Notice />} />
             <Route path="/Post" element={<Post />} />
             <Route path="/FacultyPost" element={<FacultyPost />} />
