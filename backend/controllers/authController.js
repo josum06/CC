@@ -11,15 +11,19 @@ exports.signUp = async (req, res) => {
     // Check if user already exists
     console.log("User checking...");
     let user = await User.findOne({ clerkId });
+
+    if (user) {
+      return res.status(200).json({ message: "User already exists.", user });
+    }
     console.log("User checked.");
-   
+
     if (!user) {
       user = new User({
         clerkId,
         fullName: `${firstName} ${lastName}`,
         email,
       });
-      
+
       console.log(user);
       console.log("Saving user...");
       await user.save();
