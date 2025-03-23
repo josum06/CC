@@ -16,7 +16,7 @@ function Home() {
         return;
       }
 
-      fetch("http://localhost:3000/api/auth/save-user", {
+      fetch("https://campus-connect-wi6v.onrender.com/api/auth/save-user", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
