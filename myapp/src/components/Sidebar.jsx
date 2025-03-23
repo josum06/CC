@@ -1,6 +1,7 @@
 import { SignOutButton } from "@clerk/clerk-react";
 import React from "react";
 import { FaTimes } from "react-icons/fa";
+import { Link } from "react-router-dom";
 
 const Sidebar = ({ isOpen, toggleSidebar }) => {
   return (
@@ -16,7 +17,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
 
       <div className="p-4">
         <ul>
-          <li className="py-2 border-b">Profile</li>
+          <Link  to='/Profile'className="py-2 border-b">Profile</Link>
           <li className="py-2 border-b">Settings</li>
           <SignOutButton redirectUrl="/Signup"/>
 

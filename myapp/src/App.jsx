@@ -12,6 +12,7 @@ import SignUpPage from "./pages/SignUp";
 import Login from "./pages/Login";
 import Loader from "./components/Loader";
 import Home from "./pages/Home";
+import UserProfilePage from "./pages/UserProfilePage";
 const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 
 // Protected Route Component
@@ -50,6 +51,7 @@ function App() {
             <Route path="/" index element={<Home />} />
             <Route path="/Notice" element={<Notice />} />
             <Route path="/Post" element={<Post />} />
+            <Route path="/Profile" element={<UserProfilePage />} />
             <Route path="/FacultyPost" element={<FacultyPost />} />
             <Route path="/Events" element={<Events />} />
             <Route path="/Network" element={<Network />} />
