@@ -13,8 +13,9 @@ import Login from "./pages/Login";
 import Loader from "./components/Loader";
 import Home from "./pages/Home";
 import YourAccount from "./pages/YourAccount";
-import CompleteYourProfile from "./pages/CompleteYourProfile";
+import YourProfile from "./pages/YourProfile";
 import NoNavFooterLayout from "./ui/NoNavFooterLayout"; // Import the new layout
+import PostProject from "./pages/PostProject";
 
 const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 
@@ -55,8 +56,8 @@ function App() {
           >
             <Route path="/" index element={<Home />} />
             <Route path="/Notice" element={<Notice />} />
-            <Route path="/Post" element={<Post />} />
-            <Route path="/FacultyPost" element={<FacultyPost />} />
+           
+          
             <Route path="/Events" element={<Events />} />
             <Route path="/Network" element={<Network />} />
             <Route path="/Companies" element={<Companies />} />
@@ -69,10 +70,13 @@ function App() {
           <Route element={<NoNavFooterLayout />}>
             {/* These pages don't require Navbar and Footer */}
             <Route path="/Login" element={<Login />} />
+            <Route path="/Post" element={<Post />} />
+            <Route path="/PostProject" element={<PostProject />} />
             <Route path="/Signup" element={<SignUpPage />} />
             <Route path="/YourAccount" element={<YourAccount />} />
+            <Route path="/FacultyPost" element={<FacultyPost />} />
             <Route path="/Chats" element={<Chats />} />
-            <Route path="/CompleteYourProfile" element={<CompleteYourProfile />} />
+            <Route path="/YourProfile" element={<YourProfile />} />
           </Route>
 
           <Route path="*" element={<Navigate to="/Login" />} />

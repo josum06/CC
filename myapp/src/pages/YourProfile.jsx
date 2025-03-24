@@ -5,7 +5,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { X, UploadCloud } from "lucide-react";
 import { useNavigate } from "react-router-dom"; // Added import for useNavigate
 
-const CompleteYourProfile = () => {
+const YourProfile = () => {
   const { user } = useUser();
   const [enrollmentNumber, setEnrollmentNumber] = useState("");
   const [rollNumber, setRollNumber] = useState("");
@@ -330,4 +330,4 @@ const CompleteYourProfile = () => {
   );
 };
 
-export default CompleteYourProfile;
+export default YourProfile;
