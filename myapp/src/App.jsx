@@ -12,7 +12,11 @@ import SignUpPage from "./pages/SignUp";
 import Login from "./pages/Login";
 import Loader from "./components/Loader";
 import Home from "./pages/Home";
-import UserProfilePage from "./pages/UserProfilePage";
+import YourAccount from "./pages/YourAccount";
+import YourProfile from "./pages/YourProfile";
+import NoNavFooterLayout from "./ui/NoNavFooterLayout"; // Import the new layout
+import PostProject from "./pages/PostProject";
+
 const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 
 // Protected Route Component
@@ -41,6 +45,8 @@ function App() {
         <Routes>
           <Route path="/Signup" element={<SignUpPage />} />
           <Route path="/Login" element={<Login />} />
+
+          {/* Protected routes with Navbar and Footer */}
           <Route
             element={
               <ProtectedRoute>
@@ -50,14 +56,29 @@ function App() {
           >
             <Route path="/" index element={<Home />} />
             <Route path="/Notice" element={<Notice />} />
-            <Route path="/Post" element={<Post />} />
-            <Route path="/Profile" element={<UserProfilePage />} />
-            <Route path="/FacultyPost" element={<FacultyPost />} />
+           
+          
             <Route path="/Events" element={<Events />} />
             <Route path="/Network" element={<Network />} />
             <Route path="/Companies" element={<Companies />} />
-            <Route path="/Chats" element={<Chats />} />
+            
+         
+           
           </Route>
+
+          {/* Routes without Navbar and Footer */}
+          <Route element={<NoNavFooterLayout />}>
+            {/* These pages don't require Navbar and Footer */}
+            <Route path="/Login" element={<Login />} />
+            <Route path="/Post" element={<Post />} />
+            <Route path="/PostProject" element={<PostProject />} />
+            <Route path="/Signup" element={<SignUpPage />} />
+            <Route path="/YourAccount" element={<YourAccount />} />
+            <Route path="/FacultyPost" element={<FacultyPost />} />
+            <Route path="/Chats" element={<Chats />} />
+            <Route path="/YourProfile" element={<YourProfile />} />
+          </Route>
+
           <Route path="*" element={<Navigate to="/Login" />} />
         </Routes>
       </BrowserRouter>

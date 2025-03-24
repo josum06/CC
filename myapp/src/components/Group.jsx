@@ -9,8 +9,8 @@ const Group = ({ group }) => {
   };
 
   return (
-    <div className="bg-white p-4 mb-4 rounded shadow-lg">
-      <div className="flex justify-between items-center">
+    <div className=" bg-white p-4 mb-4 rounded shadow-lg">
+      <div className=" flex justify-between items-center">
         <div>
           <p className="font-bold">{group.name}</p>
           <p className="text-sm text-gray-500">{group.members} Members</p>
