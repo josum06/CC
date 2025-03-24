@@ -1,5 +1,5 @@
 import { SignOutButton } from "@clerk/clerk-react";
-import React, { useEffect } from "react";
+import React from "react";
 import { FaTimes } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { IoSettings } from "react-icons/io5";
@@ -8,37 +8,6 @@ import { useUser } from "@clerk/clerk-react";
 const Sidebar = ({ isOpen, toggleSidebar }) => {
   const navigate = useNavigate();
   const { user } = useUser();
- 
-
-  useEffect(() => {
-    if (user) {
-      console.log("User object:", user);
-
-      const email = user?.primaryEmailAddress?.emailAddress || null;
-
-      if (!user.id || !email) {
-        console.error("User ID or Email is missing.");
-        return;
-      }
-
-      fetch("https://campus-connect-wi6v.onrender.com/api/auth/save-user", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          clerkId: user.id,
-          firstName: user.firstName,
-          lastName: user.lastName,
-          email,
-        }),
-      })
-        .then((res) => res.json())
-        .then((data) => console.log("User saved:", data))
-        .catch((err) => console.error("Error saving user:", err));
-    }
-  }, [user]);
-
   return (
     <div
       className={`fixed top-0 right-0 w-64 h-full bg-white shadow-lg z-50 transform transition-transform ${
