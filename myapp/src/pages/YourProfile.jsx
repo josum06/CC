@@ -263,14 +263,14 @@ const YourProfile = () => {
 
           {/* GitHub Email */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">GitHub Email *</label>
+            <label className="block text-sm font-medium text-gray-700">GitHub Url *</label>
             <div className="flex">
               <input
                 type="email"
                 value={githubEmail}
                 onChange={(e) => setGithubEmail(e.target.value)}
                 className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 transition"
-                placeholder="Enter your GitHub email"
+                placeholder="Enter your GitHub url"
                 required
               />
               <button

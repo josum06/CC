@@ -73,7 +73,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
 
         <button
           onClick={() => {
-            navigate("/CompleteYourProfile");
+            navigate("/YourProfile");
             toggleSidebar();
           }}
           className="mb-2 bg-orange-400 hover:bg-orange-500 hover:shadow w-full px-4 py-2 text-white font-semibold rounded-md cursor-pointer justify-center flex items-center"
