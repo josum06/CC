@@ -1,6 +1,8 @@
 import { SignUp } from "@clerk/clerk-react";
 
+
 export default function SignUpPage() {
+  
   return (
     <div className="flex items-center justify-center min-h-screen">
       <SignUp
@@ -9,6 +11,7 @@ export default function SignUpPage() {
             formFieldLabel: "text-lg font-bold",
           },
         }}
+        signInUrl="/Login"
         additionalFields={[
           {
             name: "enrollmentNumber",

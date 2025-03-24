@@ -1,35 +1,34 @@
-const  express = require("express");
+const express = require("express");
 const { ClerkExpressWithAuth, users } = require("@clerk/clerk-sdk-node");
-const  User =  require("../models/User.js"); // Mongoose model
-
+const User = require("../models/User.js"); // Mongoose model
+const authController = require("../controllers/authController.js");
 const router = express.Router();
 
-// Middleware to authenticate requests
-router.post("/register", ClerkExpressWithAuth(), async (req, res) => {
-  try {
-    const { enrollmentNumber, fullName } = req.body;
-    const clerkUserId = req.auth.userId;
+router.post("/save-user", authController.signUp);
+router.post("/clerk-webhook", async (req, res) => {
+    try {
+        const { id, first_name, last_name, email_addresses, image_url } = req.body.data;
 
-    if (!clerkUserId || !enrollmentNumber) {
-      return res.status(400).json({ message: "Missing required fields" });
+        if (!id) {
+            return res.status(400).json({ error: "Invalid webhook data" });
+        }
+
+        // Find and update user in MongoDB
+        const updatedUser = await User.findOneAndUpdate(
+            { clerkId: id },
+            {
+                fullName: `${first_name} ${last_name}`,
+                email: email_addresses[0]?.email_address,
+            },
+            { new: true, upsert: true } // Create if not found
+        );
+
+        console.log("User updated:", updatedUser);
+        res.status(200).json({ message: "User updated successfully" });
+    } catch (error) {
+        console.error("Webhook error:", error);
+        res.status(500).json({ error: "Internal Server Error" });
     }
-
-    const existingUser = await User.findOne({ enrollmentNumber });
-    if (existingUser) {
-      return res.status(400).json({ message: "User already exists" });
-    }
-
-    const newUser = new User({
-      clerkUserId,
-      enrollmentNumber,
-      fullName,
-    });
-
-    await newUser.save();
-    res.status(201).json({ message: "User registered successfully", newUser });
-  } catch (error) {
-    res.status(500).json({ message: "Error registering user", error });
-  }
 });
 
 module.exports = router;
