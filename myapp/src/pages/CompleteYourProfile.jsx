@@ -11,11 +11,11 @@ const CompleteYourProfile = () => {
   const [rollNumber, setRollNumber] = useState("");
   const [branchCode, setBranchCode] = useState("");
   const [batchYear, setBatchYear] = useState("");
-  const [profilePhoto, setProfilePhoto] = useState(null);
   const [idCardPhoto, setIdCardPhoto] = useState(null);
   const [isChecked, setIsChecked] = useState(false);
-  const [skills, setSkills] = useState([]);
-  const [input, setInput] = useState("");
+  const [githubEmail, setGithubEmail] = useState(""); // State for GitHub email
+  const [linkedinUrl, setLinkedinUrl] = useState(""); // State for LinkedIn URL
+
   const navigate = useNavigate();
 
   const allowedBranchCodes = {
@@ -94,28 +94,15 @@ const CompleteYourProfile = () => {
       !rollNumber ||
       !branchCode ||
       !batchYear ||
-      !profilePhoto ||
       !idCardPhoto ||
       !isChecked ||
-      skills.length === 0
+      !githubEmail ||
+      !linkedinUrl
     ) {
-      toast.error("Please fill all required fields, upload both images, add at least one skill, and agree to the terms.");
+      toast.error("Please fill all required fields, upload your ID card, and agree to the terms.");
       return false;
     }
     return true;
-  };
-
-  const handleAddSkill = () => {
-    if (input.trim() && !skills.includes(input.trim())) {
-      setSkills([...skills, input.trim()]);
-      setInput("");
-    } else {
-      toast.error("Enter a valid skill or avoid duplicates.");
-    }
-  };
-
-  const handleRemoveSkill = (skill) => {
-    setSkills(skills.filter((s) => s !== skill));
   };
 
   const handleSubmit = (e) => {
@@ -127,9 +114,9 @@ const CompleteYourProfile = () => {
       collegeName: COLLEGE_NAME,
       branch: allowedBranchCodes[branchCode],
       batchYear,
-      profilePhoto,
       idCardPhoto,
-      skills,
+      githubEmail,
+      linkedinUrl,
     });
 
     toast.success("Profile saved successfully!");
@@ -140,17 +127,29 @@ const CompleteYourProfile = () => {
     navigate(-1); // Goes back to the previous page
   };
 
+  // Function to verify GitHub email
+  const verifyGithubEmail = () => {
+    // Add your verification logic here
+    toast.success("GitHub email verified successfully!");
+  };
+
+  // Function to verify LinkedIn URL
+  const verifyLinkedinUrl = () => {
+    // Add your verification logic here
+    toast.success("LinkedIn URL verified successfully!");
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
       <button
         onClick={handleBack}
-        className="absolute top-4 left-4 text-3xl bg-gray-200 px-3 py-1 hover:cursor-pointer rounded-full  text-gray-600 hover:text-gray-800"
+        className="absolute top-4 left-4 text-3xl bg-gray-200 px-3 py-1 hover:cursor-pointer rounded-full text-gray-600 hover:text-gray-800"
       >
         &times; {/* "×" represents the cross sign */}
       </button>
       <div className="w-full max-w-4xl bg-white rounded-lg shadow-xl p-10">
         <h2 className="text-4xl font-bold text-gray-800 text-center mb-8">
-          Complete Your Profile
+        Your Profile
         </h2>
 
         {user && (
@@ -224,81 +223,81 @@ const CompleteYourProfile = () => {
             )}
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {/* Profile Photo */}
-           
-
-           {/* ID Card Photo */}
-           <div className="flex flex-col items-center">
-              <label className="text-sm font-medium mb-2">College ID Card *</label>
-              <div
-                className="relative w-72 h-48 rounded-lg border-2 border-gray-300 hover:shadow-lg transition"
-              >
-                <input
-                  type="file"
-                  accept="image/*"
-                  className="absolute inset-0 opacity-0 cursor-pointer"
-                  onChange={(e) => handleFileChange(e, setIdCardPhoto)}
-                  required
+          {/* ID Card Photo */}
+          <div className="flex flex-col ">
+            <label className="text-sm font-medium mb-2">College ID Card *</label>
+            <div className="relative w-72 h-48 rounded-lg border-2 border-gray-300 hover:shadow-lg transition">
+              <input
+                type="file"
+                accept="image/*"
+                className="absolute inset-0 opacity-0 cursor-pointer"
+                onChange={(e) => handleFileChange(e, setIdCardPhoto)}
+                required
+              />
+              {idCardPhoto ? (
+                <img
+                  src={idCardPhoto}
+                  alt="ID Card"
+                  className="w-full h-full object-cover"
                 />
-                {idCardPhoto ? (
-                  <img
-                    src={idCardPhoto}
-                    alt="ID Card"
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="flex items-center justify-center h-full text-gray-500">
-                    <UploadCloud size={40} />
-                  </div>
-                )}
-                {idCardPhoto && (
-                  <button
-                    onClick={() => removeImage(setIdCardPhoto)}
-                    className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-2 hover:bg-red-600"
-                    style={{ transform: "translate(50%, -50%)" }}
-                  >
-                    <X size={18} />
-                  </button>
-                )}
-              </div>
+              ) : (
+                <div className="flex items-center justify-center h-full text-gray-500">
+                  <UploadCloud size={40} />
+                </div>
+              )}
+              {idCardPhoto && (
+                <button
+                  onClick={() => removeImage(setIdCardPhoto)}
+                  className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-2 hover:bg-red-600"
+                  style={{ transform: "translate(50%, -50%)" }}
+                >
+                  <X size={18} />
+                </button>
+              )}
             </div>
           </div>
 
-          {/* Skills Section */}
-          <div className="mb-6">
-            <label className="block text-sm font-medium mb-2">Skills *</label>
+          {/* GitHub Email */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700">GitHub Email *</label>
             <div className="flex">
               <input
-                type="text"
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                placeholder="Add a skill"
-                className="p-2 border rounded-l-md w-full"
+                type="email"
+                value={githubEmail}
+                onChange={(e) => setGithubEmail(e.target.value)}
+                className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 transition"
+                placeholder="Enter your GitHub email"
+                required
               />
               <button
                 type="button"
-                onClick={handleAddSkill}
-                className="bg-blue-500 text-white px-4 rounded-r-md"
+                onClick={verifyGithubEmail}
+                className="ml-2 bg-blue-500 text-white px-4 rounded-lg hover:bg-blue-600 transition"
               >
-                Add
+                Verify
               </button>
             </div>
-            <div className="mt-4 flex flex-wrap gap-4">
-              {skills.map((skill) => (
-                <span
-                  key={skill}
-                  className="bg-gray-200 text-gray-800 py-1 px-4 rounded-full flex items-center space-x-2"
-                >
-                  <span>{skill}</span>
-                  <button
-                    onClick={() => handleRemoveSkill(skill)}
-                    className="text-red-500"
-                  >
-                    &times;
-                  </button>
-                </span>
-              ))}
+          </div>
+
+          {/* LinkedIn URL */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700">LinkedIn URL *</label>
+            <div className="flex">
+              <input
+                type="url"
+                value={linkedinUrl}
+                onChange={(e) => setLinkedinUrl(e.target.value)}
+                className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 transition"
+                placeholder="Enter your LinkedIn URL"
+                required
+              />
+              <button
+                type="button"
+                onClick={verifyLinkedinUrl}
+                className="ml-2 bg-blue-500 text-white px-4 rounded-lg hover:bg-blue-600 transition"
+              >
+                Verify
+              </button>
             </div>
           </div>
 
