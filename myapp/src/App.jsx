@@ -9,6 +9,9 @@ import Companies from './pages/Companies';
 import Chats from './pages/Chats';
 import { ClerkProvider } from "@clerk/clerk-react";
 import SignUpPage from './pages/SignUp';
+import CompleteYourProfile from './pages/CompleteYourProfile';
+import Settings from './pages/Settings';
+import ClassRoom from './pages/ClassRoom';
 
 
 
@@ -31,6 +34,9 @@ function App() {
                 <Route path="/Network" element={<Network />} />
                 <Route path="/Companies" element={<Companies/>} />
                 <Route path="/Chats" element={<Chats/>} />
+                <Route path="/CompleteYourProfile" element={<CompleteYourProfile/>} />
+                <Route path="/Settings" element={<Settings/>} />
+                <Route path="/ClassRoom" element={<ClassRoom/>} />
                </Route>
               </Routes>
       
