@@ -60,7 +60,7 @@ function App() {
             <Route path="/Events" element={<Events />} />
             <Route path="/Network" element={<Network />} />
             <Route path="/Companies" element={<Companies />} />
-            <Route path="/Chats" element={<Chats />} />
+            
          
            
           </Route>
@@ -71,6 +71,7 @@ function App() {
             <Route path="/Login" element={<Login />} />
             <Route path="/Signup" element={<SignUpPage />} />
             <Route path="/YourAccount" element={<YourAccount />} />
+            <Route path="/Chats" element={<Chats />} />
             <Route path="/CompleteYourProfile" element={<CompleteYourProfile />} />
           </Route>
 

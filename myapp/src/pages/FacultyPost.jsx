@@ -29,7 +29,7 @@ const FacultyPost = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
+    <div className="min-h-[80vh] flex items-center justify-center bg-gray-100 p-4">
       <div className="w-full max-w-2xl bg-white shadow-lg rounded-2xl p-6">
         <h1 className="text-2xl font-bold mb-4">Faculty Post Form</h1>
 
@@ -72,7 +72,7 @@ const FacultyPost = () => {
               className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               required
             >
-              <option value="Academics">Academics</option>
+              
               <option value="Notice">Notice</option>
               <option value="Events">Events</option>
               <option value="Placement">Placement</option>

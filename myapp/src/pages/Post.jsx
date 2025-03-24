@@ -28,9 +28,9 @@ const PostPage = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
+    <div className="min-h-[80vh] flex items-center justify-center bg-gray-100 p-4">
       <div className="w-full max-w-2xl bg-white shadow-lg rounded-2xl p-6">
-        <h1 className="text-2xl font-bold mb-4">Faculty Post Form</h1>
+        <h1 className="text-2xl font-bold mb-4">Post Form</h1>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Title */}

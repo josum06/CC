@@ -6,7 +6,7 @@ const Footer = () => {
   const navigate = useNavigate();
   return (
     <div className="sticky bottom-0 left-0 right-0 z-10 w-full bg-transparent shadow-md  overflow-x-hidden">
-      <div className="container mx-auto px-2 py-2 flex justify-center items-center gap-2 sm:gap-4 md:gap-6 lg:gap-8">
+      <div className="container mx-auto px-2 py-2 flex justify-center items-center gap-7 sm:gap-9 md:gap-11 lg:gap-13">
 
         {/* Left Icons */}
         <button onClick={() => navigate("/Notice")} className="flex flex-col items-center cursor-pointer hover:text-blue-500">

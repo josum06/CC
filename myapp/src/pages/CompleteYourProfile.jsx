@@ -142,7 +142,11 @@ const CompleteYourProfile = () => {
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
       <button
-        onClick={handleBack}
+         
+         onClick={() => {
+           navigate("/Home")
+           
+         }}
         className="absolute top-4 left-4 text-3xl bg-gray-200 px-3 py-1 hover:cursor-pointer rounded-full text-gray-600 hover:text-gray-800"
       >
         &times; {/* "×" represents the cross sign */}
@@ -291,13 +295,7 @@ const CompleteYourProfile = () => {
                 placeholder="Enter your LinkedIn URL"
                 required
               />
-              <button
-                type="button"
-                onClick={verifyLinkedinUrl}
-                className="ml-2 bg-blue-500 text-white px-4 rounded-lg hover:bg-blue-600 transition"
-              >
-                Verify
-              </button>
+              
             </div>
           </div>
 
