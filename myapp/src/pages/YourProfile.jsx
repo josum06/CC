@@ -11,12 +11,65 @@ const YourProfile = () => {
   const navigate = useNavigate();
 
   const [enrollmentNumber, setEnrollmentNumber] = useState("");
+  const [rollNumber, setRollNumber] = useState("");
+  const [branchCode, setBranchCode] = useState("");
+  const [batchYear, setBatchYear] = useState("");
   const [githubUrl, setGithubUrl] = useState("");
   const [linkedinUrl, setLinkedinUrl] = useState("");
   const [skills, setSkills] = useState([]);
   const [aboutMe, setAboutMe] = useState("");
   const [idCardPhoto, setIdCardPhoto] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+
+  const allowedBranchCodes = {
+    "027": "Computer Science Engineering",
+    "031": "Information Technology",
+    "119": "Artificial Intelligence and Data Science",
+    "049": "Electrical Engineering",
+    "028": "Electronics and Communication Engineering",
+    "157": "Computer Science Engineering in Data Science",
+  };
+
+  const VALID_COLLEGE_CODE = "208";
+  const COLLEGE_NAME = "Bhagwan Parshuram Institute of Technology";
+
+
+   const handleEnrollmentChange = (e) => {
+      const value = e.target.value;
+      if (/^\d*$/.test(value)) {
+        setEnrollmentNumber(value);
+        if (value.length === 11) {
+          const roll = value.substring(0, 3);
+          const college = value.substring(3, 6);
+          const branch = value.substring(6, 9);
+          const batch = value.substring(9, 11);
+  
+          if (college !== VALID_COLLEGE_CODE) {
+            toast.error("Your college is not registered.");
+            resetFields();
+            return;
+          }
+  
+          if (!allowedBranchCodes[branch]) {
+            toast.error("Invalid branch code.");
+            resetFields();
+            return;
+          }
+  
+          setRollNumber(roll);
+          setBranchCode(branch);
+          setBatchYear(`20${batch}`);
+        } else {
+          resetFields();
+        }
+      }
+    };
+
+    const resetFields = () => {
+      setRollNumber("");
+      setBranchCode("");
+      setBatchYear("");
+    };
 
   useEffect(() => {
     if (user) {
@@ -130,11 +183,52 @@ const YourProfile = () => {
             <input
               type="text"
               value={enrollmentNumber}
-              onChange={(e) => setEnrollmentNumber(e.target.value)}
+              onChange={handleEnrollmentChange}
               className="w-full p-3 border rounded-lg"
               placeholder="Enter enrollment number"
             />
           </div>
+           
+          {enrollmentNumber && (
+              <>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Roll Number</label>
+                  <input
+                    type="text"
+                    value={enrollmentNumber.substring(0, 3)}
+                    readOnly
+                    className="w-full p-3 bg-gray-100 rounded-lg"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">College</label>
+                  <input
+                    type="text"
+                    value={COLLEGE_NAME}
+                    readOnly
+                    className="w-full p-3 bg-gray-100 rounded-lg"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Branch</label>
+                  <input
+                    type="text"
+                    value={allowedBranchCodes[enrollmentNumber.substring(6,9)] || ""}
+                    readOnly
+                    className="w-full p-3 bg-gray-100 rounded-lg"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Batch Year</label>
+                  <input
+                    type="text"
+                    value={"20" + enrollmentNumber.substring(9, 11)}
+                    readOnly
+                    className="w-full p-3 bg-gray-100 rounded-lg"
+                  />
+                </div>
+              </>
+            )}
 
           <div>
             <label className="block text-sm font-medium text-gray-700">
