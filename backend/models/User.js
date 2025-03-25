@@ -10,6 +10,11 @@ const UserSchema = new mongoose.Schema({
   },
   fullName: { type: String, required: true },
   email: { type: String, required: true },
+  skills: { type: Array },
+  githubUrl: { type: String },
+  linkedinUrl: { type: String },
+  collegeIDCard: { type: String },
+  aboutMe: { type: String },
 });
 
 module.exports = mongoose.model("User", UserSchema);
