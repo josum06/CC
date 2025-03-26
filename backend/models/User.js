@@ -15,6 +15,7 @@ const UserSchema = new mongoose.Schema({
   linkedinUrl: { type: String },
   collegeIDCard: { type: String },
   aboutMe: { type: String },
+  status: { type: Boolean, default: false },
 });
 
 module.exports = mongoose.model("User", UserSchema);

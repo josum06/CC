@@ -5,6 +5,9 @@ import axios from "axios";
 import { X, UploadCloud } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import "react-toastify/dist/ReactToastify.css";
+import { FaEdit } from "react-icons/fa";
+
+
 
 const YourProfile = () => {
   const { user } = useUser();
@@ -20,6 +23,7 @@ const YourProfile = () => {
   const [aboutMe, setAboutMe] = useState("");
   const [idCardPhoto, setIdCardPhoto] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [status ,setStatus] = useState(false);
 
   const allowedBranchCodes = {
     "027": "Computer Science Engineering",
@@ -63,6 +67,7 @@ const YourProfile = () => {
           resetFields();
         }
       }
+    
     };
 
     const resetFields = () => {
@@ -92,6 +97,7 @@ const YourProfile = () => {
       if (data.collegeIDCard) {
         setIdCardPhoto(data.collegeIDCard);
       }
+      setStatus(data.status);
     } catch (error) {
       console.error("Error fetching profile:", error);
       toast.error("Failed to load profile.");
@@ -149,6 +155,7 @@ const YourProfile = () => {
   };
 
   return (
+
     <div className="min-h-screen flex items-center justify-center p-4 bg-gray-50">
       <button
         onClick={() => navigate("/Home")}
@@ -156,10 +163,16 @@ const YourProfile = () => {
       >
         &times;
       </button>
-      <div className="w-full max-w-4xl bg-white rounded-lg shadow-xl p-10">
+      <div className= "w-full max-w-4xl bg-white rounded-lg shadow-xl p-10">
         <h2 className="text-4xl font-bold text-gray-800 text-center mb-8">
           Your Profile
         </h2>
+        <button 
+           onClick={()=> setStatus(false)}
+           className="absolute top-4 right-4 text-3xl bg-gray-200 px-3 py-1 hover:cursor-pointer rounded-full text-gray-600 hover:text-gray-800"
+           >
+          <FaEdit/>
+        </button>
 
         {user && (
           <div className="text-center mb-8">
@@ -175,19 +188,30 @@ const YourProfile = () => {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Enrollment Number
-            </label>
-            <input
-              type="text"
-              value={enrollmentNumber}
-              onChange={handleEnrollmentChange}
-              className="w-full p-3 border rounded-lg"
-              placeholder="Enter enrollment number"
-            />
-          </div>
+        <form 
+          onSubmit={handleSubmit} 
+          className="space-y-6">
+        <div>
+          <label className="block text-sm font-medium text-gray-700">
+            Enrollment Number
+          </label>
+          <input
+            type="text"
+            disabled={status}
+            value={enrollmentNumber}
+            required
+            onChange={(e) => {
+              if (e.target.value.length <= 11) {
+                handleEnrollmentChange(e);
+              }
+            }}
+            className={`w-full p-3 border rounded-lg ${
+              status ? "bg-gray-100" : "bg-white"
+            }`}
+            placeholder="Enter enrollment number"
+          />
+        </div>
+
            
           {enrollmentNumber && (
               <>
@@ -236,9 +260,12 @@ const YourProfile = () => {
             </label>
             <input
               type="url"
+              disabled={status}
               value={githubUrl}
               onChange={(e) => setGithubUrl(e.target.value)}
-              className="w-full p-3 border rounded-lg"
+              className={`w-full p-3 border rounded-lg ${
+                status ? "bg-gray-100" : "bg-white"
+              }`}
               placeholder="Enter GitHub URL"
             />
           </div>
@@ -249,9 +276,12 @@ const YourProfile = () => {
             </label>
             <input
               type="url"
+              disabled={status}
               value={linkedinUrl}
               onChange={(e) => setLinkedinUrl(e.target.value)}
-              className="w-full p-3 border rounded-lg"
+              className={`w-full p-3 border rounded-lg ${
+                status ? "bg-gray-100" : "bg-white"
+              }`}
               placeholder="Enter LinkedIn URL"
             />
           </div>
@@ -262,9 +292,12 @@ const YourProfile = () => {
             </label>
             <input
               type="text"
+              disabled={status}
               value={skills.join(", ")}
               onChange={(e) => setSkills(e.target.value.split(","))}
-              className="w-full p-3 border rounded-lg"
+              className={`w-full p-3 border rounded-lg ${
+                status ? "bg-gray-100" : "bg-white"
+              }`}
               placeholder="Enter skills (comma separated)"
             />
           </div>
@@ -275,8 +308,11 @@ const YourProfile = () => {
             </label>
             <textarea
               value={aboutMe}
+              disabled={status}
               onChange={(e) => setAboutMe(e.target.value)}
-              className="w-full p-3 border rounded-lg"
+              className={`w-full p-3 border rounded-lg ${
+                status ? "bg-gray-100" : "bg-white"
+              }`}
               placeholder="Tell something about yourself"
             ></textarea>
           </div>
@@ -284,12 +320,13 @@ const YourProfile = () => {
           {/* ID Card Photo Upload */}
           <div>
             <label className="block text-sm font-medium text-gray-700">
-              College ID Card (Optional)
+              College ID Card
             </label>
             <div className="relative w-72 h-48 border-2 border-gray-300 rounded-lg hover:shadow-lg transition">
               <input
                 type="file"
                 accept="image/*"
+                required={!idCardPhoto}
                 className="absolute inset-0 opacity-0 cursor-pointer"
                 onChange={handleFileChange}
               />

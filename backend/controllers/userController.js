@@ -11,6 +11,7 @@ const uploadProfile = async (req, res) => {
       linkedinUrl,
       skills,
       aboutMe,
+      status
     } = req.body;
 
     let imageUrl = "";
@@ -29,13 +30,14 @@ const uploadProfile = async (req, res) => {
       });
 
       updateData.collegeIDCard = uploadedImage.url; // Store ImageKit URL
+      updateData.status = true;
     }
 
     // Save user data in MongoDB
     const updatedUser = await User.findOneAndUpdate(
       { clerkId }, // Find by clerkId
       { $set: updateData }, // Update only provided fields
-      { new: true } // Return updated document
+      { new: true } , // Return updated document
     );
 
     if (!updatedUser) {
