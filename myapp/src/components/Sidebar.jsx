@@ -75,7 +75,18 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
           className="bg-red-400 w-full px-4 py-2 hover:bg-red-500 hover:shadow text-white font-semibold rounded-md cursor-pointer"
           redirectUrl="/Signup"
         />
+
+       <button
+          onClick={() => {
+            navigate("/AuthorityRegister");
+            toggleSidebar();
+          }}
+          className="mb-2 bg-gray-200 hover:bg-gray-300 hover:shadow w-full px-4 py-2 text-gray-900 font-semibold rounded-md cursor-pointer justify-center flex items-center"
+        >
+          <IoSettings className="me-1" /> Authority
+        </button>
       </div>
+
     </div>
   );
 };

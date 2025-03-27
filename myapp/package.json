@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@clerk/clerk-react": "^5.25.2",
+    "@clerk/elements": "^0.23.8",
     "@tailwindcss/vite": "^4.0.14",
     "axios": "^1.8.4",
     "body-parser": "^1.20.3",

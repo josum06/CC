@@ -16,6 +16,8 @@ import YourAccount from "./pages/YourAccount";
 import YourProfile from "./pages/YourProfile";
 import NoNavFooterLayout from "./ui/NoNavFooterLayout"; // Import the new layout
 import PostProject from "./pages/PostProject";
+import AuthorityRegister from "./pages/AuthorityRegister";
+
 
 const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 
@@ -73,7 +75,8 @@ function App() {
             <Route path="/Post" element={<Post />} />
             <Route path="/PostProject" element={<PostProject />} />
             <Route path="/Signup" element={<SignUpPage />} />
-            <Route path="/YourAccount" element={<YourAccount />} />
+            <Route path="/AuthorityRegister" element={<AuthorityRegister />} />
+            <Route path="/YourAccount" element={<AuthorityRegister />} />
             <Route path="/FacultyPost" element={<FacultyPost />} />
             <Route path="/Chats" element={<Chats />} />
             <Route path="/YourProfile" element={<YourProfile />} />

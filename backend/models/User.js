@@ -15,6 +15,10 @@ const UserSchema = new mongoose.Schema({
   linkedinUrl: { type: String },
   collegeIDCard: { type: String },
   aboutMe: { type: String },
+  designation: { 
+    type: String 
+  },
+  collegeId: { type: String },
   status: { type: Boolean, default: false },
 });
 
