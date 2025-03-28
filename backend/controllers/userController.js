@@ -11,10 +11,9 @@ const uploadProfile = async (req, res) => {
       linkedinUrl,
       skills,
       aboutMe,
-      status
+      designation,
+      collegeId,
     } = req.body;
-
-    let imageUrl = "";
 
     let updateData = {}; // Store only provided fields
     if (enrollmentNumber) updateData.enrollmentNumber = enrollmentNumber;
@@ -22,11 +21,24 @@ const uploadProfile = async (req, res) => {
     if (linkedinUrl) updateData.linkedinUrl = linkedinUrl;
     if (aboutMe) updateData.aboutMe = aboutMe;
     if (skills) updateData.skills = JSON.parse(skills);
+    if (designation) updateData.designation = designation;
+    if (collegeId) updateData.collegeId = collegeId;
+
+    // Assign role based on designation
+    if (designation) {
+      if (["principal", "dean"].includes(designation.toLowerCase())) {
+        updateData.role = "admin";
+      } else if (
+        ["teacher", "faculty", "hod"].includes(designation.toLowerCase())
+      ) {
+        updateData.role = "faculty";
+      }
+    }
 
     if (req.file) {
       const uploadedImage = await imagekit.upload({
         file: req.file.buffer, // File buffer from multer
-        fileName: `${enrollmentNumber}_idcard.jpg`, // Unique filename
+        fileName: `${enrollmentNumber || collegeId}_idcard.jpg`, // Unique filename
       });
 
       updateData.collegeIDCard = uploadedImage.url; // Store ImageKit URL
@@ -37,7 +49,7 @@ const uploadProfile = async (req, res) => {
     const updatedUser = await User.findOneAndUpdate(
       { clerkId }, // Find by clerkId
       { $set: updateData }, // Update only provided fields
-      { new: true } , // Return updated document
+      { new: true } // Return updated document
     );
 
     if (!updatedUser) {
@@ -53,7 +65,7 @@ const uploadProfile = async (req, res) => {
   }
 };
 
-getUserProfile = async (req, res) => {
+const getUserProfile = async (req, res) => {
   try {
     const { clerkId } = req.params;
 
