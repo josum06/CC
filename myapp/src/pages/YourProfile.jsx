@@ -1,378 +1,329 @@
-import React, { useState, useEffect } from "react";
-import { useUser } from "@clerk/clerk-react";
-import { toast, ToastContainer } from "react-toastify";
-import axios from "axios";
-import { X, UploadCloud } from "lucide-react";
-import { useNavigate } from "react-router-dom";
-import "react-toastify/dist/ReactToastify.css";
-import { FaEdit } from "react-icons/fa";
+import { useState, useRef } from 'react';
 
+const UserProfile = () => {
+  const [user, setUser] = useState({
+    profilePicture: 'https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1180&q=80',
+    name: 'Alex Johnson',
+    email: 'alex.johnson@university.edu',
+    enrollmentNo: 'CS20230045',
+    branch: 'Computer Science',
+    collegeIdPhoto: 'https://images.unsplash.com/photo-1586287011575-a2310347ca9e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=880&q=80',
+    skills: ['React.js', 'Node.js', 'Python', 'Machine Learning', 'Database Design'],
+    aboutMe: 'Senior Computer Science student with a passion for full-stack development and AI. Currently working on a research project about neural networks and their applications in healthcare. Looking for internship opportunities in software engineering.',
+    githubUrl: 'https://github.com/alexjohnson',
+    linkedInUrl: 'https://linkedin.com/in/alexjohnson'
+  });
 
+  const [editMode, setEditMode] = useState(false);
+  const [tempUser, setTempUser] = useState({...user});
+  const [newSkill, setNewSkill] = useState('');
+  
+  const profilePicInputRef = useRef(null);
+  const idCardInputRef = useRef(null);
 
-const YourProfile = () => {
-  const { user } = useUser();
-  const navigate = useNavigate();
-
-  const [enrollmentNumber, setEnrollmentNumber] = useState("");
-  const [rollNumber, setRollNumber] = useState("");
-  const [branchCode, setBranchCode] = useState("");
-  const [batchYear, setBatchYear] = useState("");
-  const [githubUrl, setGithubUrl] = useState("");
-  const [linkedinUrl, setLinkedinUrl] = useState("");
-  const [skills, setSkills] = useState([]);
-  const [aboutMe, setAboutMe] = useState("");
-  const [idCardPhoto, setIdCardPhoto] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [status ,setStatus] = useState(false);
-
-  const allowedBranchCodes = {
-    "027": "Computer Science Engineering",
-    "031": "Information Technology",
-    "119": "Artificial Intelligence and Data Science",
-    "049": "Electrical Engineering",
-    "028": "Electronics and Communication Engineering",
-    "157": "Computer Science Engineering in Data Science",
+  const handleInputChange = (field, value) => {
+    setTempUser({...tempUser, [field]: value});
   };
 
-  const VALID_COLLEGE_CODE = "208";
-  const COLLEGE_NAME = "Bhagwan Parshuram Institute of Technology";
+  const handleSave = () => {
+    setUser({...tempUser});
+    setEditMode(false);
+  };
 
+  const handleCancel = () => {
+    setTempUser({...user});
+    setEditMode(false);
+  };
 
-   const handleEnrollmentChange = (e) => {
-      const value = e.target.value;
-      if (/^\d*$/.test(value)) {
-        setEnrollmentNumber(value);
-        if (value.length === 11) {
-          const roll = value.substring(0, 3);
-          const college = value.substring(3, 6);
-          const branch = value.substring(6, 9);
-          const batch = value.substring(9, 11);
-  
-          if (college !== VALID_COLLEGE_CODE) {
-            toast.error("Your college is not registered.");
-            resetFields();
-            return;
-          }
-  
-          if (!allowedBranchCodes[branch]) {
-            toast.error("Invalid branch code.");
-            resetFields();
-            return;
-          }
-  
-          setRollNumber(roll);
-          setBranchCode(branch);
-          setBatchYear(`20${batch}`);
-        } else {
-          resetFields();
-        }
-      }
-    
-    };
-
-    const resetFields = () => {
-      setRollNumber("");
-      setBranchCode("");
-      setBatchYear("");
-    };
-
-  useEffect(() => {
-    if (user) {
-      fetchUserProfile();
-    }
-  }, [user]);
-
-  const fetchUserProfile = async () => {
-    try {
-      const response = await axios.get(
-        `http://localhost:3000/api/user/profile/${user.id}`
-      );
-      const data = response.data;
-      console.log(data);
-      setEnrollmentNumber(data.enrollmentNumber || "");
-      setGithubUrl(data.githubUrl || "");
-      setLinkedinUrl(data.linkedinUrl || "");
-      setSkills(data.skills || []);
-      setAboutMe(data.aboutMe || "");
-      if (data.collegeIDCard) {
-        setIdCardPhoto(data.collegeIDCard);
-      }
-      setStatus(data.status);
-    } catch (error) {
-      console.error("Error fetching profile:", error);
-      toast.error("Failed to load profile.");
+  const handleSkillAdd = () => {
+    if (newSkill.trim() !== '' && !tempUser.skills.includes(newSkill)) {
+      setTempUser({
+        ...tempUser,
+        skills: [...tempUser.skills, newSkill]
+      });
+      setNewSkill('');
     }
   };
 
-  const handleFileChange = (e) => {
+  const handleSkillRemove = (index) => {
+    const updatedSkills = tempUser.skills.filter((_, i) => i !== index);
+    setTempUser({...tempUser, skills: updatedSkills});
+  };
+
+  const handleImageUpload = (e, field) => {
     const file = e.target.files[0];
     if (file) {
-      const validTypes = ["image/jpeg", "image/png", "image/jpg"];
-      if (!validTypes.includes(file.type)) {
-        toast.error("Only JPG, JPEG, and PNG files are allowed.");
-        return;
-      }
-      setIdCardPhoto(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setTempUser({
+          ...tempUser,
+          [field]: reader.result
+        });
+      };
+      reader.readAsDataURL(file);
     }
   };
 
-  const removeImage = () => {
-    setIdCardPhoto(null);
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsLoading(true);
-
-    try {
-      const formData = new FormData();
-      formData.append("clerkId", user?.id);
-      if (enrollmentNumber)
-        formData.append("enrollmentNumber", enrollmentNumber);
-      if (githubUrl) formData.append("githubUrl", githubUrl);
-      if (linkedinUrl) formData.append("linkedinUrl", linkedinUrl);
-      if (aboutMe) formData.append("aboutMe", aboutMe);
-      if (skills.length) formData.append("skills", JSON.stringify(skills));
-      if (idCardPhoto && typeof idCardPhoto !== "string")
-        formData.append("idCardPhoto", idCardPhoto);
-
-      const response = await axios.patch(
-        "http://localhost:3000/api/user/upload-profile",
-        formData,
-        {
-          headers: { "Content-Type": "multipart/form-data" },
-        }
-      );
-
-      toast.success("Profile updated successfully!");
-      console.log("Updated User:", response.data.user);
-    } catch (error) {
-      console.error("Error updating profile:", error);
-      toast.error("Failed to update profile. Please try again.");
-    } finally {
-      setIsLoading(false);
-    }
+  const triggerFileInput = (ref) => {
+    ref.current.click();
   };
 
   return (
-
-    <div className="min-h-screen flex items-center justify-center p-4 bg-gray-50">
-      <button
-        onClick={() => navigate("/Home")}
-        className="absolute top-4 left-4 text-3xl bg-gray-200 px-3 py-1 hover:cursor-pointer rounded-full text-gray-600 hover:text-gray-800"
-      >
-        &times;
-      </button>
-      <div className= "w-full max-w-4xl bg-white rounded-lg shadow-xl p-10">
-        <h2 className="text-4xl font-bold text-gray-800 text-center mb-8">
-          Your Profile
-        </h2>
-        <button 
-           onClick={()=> setStatus(false)}
-           className="absolute top-4 right-4 text-3xl bg-gray-200 px-3 py-1 hover:cursor-pointer rounded-full text-gray-600 hover:text-gray-800"
-           >
-          <FaEdit/>
-        </button>
-
-        {user && (
-          <div className="text-center mb-8">
-            <img
-              className="w-28 h-28 rounded-full"
-              src={user?.imageUrl}
-              alt="profile"
-            />
-            <p className="text-lg font-medium">{user.fullName}</p>
-            <p className="text-gray-600">
-              {user.primaryEmailAddress?.emailAddress}
-            </p>
+    <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-6xl mx-auto">
+        {/* Header */}
+        <div className="text-left mb-8">
+          <div className="flex justify-between items-center">
+            
+            <h1 className="text-3xl font-bold text-gray-900">Student Profile</h1>
+            {!editMode ? (
+              <button
+                onClick={() => setEditMode(true)}
+                className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                  <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                </svg>
+                Edit Profile
+              </button>
+            ) : (
+              <div className="flex space-x-2">
+                <button
+                  onClick={handleCancel}
+                  className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSave}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
+                >
+                  Save Changes
+                </button>
+              </div>
+            )}
           </div>
-        )}
-
-        <form 
-          onSubmit={handleSubmit} 
-          className="space-y-6">
-        <div>
-          <label className="block text-sm font-medium text-gray-700">
-            Enrollment Number
-          </label>
-          <input
-            type="text"
-            disabled={status}
-            value={enrollmentNumber}
-            required
-            onChange={(e) => {
-              if (e.target.value.length <= 11) {
-                handleEnrollmentChange(e);
-              }
-            }}
-            className={`w-full p-3 border rounded-lg ${
-              status ? "bg-gray-100" : "bg-white"
-            }`}
-            placeholder="Enter enrollment number"
-          />
+          <p className="mt-2 text-lg text-gray-600">Manage your academic and professional information</p>
         </div>
 
-           
-          {enrollmentNumber && (
-              <>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Roll Number</label>
-                  <input
-                    type="text"
-                    value={enrollmentNumber.substring(0, 3)}
-                    readOnly
-                    className="w-full p-3 bg-gray-100 rounded-lg"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">College</label>
-                  <input
-                    type="text"
-                    value={COLLEGE_NAME}
-                    readOnly
-                    className="w-full p-3 bg-gray-100 rounded-lg"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Branch</label>
-                  <input
-                    type="text"
-                    value={allowedBranchCodes[enrollmentNumber.substring(6,9)] || ""}
-                    readOnly
-                    className="w-full p-3 bg-gray-100 rounded-lg"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Batch Year</label>
-                  <input
-                    type="text"
-                    value={"20" + enrollmentNumber.substring(9, 11)}
-                    readOnly
-                    className="w-full p-3 bg-gray-100 rounded-lg"
-                  />
-                </div>
-              </>
-            )}
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              GitHub URL
-            </label>
-            <input
-              type="url"
-              disabled={status}
-              value={githubUrl}
-              onChange={(e) => setGithubUrl(e.target.value)}
-              className={`w-full p-3 border rounded-lg ${
-                status ? "bg-gray-100" : "bg-white"
-              }`}
-              placeholder="Enter GitHub URL"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              LinkedIn URL
-            </label>
-            <input
-              type="url"
-              disabled={status}
-              value={linkedinUrl}
-              onChange={(e) => setLinkedinUrl(e.target.value)}
-              className={`w-full p-3 border rounded-lg ${
-                status ? "bg-gray-100" : "bg-white"
-              }`}
-              placeholder="Enter LinkedIn URL"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Skills
-            </label>
-            <input
-              type="text"
-              disabled={status}
-              value={skills.join(", ")}
-              onChange={(e) => setSkills(e.target.value.split(","))}
-              className={`w-full p-3 border rounded-lg ${
-                status ? "bg-gray-100" : "bg-white"
-              }`}
-              placeholder="Enter skills (comma separated)"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              About Me
-            </label>
-            <textarea
-              value={aboutMe}
-              disabled={status}
-              onChange={(e) => setAboutMe(e.target.value)}
-              className={`w-full p-3 border rounded-lg ${
-                status ? "bg-gray-100" : "bg-white"
-              }`}
-              placeholder="Tell something about yourself"
-            ></textarea>
-          </div>
-
-          {/* ID Card Photo Upload */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              College ID Card
-            </label>
-            <div className="relative w-72 h-48 border-2 border-gray-300 rounded-lg hover:shadow-lg transition">
-              <input
-                type="file"
-                accept="image/*"
-                required={!idCardPhoto}
-                className="absolute inset-0 opacity-0 cursor-pointer"
-                onChange={handleFileChange}
-              />
-              {idCardPhoto ? (
+        {/* Main Card */}
+        <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+          <div className="md:flex">
+            {/* Left Column - Profile Picture */}
+            <div className="md:w-1/3 bg-gradient-to-b from-blue-600 to-blue-800 p-6 flex flex-col items-center">
+              <div className="relative mb-6">
                 <img
-                  src={
-                    typeof idCardPhoto === "string"
-                      ? idCardPhoto // If it's a URL, use it directly
-                      : idCardPhoto
-                      ? URL.createObjectURL(idCardPhoto) // If it's a file, create an object URL
-                      : ""
-                  }
-                  alt="ID Card"
-                  className="w-full h-full object-cover"
+                  src={editMode ? tempUser.profilePicture : user.profilePicture}
+                  alt="Profile"
+                  className="w-40 h-40 rounded-full object-cover border-4 border-white shadow-lg"
                 />
-              ) : (
-                <div className="flex items-center justify-center h-full text-gray-500">
-                  <UploadCloud size={40} />
+               
+              </div>
+
+              {/* College ID Card */}
+              <div className="w-full mt-8">
+                <h3 className="text-lg font-semibold text-white mb-3">University ID Card</h3>
+                <div className="relative bg-white rounded-lg overflow-hidden shadow-md">
+                  <img
+                    src={editMode ? tempUser.collegeIdPhoto : user.collegeIdPhoto}
+                    alt="College ID"
+                    className="w-56 h-52 object-cover"
+                  />
+                  {editMode && (
+                    <>
+                      <button
+                        onClick={() => triggerFileInput(idCardInputRef)}
+                        className="absolute top-3 right-3 bg-blue-600 text-white p-2 rounded-full shadow-md hover:bg-blue-700 transition"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                          <path fillRule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clipRule="evenodd" />
+                        </svg>
+                      </button>
+                      <input
+                        type="file"
+                        ref={idCardInputRef}
+                        onChange={(e) => handleImageUpload(e, 'collegeIdPhoto')}
+                        accept="image/*"
+                        className="hidden"
+                      />
+                    </>
+                  )}
                 </div>
-              )}
-              {idCardPhoto && (
-                <button
-                  onClick={removeImage}
-                  className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-2 hover:bg-red-600"
-                >
-                  <X size={18} />
-                </button>
-              )}
+              </div>
+            </div>
+
+            {/* Right Column - User Information */}
+            <div className="md:w-2/3 p-8">
+              {/* Personal Information Section */}
+              <div className="mb-8">
+                <h2 className="text-xl font-bold text-gray-800 border-b pb-2 mb-4">Personal Information</h2>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Name */}
+                  <div className="space-y-1">
+                    <label className="text-sm font-medium text-gray-600">Full Name</label>
+                    
+                      <p className="text-gray-800 font-medium">{user.name}</p>
+                    
+                  </div>
+
+                  {/* Email */}
+                  <div className="space-y-1">
+                    <label className="text-sm font-medium text-gray-600">Email Address</label>
+                    
+                      <p className="text-gray-800 font-medium">{user.email}</p>
+                    
+                  </div>
+
+                  {/* Enrollment No */}
+                  <div className="space-y-1">
+                    <label className="text-sm font-medium text-gray-600">Enrollment Number</label>
+                    {editMode ? (
+                      <input
+                        type="text"
+                        value={tempUser.enrollmentNo}
+                        onChange={(e) => handleInputChange('enrollmentNo', e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    ) : (
+                      <p className="text-gray-800 font-medium">{user.enrollmentNo}</p>
+                    )}
+                  </div>
+
+                  {/* Branch - Not Editable */}
+                  <div className="space-y-1">
+                    <label className="text-sm font-medium text-gray-600">Academic Branch</label>
+                    <p className="text-gray-800 font-medium">{user.branch}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Skills Section */}
+              <div className="mb-8">
+                <h2 className="text-xl font-bold text-gray-800 mb-4">Technical Skills</h2>
+                
+                {editMode ? (
+                  <div className="space-y-4">
+                    <div className="flex flex-wrap gap-2">
+                      {tempUser.skills.map((skill, index) => (
+                        <div key={index} className="flex items-center bg-blue-100 text-blue-800 px-3 py-1 rounded-full">
+                          <span className="text-sm font-medium">{skill}</span>
+                          <button
+                            onClick={() => handleSkillRemove(index)}
+                            className="ml-1 text-blue-600 hover:text-blue-800"
+                          >
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                              <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                            </svg>
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="flex">
+                      <input
+                        type="text"
+                        value={newSkill}
+                        onChange={(e) => setNewSkill(e.target.value)}
+                        placeholder="Type a skill and press Add"
+                        className="flex-1 px-3 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        onKeyDown={(e) => e.key === 'Enter' && handleSkillAdd()}
+                      />
+                      <button
+                        onClick={handleSkillAdd}
+                        className="px-4 py-2 bg-blue-600 text-white rounded-r-md hover:bg-blue-700"
+                      >
+                        Add
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex flex-wrap gap-2">
+                    {user.skills.map((skill, index) => (
+                      <span key={index} className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
+                        {skill}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* About Me Section */}
+              <div className="mb-8">
+                <h2 className="text-xl font-bold text-gray-800 mb-4">About Me</h2>
+                
+                {editMode ? (
+                  <textarea
+                    value={tempUser.aboutMe}
+                    onChange={(e) => handleInputChange('aboutMe', e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    rows="6"
+                  />
+                ) : (
+                  <p className="text-gray-700 whitespace-pre-line">{user.aboutMe}</p>
+                )}
+              </div>
+
+              {/* Social Links Section */}
+              <div>
+                <h2 className="text-xl font-bold text-gray-800 border-b pb-2 mb-4">Social Profiles</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* GitHub */}
+                  <div className="space-y-1">
+                    <label className="text-sm font-medium text-gray-600">GitHub Profile</label>
+                    {editMode ? (
+                      <input
+                        type="url"
+                        value={tempUser.githubUrl}
+                        onChange={(e) => handleInputChange('githubUrl', e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    ) : (
+                      <a 
+                        href={user.githubUrl} 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        className="text-blue-600 hover:underline font-medium"
+                      >
+                        {user.githubUrl.replace('https://', '')}
+                      </a>
+                    )}
+                  </div>
+
+                  {/* LinkedIn */}
+                  <div className="space-y-1">
+                    <label className="text-sm font-medium text-gray-600">LinkedIn Profile</label>
+                    {editMode ? (
+                      <input
+                        type="url"
+                        value={tempUser.linkedInUrl}
+                        onChange={(e) => handleInputChange('linkedInUrl', e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    ) : (
+                      <a 
+                        href={user.linkedInUrl} 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        className="text-blue-600 hover:underline font-medium"
+                      >
+                        {user.linkedInUrl.replace('https://', '')}
+                      </a>
+                    )}
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
-          <div className="text-center mt-6">
-            <button
-              type="submit"
-              className="bg-blue-500 text-white px-8 py-3 rounded-lg hover:bg-blue-600 transition"
-              disabled={isLoading}
-            >
-              {isLoading ? "Saving..." : "Save Profile"}
-            </button>
+          {/* Footer */}
+          <div className="bg-gray-50 px-8 py-4 border-t">
+            <p className="text-sm text-gray-500 text-center">Last updated: {new Date().toLocaleDateString()}</p>
           </div>
-        </form>
-
-        <ToastContainer />
+        </div>
       </div>
     </div>
   );
 };
 
-export default YourProfile;
+export default UserProfile;
