@@ -56,6 +56,11 @@ const uploadProfile = async (req, res) => {
       return res.status(404).json({ error: "User not found" });
     }
 
+    if (updatedUser.enrollmentNumber && updatedUser.collegeIDCard) {
+      updatedUser.profileComplete = true;
+      await updatedUser.save();
+    }
+
     res
       .status(200)
       .json({ message: "Profile updated successfully", user: updatedUser });

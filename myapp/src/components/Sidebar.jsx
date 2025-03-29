@@ -1,13 +1,36 @@
 import { SignOutButton } from "@clerk/clerk-react";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { FaTimes } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { IoSettings } from "react-icons/io5";
 import { useUser } from "@clerk/clerk-react";
+import axios from "axios";
+import { toast } from "react-toastify";
 
 const Sidebar = ({ isOpen, toggleSidebar }) => {
   const navigate = useNavigate();
   const { user } = useUser();
+  const [mainUser, setMainUser] = useState();
+
+  useEffect(() => {
+    if (user) {
+      fetchUserProfile();
+    }
+  }, [user]);
+
+  const fetchUserProfile = async () => {
+    try {
+      const response = await axios.get(
+        `http://localhost:3000/api/user/profile/${user.id}`
+      );
+      const data = response.data;
+      setMainUser(data);
+    } catch (error) {
+      console.error("Error fetching profile:", error);
+      toast.error("Failed to load profile.");
+    }
+  };
+
   return (
     <div
       className={`fixed top-0 right-0 w-64 h-full bg-white shadow-lg z-50 transform transition-transform ${
@@ -29,7 +52,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
           />
         </div>
 
-         <button
+        <button
           onClick={() => {
             navigate("/YourAccount");
             toggleSidebar();
@@ -39,26 +62,29 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
           Account
         </button>
 
+        {!mainUser?.profileComplete && (
+          <button
+            onClick={() => {
+              navigate("/CompleteYourProfile");
+              toggleSidebar();
+            }}
+            className="mb-2 bg-orange-400 hover:bg-orange-500 hover:shadow w-full px-4 py-2 text-white font-semibold rounded-md cursor-pointer justify-center flex items-center"
+          >
+            Complete Your Profile
+          </button>
+        )}
 
-        <button
-          onClick={() => {
-            navigate("/CompleteYourProfile");
-            toggleSidebar();
-          }}
-          className="mb-2 bg-orange-400 hover:bg-orange-500 hover:shadow w-full px-4 py-2 text-white font-semibold rounded-md cursor-pointer justify-center flex items-center"
-        >
-         Complete Your Profile
-        </button>
-
-        <button
-          onClick={() => {
-            navigate("/YourProfile");
-            toggleSidebar();
-          }}
-          className="mb-2 bg-orange-400 hover:bg-orange-500 hover:shadow w-full px-4 py-2 text-white font-semibold rounded-md cursor-pointer justify-center flex items-center"
-        >
-          Your Profile
-        </button>
+        {mainUser?.profileComplete && (
+          <button
+            onClick={() => {
+              navigate("/YourProfile");
+              toggleSidebar();
+            }}
+            className="mb-2 bg-orange-400 hover:bg-orange-500 hover:shadow w-full px-4 py-2 text-white font-semibold rounded-md cursor-pointer justify-center flex items-center"
+          >
+            Your Profile
+          </button>
+        )}
 
         <button
           onClick={() => {
@@ -86,7 +112,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
           redirectUrl="/Signup"
         />
 
-       <button
+        <button
           onClick={() => {
             navigate("/AuthorityRegister");
             toggleSidebar();
@@ -96,7 +122,6 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
           <IoSettings className="me-1" /> Authority
         </button>
       </div>
-
     </div>
   );
 };
