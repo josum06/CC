@@ -5,7 +5,6 @@ import axios from "axios";
 import { X, UploadCloud } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import "react-toastify/dist/ReactToastify.css";
-import { FaEdit } from "react-icons/fa";
 
 
 
@@ -13,6 +12,7 @@ const CompleteYourProfile = () => {
   const { user } = useUser();
   const navigate = useNavigate();
 
+  const [skillsInput, setSkillsInput] = useState("");
   const [enrollmentNumber, setEnrollmentNumber] = useState("");
   const [rollNumber, setRollNumber] = useState("");
   const [branchCode, setBranchCode] = useState("");
@@ -145,6 +145,7 @@ const CompleteYourProfile = () => {
       );
 
       toast.success("Profile updated successfully!");
+      navigate("/");
       console.log("Updated User:", response.data.user);
     } catch (error) {
       console.error("Error updating profile:", error);
@@ -167,12 +168,7 @@ const CompleteYourProfile = () => {
         <h2 className="text-4xl font-bold text-gray-800 text-center mb-8">
           Your Profile
         </h2>
-        <button 
-           onClick={()=> setStatus(false)}
-           className="absolute top-4 right-4 text-3xl bg-gray-200 px-3 py-1 hover:cursor-pointer rounded-full text-gray-600 hover:text-gray-800"
-           >
-          <FaEdit/>
-        </button>
+
 
         {user && (
           <div className="text-center mb-8">
@@ -287,20 +283,44 @@ const CompleteYourProfile = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Skills
-            </label>
-            <input
-              type="text"
-              disabled={status}
-              value={skills.join(", ")}
-              onChange={(e) => setSkills(e.target.value.split(","))}
-              className={`w-full p-3 border rounded-lg ${
-                status ? "bg-gray-100" : "bg-white"
-              }`}
-              placeholder="Enter skills (comma separated)"
-            />
-          </div>
+        <label className="block text-sm font-medium text-gray-700">Skills</label>
+        <div className="flex flex-wrap gap-2 mb-2">
+          {skills.map((skill, index) => (
+            <span key={index} className="flex items-center bg-blue-100 text-blue-700 px-3 py-1 rounded-full">
+              {skill}
+              <button 
+                type="button"
+                onClick={() => setSkills(skills.filter((s) => s !== skill))}
+                className="ml-2 text-blue-500 hover:text-blue-700"
+              >
+                <X size={14} /> 
+              </button>
+            </span>
+          ))}
+        </div>
+        <div className="flex">
+          <input
+            type="text"
+            value={skillsInput}
+            onChange={(e) => setSkillsInput(e.target.value)}
+            className="w-full p-2 border rounded-l-lg"
+            placeholder="Type a skill and press Add"
+    />
+    <button
+      type="button"
+      onClick={() => {
+        if (skillsInput.trim() && !skills.includes(skillsInput.trim().toLowerCase())) {
+          setSkills([...skills, skillsInput.trim().toLowerCase()]);
+          setSkillsInput(""); // Clear input
+        }
+      }}
+      className="bg-blue-500 text-white px-4 rounded-r-lg hover:bg-blue-600"
+    >
+      Add
+    </button>
+  </div>
+</div>
+
 
           <div>
             <label className="block text-sm font-medium text-gray-700">
