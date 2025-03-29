@@ -16,8 +16,12 @@ import YourAccount from "./pages/YourAccount";
 import YourProfile from "./pages/YourProfile";
 import NoNavFooterLayout from "./ui/NoNavFooterLayout"; // Import the new layout
 import PostProject from "./pages/PostProject";
+<<<<<<< HEAD
 import AuthorityRegister from "./pages/AuthorityRegister";
 
+=======
+import ClassRoom from "./pages/ClassRoom";
+>>>>>>> 3982326 (new commit)
 
 const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 
@@ -58,6 +62,7 @@ function App() {
           >
             <Route path="/" index element={<Home />} />
             <Route path="/Notice" element={<Notice />} />
+            
            
           
             <Route path="/Events" element={<Events />} />
@@ -80,6 +85,7 @@ function App() {
             <Route path="/FacultyPost" element={<FacultyPost />} />
             <Route path="/Chats" element={<Chats />} />
             <Route path="/YourProfile" element={<YourProfile />} />
+            <Route path="/ClassRoom" element={<ClassRoom />} />
           </Route>
 
           <Route path="*" element={<Navigate to="/Login" />} />
