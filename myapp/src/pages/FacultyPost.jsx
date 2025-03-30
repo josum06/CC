@@ -1,9 +1,14 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { UploadCloud, Send, X } from "lucide-react";
+import { toast } from "react-toastify";
+import { useUser } from "@clerk/clerk-react";
+import "react-toastify/dist/ReactToastify.css";
+import axios from "axios";
 
 const FacultyPost = () => {
   const navigate = useNavigate();
+  const { user} = useUser();
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -27,10 +32,37 @@ const FacultyPost = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const form = new FormData();
-    form.append("title", formData.title);
+    const response = await axios.get(
+      `http://localhost:3000/api/user/profile/${user.id}`
+    );
+    const data = response.data;
+    try{
+      form.append("title", formData.title);
+      form.append("content",formData.description);
+      form.append("category",formData.postType);
+      form.append("author",data._id);
+
+      if(formData.link){
+        form.append("link", formData.link);
+      }
+      if(formData.file){
+        form.append("image", formData.file);
+      }
+      await axios.post("http://localhost:3000/api/admin-post/create-post", form,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      )
+      toast.success("Post submitted successfully")
+      navigate("/"); // Navigate to Home Page
+      
+    }catch(err){
+       console.error("Error appending form data:", err);
+       toast.error("Failed to append form data."); 
+    }
     console.log("Form Data:", formData);
 
     // Handle form submission logic (API call, etc.)
@@ -147,7 +179,7 @@ const FacultyPost = () => {
                 accept="image/*,video/*"
                 onChange={handleChange}
                 className="absolute inset-0 opacity-0 cursor-pointer"
-                required
+                
               />
             </div>
           </div>

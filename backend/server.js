@@ -24,6 +24,7 @@ app.use(
 );
 app.use("/api/user", userRouter);
 app.use("/api/admin-post", adminRouter);
+
 app.post(
   "/api/webhooks",
   express.raw({ type: "application/json" }),
@@ -52,7 +53,8 @@ app.post(
       console.log("Webhook Event Received:", evt);
 
       const eventType = evt.type;
-      const { id, first_name, last_name, email_addresses } = evt.data;
+
+      const { id, first_name, last_name, email_addresses,image_url} = evt.data;
       const email = email_addresses?.length
         ? email_addresses[0].email_address
         : null;
@@ -80,6 +82,7 @@ app.post(
           {
             fullName: `${first_name} ${last_name}`,
             email: email,
+            profileImage: image_url,
           },
           { new: true, upsert: true }
         );

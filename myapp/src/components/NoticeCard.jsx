@@ -1,6 +1,8 @@
+import { useUser } from "@clerk/clerk-react";
 import React, { useState } from "react";
 
 const NoticeCard = ({ title, date, postedBy, profilePhoto, role, fileUrl }) => {
+  const {user} = useUser();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleOpenModal = () => setIsModalOpen(true);
@@ -60,7 +62,7 @@ const NoticeCard = ({ title, date, postedBy, profilePhoto, role, fileUrl }) => {
             </div>
 
             {/* PDF or Image */}
-            {fileUrl.endsWith(".pdf") ? (
+            {fileUrl?.endsWith(".pdf") ? (
               <iframe
                 src={fileUrl}
                 className="w-full h-[60vh] border rounded"

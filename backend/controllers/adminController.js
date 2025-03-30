@@ -29,3 +29,26 @@ exports.createPost = async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 };
+
+
+exports.getPosts = async (req,res)=>{
+  try {
+    const category = req.query.category;
+    const page = parseInt(req.query.page) || 1; // Default to page 1
+    const limit = 10; // Fetch 10 notices per request
+    const skip = (page - 1) * limit;
+
+    // Fetch notices with pagination (latest first)
+    const post = await AdminPost.find({category : category})
+      .populate("author", "fullName email profileImage designation")
+      .sort({ createdAt: -1 }) // Sort by latest
+      .skip(skip)
+      .limit(limit);
+
+    console.log("Fetched posts",post);
+    res.json({ post });
+  } catch (error) {
+    console.error("Error fetching notices:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+}

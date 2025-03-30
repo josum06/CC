@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import "react-toastify/dist/ReactToastify.css";
 import { ClerkProvider, useAuth } from "@clerk/clerk-react";
 import AppLayout from "./ui/AppLayout";
 import NoNavFooterLayout from "./ui/NoNavFooterLayout";
@@ -22,6 +23,7 @@ import ClassRoom from "./pages/ClassRoom";
 import AuthorityRegister from "./pages/AuthorityRegister"; // Added missing import
 import CompleteYourProfile from "./pages/CompleteYourProfile";
 import YourProfile from "./pages/YourProfile";
+import { ToastContainer } from "react-toastify";
 
 const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 
@@ -47,7 +49,9 @@ function ProtectedRoute({ children }) {
 function App() {
   return (
     <ClerkProvider publishableKey={clerkPubKey}>
+
       <BrowserRouter>
+      <ToastContainer position="top-right" autoClose={3000} />
         <Routes>
           {/* Public Routes */}
           <Route element={<NoNavFooterLayout />}>
@@ -67,7 +71,7 @@ function App() {
                 <AppLayout />
               </ProtectedRoute>
             }
-          >
+            >
             <Route path="/" index element={<Home />} />
             <Route path="/Notice" element={<Notice />} />
             <Route path="/Events" element={<Events />} />
@@ -82,6 +86,7 @@ function App() {
           {/* Fallback Route */}
           <Route path="*" element={<Navigate to="/Login" />} />
         </Routes>
+
       </BrowserRouter>
     </ClerkProvider>
   );
