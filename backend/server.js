@@ -7,6 +7,7 @@ const User = require("./models/User"); // ✅ Import User model
 const ngrok = require("@ngrok/ngrok");
 const cors = require("cors");
 const userRouter = require("./routes/userRoute");
+const adminRouter = require("./routes/adminPostRoute");
 const app = express();
 connectDb();
 
@@ -22,6 +23,7 @@ app.use(
   })
 );
 app.use("/api/user", userRouter);
+app.use("/api/admin-post", adminRouter);
 app.post(
   "/api/webhooks",
   express.raw({ type: "application/json" }),

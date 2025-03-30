@@ -8,7 +8,7 @@ const FacultyPost = () => {
     title: "",
     description: "",
     file: null,
-    postType: "Academics", // Default value
+    postType: "Notice", // Default value
     link: "", // State for the link
   });
 
@@ -29,11 +29,13 @@ const FacultyPost = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    const form = new FormData();
+    form.append("title", formData.title);
     console.log("Form Data:", formData);
 
     // Handle form submission logic (API call, etc.)
-    alert(`Post submitted successfully!\nType: ${formData.postType}`);
-    navigate("/home"); // Navigate to Home Page
+    // alert(`Post submitted successfully!\nType: ${formData.postType}`);
+    // navigate("/home"); // Navigate to Home Page
   };
 
   return (
@@ -89,7 +91,7 @@ const FacultyPost = () => {
               required
             >
               <option value="Notice">Notice</option>
-              <option value="Events">Events</option>
+              <option value="Event">Events</option>
               <option value="Placement">Placement</option>
             </select>
           </div>
