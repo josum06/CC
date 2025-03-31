@@ -1,8 +1,12 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { UploadCloud, Send, ArrowLeft, X } from "lucide-react";
+import axios from "axios";
+import { toast } from "react-toastify";
+import { useUser } from "@clerk/clerk-react";
 
 const PostPage = () => {
+  const {user} = useUser();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     title: "",
@@ -25,13 +29,31 @@ const PostPage = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Form Data:", formData);
+    try{
+      const response = await axios.get(
+        `http://localhost:3000/api/user/profile/${user.id}`
+      );
 
-    // Handle form submission logic here (API call, etc.)
-    // alert("Post submitted successfully!");
-    // navigate("/home"); // Navigate to the home page after submitting
+      const data = response.data;
+      const form = new FormData();
+      form.append("caption", formData.description);
+      form.append("file", formData.file);
+      form.append("author", data._id);
+
+      await axios.post('http://localhost:3000/api/post/create-post', form ,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+       );
+      console.log("Post created successfully!",form);
+      toast.success("Post created successfully!");
+      navigate("/");
+    }catch(err){
+      console.error("Error uploading file:", err);
+      toast.error("Error uploading file. Please try again.");
+    }
   };
 
   return (
@@ -111,7 +133,7 @@ const PostPage = () => {
               type="submit"
               className="flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg transition"
             >
-              <Send size={20} /> Post
+              <Send size={20} />Post
             </button>
           </div>
         </form>

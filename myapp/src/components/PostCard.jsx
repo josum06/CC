@@ -34,13 +34,15 @@ const PostCard = ({ avatar, username, time, content, imageUrl, likes, comments }
         </div>
       </div>
 
-      {/* Message */}
-      <div className="mb-4">
+
+       
+{      <div className="mb-4">
         <p className="text-gray-800">
-          {content} <a href="#" className="text-blue-600">#CuteKitten</a>
-          <a href="#" className="text-blue-600">#AdventureCat</a>
+          {content} 
         </p>
-      </div>
+      </div> 
+      }
+     
 
       {/* Image */}
       <div className="mb-4">
