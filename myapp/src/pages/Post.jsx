@@ -30,8 +30,8 @@ const PostPage = () => {
     console.log("Form Data:", formData);
 
     // Handle form submission logic here (API call, etc.)
-    alert("Post submitted successfully!");
-    navigate("/home"); // Navigate to the home page after submitting
+    // alert("Post submitted successfully!");
+    // navigate("/home"); // Navigate to the home page after submitting
   };
 
   return (
@@ -48,8 +48,6 @@ const PostPage = () => {
         <h1 className="text-2xl font-bold mb-4">Make your new Post!</h1>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-         
-
           {/* Caption */}
           <div>
             <label className="block text-lg font-medium">Caption</label>

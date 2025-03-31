@@ -8,6 +8,7 @@ const ngrok = require("@ngrok/ngrok");
 const cors = require("cors");
 const userRouter = require("./routes/userRoute");
 const adminRouter = require("./routes/adminPostRoute");
+const postRouter = require("./routes/userPostRoute");
 const app = express();
 connectDb();
 
@@ -24,6 +25,7 @@ app.use(
 );
 app.use("/api/user", userRouter);
 app.use("/api/admin-post", adminRouter);
+app.use("/api/post", postRouter);
 
 app.post(
   "/api/webhooks",
@@ -54,7 +56,8 @@ app.post(
 
       const eventType = evt.type;
 
-      const { id, first_name, last_name, email_addresses,image_url} = evt.data;
+      const { id, first_name, last_name, email_addresses, image_url } =
+        evt.data;
       const email = email_addresses?.length
         ? email_addresses[0].email_address
         : null;

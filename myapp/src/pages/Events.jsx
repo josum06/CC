@@ -1,99 +1,41 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import EventCard from "../components/EventCard";
+import axios from "axios";
 
 const Event = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedPoster, setSelectedPoster] = useState("");
+  const [eventData, setEventData] = useState([]);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
 
-  const eventData = [
-    {
-      id: 1,
-      poster: "https://marketplace.canva.com/EAFHr6puSmQ/2/0/1131w/canva-dark-grey-minimalist-music-concert-poster-r1nQ0FK9IKY.jpg",
-      title: "Tech Fest 2025",
-      postedDate: "March 22, 2025",
-      postedBy: "John Doe",
-      postedRole: "Event Manager",
-      profilePhoto: "https://kumospace.mo.cloudinary.net/https://content.kumospace.com/hubfs/brooke-cagle-n1m25jvupEU-unsplash-2.jpg?tx=w_responsive:fallback-max-width_2400;fallback-max-width-mobile_720",
-    },
-    {
-      id: 2,
-      poster: "https://marketplace.canva.com/EAFHr6puSmQ/2/0/1131w/canva-dark-grey-minimalist-music-concert-poster-r1nQ0FK9IKY.jpg",
-      title: "AI & ML Workshop",
-      postedDate: "April 10, 2025",
-      postedBy: "Alice Smith",
-      postedRole: "Tech Lead",
-      profilePhoto: "https://kumospace.mo.cloudinary.net/https://content.kumospace.com/hubfs/brooke-cagle-n1m25jvupEU-unsplash-2.jpg?tx=w_responsive:fallback-max-width_2400;fallback-max-width-mobile_720",
-    },
-    {
-      id: 3,
-      poster: "https://marketplace.canva.com/EAFHr6puSmQ/2/0/1131w/canva-dark-grey-minimalist-music-concert-poster-r1nQ0FK9IKY.jpg",
-      title: "Startup Pitch 2025",
-      postedDate: "May 5, 2025",
-      postedBy: "Raj Patel",
-      postedRole: "Startup Mentor",
-      profilePhoto: "https://kumospace.mo.cloudinary.net/https://content.kumospace.com/hubfs/brooke-cagle-n1m25jvupEU-unsplash-2.jpg?tx=w_responsive:fallback-max-width_2400;fallback-max-width-mobile_720",
-    },
-    {
-      id: 4,
-      poster: "https://marketplace.canva.com/EAFHr6puSmQ/2/0/1131w/canva-dark-grey-minimalist-music-concert-poster-r1nQ0FK9IKY.jpg",
-      title: "Tech Fest 2025",
-      postedDate: "March 22, 2025",
-      postedBy: "John Doe",
-      postedRole: "Event Manager",
-      profilePhoto: "https://kumospace.mo.cloudinary.net/https://content.kumospace.com/hubfs/brooke-cagle-n1m25jvupEU-unsplash-2.jpg?tx=w_responsive:fallback-max-width_2400;fallback-max-width-mobile_720",
-    },
-    {
-      id: 5,
-      poster: "https://marketplace.canva.com/EAFHr6puSmQ/2/0/1131w/canva-dark-grey-minimalist-music-concert-poster-r1nQ0FK9IKY.jpg",
-      title: "Tech Fest 2025",
-      postedDate: "March 22, 2025",
-      postedBy: "John Doe",
-      postedRole: "Event Manager",
-      profilePhoto: "https://kumospace.mo.cloudinary.net/https://content.kumospace.com/hubfs/brooke-cagle-n1m25jvupEU-unsplash-2.jpg?tx=w_responsive:fallback-max-width_2400;fallback-max-width-mobile_720",
-    },
-    {
-      id: 6,
-      poster: "https://marketplace.canva.com/EAFHr6puSmQ/2/0/1131w/canva-dark-grey-minimalist-music-concert-poster-r1nQ0FK9IKY.jpg",
-      title: "Tech Fest 2025",
-      postedDate: "March 22, 2025",
-      postedBy: "John Doe",
-      postedRole: "Event Manager",
-      profilePhoto: "https://kumospace.mo.cloudinary.net/https://content.kumospace.com/hubfs/brooke-cagle-n1m25jvupEU-unsplash-2.jpg?tx=w_responsive:fallback-max-width_2400;fallback-max-width-mobile_720",
-    },
-     {
-      id: 7,
-      poster: "https://marketplace.canva.com/EAFHr6puSmQ/2/0/1131w/canva-dark-grey-minimalist-music-concert-poster-r1nQ0FK9IKY.jpg",
-      title: "Tech Fest 2025",
-      postedDate: "March 22, 2025",
-      postedBy: "John Doe",
-      postedRole: "Event Manager",
-      profilePhoto: "https://kumospace.mo.cloudinary.net/https://content.kumospace.com/hubfs/brooke-cagle-n1m25jvupEU-unsplash-2.jpg?tx=w_responsive:fallback-max-width_2400;fallback-max-width-mobile_720",
-    }, {
-      id: 8,
-      poster: "https://marketplace.canva.com/EAFHr6puSmQ/2/0/1131w/canva-dark-grey-minimalist-music-concert-poster-r1nQ0FK9IKY.jpg",
-      title: "Tech Fest 2025",
-      postedDate: "March 22, 2025",
-      postedBy: "John Doe",
-      postedRole: "Event Manager",
-      profilePhoto: "https://kumospace.mo.cloudinary.net/https://content.kumospace.com/hubfs/brooke-cagle-n1m25jvupEU-unsplash-2.jpg?tx=w_responsive:fallback-max-width_2400;fallback-max-width-mobile_720",
-    }, {
-      id: 9,
-      poster: "https://marketplace.canva.com/EAFHr6puSmQ/2/0/1131w/canva-dark-grey-minimalist-music-concert-poster-r1nQ0FK9IKY.jpg",
-      title: "Tech Fest 2025",
-      postedDate: "March 22, 2025",
-      postedBy: "John Doe",
-      postedRole: "Event Manager",
-      profilePhoto: "https://kumospace.mo.cloudinary.net/https://content.kumospace.com/hubfs/brooke-cagle-n1m25jvupEU-unsplash-2.jpg?tx=w_responsive:fallback-max-width_2400;fallback-max-width-mobile_720",
-    }, {
-      id: 10,
-      poster: "https://marketplace.canva.com/EAFHr6puSmQ/2/0/1131w/canva-dark-grey-minimalist-music-concert-poster-r1nQ0FK9IKY.jpg",
-      title: "Tech Fest 2025",
-      postedDate: "March 22, 2025",
-      postedBy: "John Doe",
-      postedRole: "Event Manager",
-      profilePhoto: "https://kumospace.mo.cloudinary.net/https://content.kumospace.com/hubfs/brooke-cagle-n1m25jvupEU-unsplash-2.jpg?tx=w_responsive:fallback-max-width_2400;fallback-max-width-mobile_720",
-    },
-  ];
+  // ✅ Fetch posts whenever 'page' changes
+  useEffect(() => {
+    fetchPosts(page);
+  }, [page]);
+
+  const fetchPosts = async (pageNum) => {
+    try {
+      const res = await axios.get(
+        `http://localhost:3000/api/admin-post/get-post?page=${pageNum}&limit=10&category=Event`
+      );
+      const newPosts = res.data.post;
+
+      if (newPosts.length < 10) {
+        setHasMore(false); // No more posts to load
+      }
+
+      setEventData((prev) =>
+        pageNum === 1 ? newPosts : [...prev, ...newPosts]
+      );
+    } catch (err) {
+      console.error("Error fetching eventData:", err);
+    }
+  };
+
+  const loadMorePosts = () => {
+    setPage((prevPage) => prevPage + 1); // This will trigger useEffect, which fetches posts
+  };
 
   const openModal = (poster) => {
     setSelectedPoster(poster);
@@ -106,11 +48,9 @@ const Event = () => {
   };
 
   return (
-    
-    <div className="min-h-screen p-6  flex flex-wrap gap-6 justify-center items-center">
-      
-      {eventData.map((event) => (
-        <EventCard key={event.id} event={event} openModal={openModal} />
+    <div className="min-h-screen p-6 flex flex-wrap gap-6 justify-center items-center">
+      {eventData.map((event, index) => (
+        <EventCard key={index} event={event} openModal={openModal} />
       ))}
 
       {/* Modal */}
@@ -130,6 +70,15 @@ const Event = () => {
             />
           </div>
         </div>
+      )}
+
+      {hasMore && (
+        <button
+          onClick={loadMorePosts}
+          className="mt-5 bg-blue-500 text-white p-2 rounded-lg"
+        >
+          See More
+        </button>
       )}
     </div>
   );
