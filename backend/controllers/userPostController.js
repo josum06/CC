@@ -1,19 +1,20 @@
 const Post = require("../models/Post");
 const imagekit = require("../imageKit");
 const fs = require("fs");
-
+const Comment = require("../models/Comment");
 
 exports.createPost = async (req, res) => {
   try {
-    const { author,caption } = req.body;
+    const { author, caption } = req.body;
     let mediaUrl = null;
-   
+
     if (!req.file) {
-      return res.status(400).json({ message: "Missing file parameter for upload" });
+      return res
+        .status(400)
+        .json({ message: "Missing file parameter for upload" });
     }
 
     if (req.file) {
-
       const filePath = req.file.path; // Get the file path
 
       // Read the file from disk
@@ -40,8 +41,7 @@ exports.createPost = async (req, res) => {
   }
 };
 
-
-exports.getPosts = async (req,res)=>{
+exports.getPosts = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1; // Default to page 1
     const limit = 10; // Fetch 10 notices per request
@@ -54,10 +54,92 @@ exports.getPosts = async (req,res)=>{
       .skip(skip)
       .limit(limit);
 
-    console.log("Fetched posts",post);
     res.json({ post });
   } catch (error) {
     console.error("Error fetching notices:", error);
     res.status(500).json({ message: "Server error" });
   }
-}
+};
+
+exports.createComment = async (req, res) => {
+  try {
+    const { text, postId, userId } = req.body;
+    console.log(text, postId, userId);
+    // Check if post exists
+    const post = await Post.findById(postId);
+    if (!post) {
+      return res.status(404).json({ message: "Post not found" });
+    }
+
+    // Create new comment in Comment model
+    const newComment = new Comment({ text, postId, userId });
+    await newComment.save();
+
+    // Push the new comment's ID into the Post model's comments array
+    post.comments.push(newComment._id);
+    await post.save();
+
+    res
+      .status(201)
+      .json({ message: "Comment added successfully", comment: newComment });
+  } catch (error) {
+    console.error("Error creating comment:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+exports.getComments = async (req, res) => {
+  try {
+    const postId = req.params.postId;
+    if (!postId) {
+      return res.status(400).json({ message: "Missing postId parameter" });
+    }
+    const comments = await Comment.find({ postId }).populate(
+      "userId",
+      "fullName profileImage"
+    );
+    res.json({ comments });
+  } catch (error) {
+    console.error("Error fetching comments:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+exports.likePost = async (req, res) => {
+  try {
+    const { postId } = req.params;
+    const { userId } = req.body; // Get user ID from request
+
+    if (!postId || !userId) {
+      return res.status(400).json({ message: "Missing postId or userId" });
+    }
+
+    const post = await Post.findById(postId);
+    if (!post) {
+      return res.status(404).json({ message: "Post not found" });
+    }
+
+    const hasLiked = post.likedByUsers.includes(userId);
+
+    if (hasLiked) {
+      // If user has already liked, remove like
+      post.likes -= 1;
+      post.likedByUsers = post.likedByUsers.filter((id) => id !== userId);
+    } else {
+      // If user has not liked, add like
+      post.likes += 1;
+      post.likedByUsers.push(userId);
+    }
+
+    await post.save();
+
+    res.json({
+      message: hasLiked ? "Like removed" : "Post liked",
+      post,
+      hasLiked: !hasLiked, // Send new like status
+    });
+  } catch (error) {
+    console.error("Error toggling like:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
