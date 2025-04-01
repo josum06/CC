@@ -6,14 +6,13 @@ import { toast } from "react-toastify";
 import { useUser } from "@clerk/clerk-react";
 
 const PostPage = () => {
-  const {user} = useUser();
+  const { user } = useUser();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     title: "",
     description: "",
     file: null,
   });
-
   const handleChange = (e) => {
     const { name, value, files } = e.target;
     setFormData((prev) => ({
@@ -31,7 +30,7 @@ const PostPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try{
+    try {
       const response = await axios.get(
         `http://localhost:3000/api/user/profile/${user.id}`
       );
@@ -42,15 +41,13 @@ const PostPage = () => {
       form.append("file", formData.file);
       form.append("author", data._id);
 
-      await axios.post('http://localhost:3000/api/post/create-post', form ,
-        {
-          headers: { "Content-Type": "multipart/form-data" },
-        }
-       );
-      console.log("Post created successfully!",form);
+      await axios.post("http://localhost:3000/api/post/create-post", form, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      console.log("Post created successfully!", form);
       toast.success("Post created successfully!");
       navigate("/");
-    }catch(err){
+    } catch (err) {
       console.error("Error uploading file:", err);
       toast.error("Error uploading file. Please try again.");
     }
@@ -133,7 +130,8 @@ const PostPage = () => {
               type="submit"
               className="flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg transition"
             >
-              <Send size={20} />Post
+              <Send size={20} />
+              Post
             </button>
           </div>
         </form>

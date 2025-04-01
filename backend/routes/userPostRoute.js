@@ -2,8 +2,13 @@ const express = require("express");
 const router = express.Router();
 const multer = require("multer");
 
-
-const { createPost, getPosts } = require("../controllers/userPostController");
+const {
+  createPost,
+  getPosts,
+  createComment,
+  getComments,
+  likePost,
+} = require("../controllers/userPostController");
 
 // Configure storage for videos and images
 const storage = multer.diskStorage({
@@ -35,6 +40,9 @@ const upload = multer({
 
 router.post("/create-post", upload.single("file"), createPost);
 router.get("/getAll-post", getPosts);
+router.post("/create-comment", createComment);
+router.get("/get-comments/:postId", getComments);
+router.patch("/like/:postId", likePost);
 // router.get("/get-post", getPosts);
 
 module.exports = router;
