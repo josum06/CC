@@ -17,6 +17,7 @@ const postSchema = new mongoose.Schema(
         ref: "Comment",
       },
     ],
+    likedByUsers: { type: [String], default: [] }
   },
   {
     timestamps: true,

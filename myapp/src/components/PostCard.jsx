@@ -10,16 +10,37 @@ const PostCard = ({
   time,
   content,
   imageUrl,
-  likes,
+  likes : initialLikes,
+  likedByUsers = [], 
   postId,
   userId,
   comments,
 }) => {
+  const [likes , setLikes] = useState(initialLikes);
+  const [likedByCurrentUser, setLikedByCurrentUser] = useState(
+    likedByUsers.includes(userId)
+  );
   const [commentModal, setCommentModal] = useState(false);
   const [commentText, setCommentText] = useState("");
+  
   const inputComment = () => {
-    setCommentModal(true);
+    setCommentModal(!commentModal);
   };
+
+
+  const handleLike = async () => {
+    try {
+      const response = await axios.patch(
+        `http://localhost:3000/api/post/like/${postId}/like-toggle` , { userId }
+      );
+      setLikes(response.data.post.likes); // Update likes from backend response
+      setLikedByCurrentUser(response.data.hasLiked)
+    } catch (error) {
+      console.error("Error liking post:", error);
+      toast.error("Failed to like post");
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -35,6 +56,7 @@ const PostCard = ({
         }
       );
       toast.success(`Comment posted successfully!`);
+
     } catch (e) {
       console.error("Error posting comment:", e);
       toast.error("Something went wrong");
@@ -94,7 +116,9 @@ const PostCard = ({
       {/* Like and Comment Section */}
       <div className="flex items-center justify-between text-gray-500">
         <div className="flex items-center space-x-2">
-          <button className="flex justify-center items-center gap-2 px-2 hover:bg-gray-50 rounded-full p-1">
+          <button 
+           onClick={handleLike}
+           className="flex justify-center items-center gap-2 px-2 hover:bg-gray-50 rounded-full p-1">
             <svg
               className="w-5 h-5 fill-current"
               xmlns="http://www.w3.org/2000/svg"
@@ -102,7 +126,7 @@ const PostCard = ({
             >
               <path d="M12 21.35l-1.45-1.32C6.11 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-4.11 6.86-8.55 11.54L12 21.35z" />
             </svg>
-            <span>{likes} Likes</span>
+            <span>{likes} {likedByCurrentUser ? "Liked" : "Like"}</span>
           </button>
         </div>
         <button

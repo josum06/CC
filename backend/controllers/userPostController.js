@@ -107,8 +107,39 @@ exports.getComments = async (req, res) => {
 
 exports.likePost = async (req, res) => {
   try {
+    const { postId } = req.params;
+    const { userId } = req.body; // Get user ID from request
+
+    if (!postId || !userId) {
+      return res.status(400).json({ message: "Missing postId or userId" });
+    }
+
+    const post = await Post.findById(postId);
+    if (!post) {
+      return res.status(404).json({ message: "Post not found" });
+    }
+
+    const hasLiked = post.likedByUsers.includes(userId);
+
+    if (hasLiked) {
+      // If user has already liked, remove like
+      post.likes -= 1;
+      post.likedByUsers = post.likedByUsers.filter((id) => id !== userId);
+    } else {
+      // If user has not liked, add like
+      post.likes += 1;
+      post.likedByUsers.push(userId);
+    }
+
+    await post.save();
+
+    res.json({
+      message: hasLiked ? "Like removed" : "Post liked",
+      post,
+      hasLiked: !hasLiked, // Send new like status
+    });
   } catch (error) {
-    console.error("Error liking post:", error);
+    console.error("Error toggling like:", error);
     res.status(500).json({ message: "Server error" });
   }
 };

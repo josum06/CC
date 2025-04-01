@@ -42,7 +42,7 @@ router.post("/create-post", upload.single("file"), createPost);
 router.get("/getAll-post", getPosts);
 router.post("/create-comment", createComment);
 router.get("/get-comments/:postId", getComments);
-router.patch("/like/:postId", likePost);
+router.patch("/like/:postId/like-toggle", likePost);
 // router.get("/get-post", getPosts);
 
 module.exports = router;
