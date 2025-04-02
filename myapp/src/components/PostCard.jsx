@@ -3,6 +3,7 @@ import axios from "axios";
 import React, { useState } from "react";
 import { toast } from "react-toastify";
 import Comments from "./Comments";
+import { Heart, MessageCircle, Share2, Bookmark, MoreHorizontal } from 'lucide-react';
 
 const PostCard = ({
   avatar,
@@ -10,31 +11,30 @@ const PostCard = ({
   time,
   content,
   imageUrl,
-  likes : initialLikes,
-  likedByUsers = [], 
+  likes: initialLikes,
+  likedByUsers = [],
   postId,
   userId,
   comments,
 }) => {
-  const [likes , setLikes] = useState(initialLikes);
+  const [likes, setLikes] = useState(initialLikes);
   const [likedByCurrentUser, setLikedByCurrentUser] = useState(
     likedByUsers.includes(userId)
   );
   const [commentModal, setCommentModal] = useState(false);
   const [commentText, setCommentText] = useState("");
-  
+
   const inputComment = () => {
     setCommentModal(!commentModal);
   };
 
-
   const handleLike = async () => {
     try {
       const response = await axios.patch(
-        `http://localhost:3000/api/post/like/${postId}/like-toggle` , { userId }
+        `http://localhost:3000/api/post/like/${postId}/like-toggle`, { userId }
       );
-      setLikes(response.data.post.likes); // Update likes from backend response
-      setLikedByCurrentUser(response.data.hasLiked)
+      setLikes(response.data.post.likes);
+      setLikedByCurrentUser(response.data.hasLiked);
     } catch (error) {
       console.error("Error liking post:", error);
       toast.error("Failed to like post");
@@ -43,6 +43,8 @@ const PostCard = ({
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!commentText.trim()) return;
+    
     try {
       const formData = new FormData();
       formData.append("text", commentText);
@@ -55,133 +57,123 @@ const PostCard = ({
           headers: { "Content-Type": "application/json" },
         }
       );
+      setCommentText("");
       toast.success(`Comment posted successfully!`);
-
     } catch (e) {
       console.error("Error posting comment:", e);
       toast.error("Something went wrong");
     }
   };
+
   return (
-    <div className="bg-white p-8 rounded-lg shadow-md max-w-md mb-4">
-      {/* User Info with Three-Dot Menu */}
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center space-x-2">
-          <img
-            src={avatar}
-            alt="User Avatar"
-            className="w-12 h-12 rounded-full"
-          />
+    <div className="bg-white rounded-lg shadow-sm max-w-xl w-full mx-auto mb-6 border border-gray-200">
+      {/* Header */}
+      <div className="flex items-center justify-between p-3 border-b">
+        <div className="flex items-center space-x-3">
+          <div className="w-8 h-8 rounded-full overflow-hidden ring-2 ring-gray-200">
+            <img
+              src={avatar}
+              alt={username}
+              className="w-full h-full object-cover"
+            />
+          </div>
           <div>
-            <p className="text-gray-800 font-semibold">{username}</p>
-            <p className="text-gray-500 text-sm">{time}</p>
+            <p className="font-semibold text-sm">{username}</p>
+            <p className="text-xs text-gray-500">{time}</p>
           </div>
         </div>
-        <div className="text-gray-500 cursor-pointer">
-          <button className="hover:bg-gray-50 rounded-full p-1">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <circle cx="12" cy="7" r="1" />
-              <circle cx="12" cy="12" r="1" />
-              <circle cx="12" cy="17" r="1" />
-            </svg>
-          </button>
-        </div>
+        <button className="p-2 hover:bg-gray-100 rounded-full">
+          <MoreHorizontal size={20} className="text-gray-600" />
+        </button>
       </div>
 
-      {
-        <div className="mb-4">
-          <p className="text-gray-800">{content}</p>
-        </div>
-      }
-
       {/* Image */}
-      <div className="mb-4">
+      <div className="aspect-square w-full relative">
         <img
           src={imageUrl}
-          alt="Post Image"
-          className="w-full h-48 object-cover rounded-md"
+          alt="Post content"
+          className="w-full h-full object-cover"
         />
       </div>
 
-      {/* Like and Comment Section */}
-      <div className="flex items-center justify-between text-gray-500">
-        <div className="flex items-center space-x-2">
-          <button 
-           onClick={handleLike}
-           className="flex justify-center items-center gap-2 px-2 hover:bg-gray-50 rounded-full p-1">
-            <svg
-              className="w-5 h-5 fill-current"
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
+      {/* Action Buttons */}
+      <div className="p-3">
+        <div className="flex justify-between items-center mb-2">
+          <div className="flex items-center space-x-4">
+            <button
+              onClick={handleLike}
+              className="p-2 hover:bg-gray-100 rounded-full transition-colors"
             >
-              <path d="M12 21.35l-1.45-1.32C6.11 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-4.11 6.86-8.55 11.54L12 21.35z" />
-            </svg>
-            <span>{likes} {likedByCurrentUser ? "Liked" : "Like"}</span>
-          </button>
-        </div>
-        <button
-          onClick={inputComment}
-          className="flex justify-center items-center gap-2 px-2 hover:bg-gray-50 rounded-full p-1"
-        >
-          <svg
-            width="22px"
-            height="22px"
-            viewBox="0 0 24 24"
-            className="w-5 h-5 fill-current"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
-            <g
-              id="SVGRepo_tracerCarrier"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            ></g>
-            <g id="SVGRepo_iconCarrier">
-              <path
-                fillRule="evenodd"
-                clipRule="evenodd"
-                d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 13.5997 2.37562 15.1116 3.04346 16.4525C3.22094 16.8088 3.28001 17.2161 3.17712 17.6006L2.58151 19.8267C2.32295 20.793 3.20701 21.677 4.17335 21.4185L6.39939 20.8229C6.78393 20.72 7.19121 20.7791 7.54753 20.9565C8.88837 21.6244 10.4003 22 12 22ZM8 13.25C7.58579 13.25 7.25 13.5858 7.25 14C7.25 14.4142 7.58579 14.75 8 14.75H13.5C13.9142 14.75 14.25 14.4142 14.25 14C14.25 13.5858 13.9142 13.25 13.5 13.25H8ZM7.25 10.5C7.25 10.0858 7.58579 9.75 8 9.75H16C16.4142 9.75 16.75 10.0858 16.75 10.5C16.75 10.9142 16.4142 11.25 16 11.25H8C7.58579 11.25 7.25 10.9142 7.25 10.5Z"
-              ></path>
-            </g>
-          </svg>
-          <span>{comments.length || 0} Comment</span>
-        </button>
-      </div>
-      <hr className="mt-2 mb-2" />
-      <p className="text-gray-800 font-semibold">Comment</p>
-      {/* Comment Input Section */}
-      <form onSubmit={handleSubmit}>
-        {commentModal && (
-          <div className="bg-gray-100 p-4 rounded-lg mt-2 shadow-md">
-            <p className="text-gray-800 font-semibold">Add a Comment</p>
-            <div className="mt-2 flex items-center space-x-2">
-              <input
-                type="text"
-                value={commentText}
-                onChange={(e) => setCommentText(e.target.value)}
-                placeholder="Write a comment..."
-                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-800 shadow-sm"
+              <Heart
+                size={24}
+                className={`${
+                  likedByCurrentUser
+                    ? "fill-red-500 stroke-red-500"
+                    : "stroke-gray-700"
+                }`}
               />
-              <button className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition">
-                Post
-              </button>
-            </div>
+            </button>
+            <button
+              onClick={inputComment}
+              className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+            >
+              <MessageCircle size={24} className="stroke-gray-700" />
+            </button>
+            <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+              <Share2 size={24} className="stroke-gray-700" />
+            </button>
+          </div>
+         
+        </div>
+
+        {/* Likes Count */}
+        <p className="font-semibold text-sm mb-1">{likes} likes</p>
+
+        {/* Caption */}
+        {content && (
+          <div className="mb-2">
+            <span className="font-semibold text-sm mr-2">{username}</span>
+            <span className="text-sm">{content}</span>
           </div>
         )}
-      </form>
-      <hr className="mt-2 mb-2" />
+
+        {/* Comments Count */}
+        <button
+          onClick={inputComment}
+          className="text-gray-500 text-sm mb-2 hover:text-gray-700"
+        >
+          View all {comments.length} comments
+        </button>
+
+        {/* Comment Input */}
+        <form onSubmit={handleSubmit} className="flex items-center mt-3">
+          <input
+            type="text"
+            value={commentText}
+            onChange={(e) => setCommentText(e.target.value)}
+            placeholder="Add a comment..."
+            className="flex-1 text-sm p-2 focus:outline-none"
+          />
+          <button
+            type="submit"
+            disabled={!commentText.trim()}
+            className={`px-4 py-1 text-sm font-semibold ${
+              commentText.trim()
+                ? "text-blue-500 hover:text-blue-600"
+                : "text-blue-200"
+            }`}
+          >
+            Post
+          </button>
+        </form>
+      </div>
+
       {/* Comments Section */}
-      <Comments postId={postId} />
+      {commentModal && (
+        <div className="border-t">
+          <Comments postId={postId} />
+        </div>
+      )}
     </div>
   );
 };

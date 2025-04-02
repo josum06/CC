@@ -66,7 +66,7 @@ const Network = () => {
         <div className="w-full lg:w-px  lg:block hidden"></div>
 
         {/* Right Column for Groups */}
-        <div className="lg:w-1/4 w-full flex flex-col space-y-6 ">
+        <div className="lg:w-1/4  w-full flex flex-col space-y-6 ">
           <div className="font-bold text-xl ">Join Community Groups</div>
           {groups.map((group, index) => (
             <Group key={index} group={group} />
