@@ -109,6 +109,8 @@ exports.likePost = async (req, res) => {
   try {
     const { postId } = req.params;
     const { userId } = req.body; // Get user ID from request
+    console.log("User ID:", userId);
+    console.log("Post ID:", postId);
 
     if (!postId || !userId) {
       return res.status(400).json({ message: "Missing postId or userId" });

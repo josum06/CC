@@ -1,9 +1,10 @@
 // PostCard.jsx
 import axios from "axios";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import Comments from "./Comments";
 import { Heart, MessageCircle, Share2, Bookmark, MoreHorizontal } from 'lucide-react';
+import { useUser } from "@clerk/clerk-react";
 
 const PostCard = ({
   avatar,
@@ -17,12 +18,35 @@ const PostCard = ({
   userId,
   comments,
 }) => {
+  const { user } = useUser();
+  const [currUserId , setCurrUserId] = useState(null);
   const [likes, setLikes] = useState(initialLikes);
   const [likedByCurrentUser, setLikedByCurrentUser] = useState(
-    likedByUsers.includes(userId)
+    likedByUsers.includes(currUserId)
   );
   const [commentModal, setCommentModal] = useState(false);
   const [commentText, setCommentText] = useState("");
+
+  useEffect(() => {
+    if (user) {
+      fetchUserProfile();
+    }
+  }, [user]);
+
+
+  const fetchUserProfile = async () => {
+    try {
+      const response = await axios.get(
+        `http://localhost:3000/api/user/profile/${user.id}`
+      );
+      const data = response.data;
+      setCurrUserId(data._id);
+     
+    } catch (error) {
+      console.error("Error fetching profile:", error);
+      toast.error("Failed to load profile.");
+    }
+  };
 
   const inputComment = () => {
     setCommentModal(!commentModal);
@@ -30,8 +54,9 @@ const PostCard = ({
 
   const handleLike = async () => {
     try {
+      console.log(currUserId)
       const response = await axios.patch(
-        `http://localhost:3000/api/post/like/${postId}/like-toggle`, { userId }
+        `http://localhost:3000/api/post/like/${postId}/like-toggle`,{userId : currUserId}
       );
       setLikes(response.data.post.likes);
       setLikedByCurrentUser(response.data.hasLiked);
@@ -49,7 +74,7 @@ const PostCard = ({
       const formData = new FormData();
       formData.append("text", commentText);
       formData.append("postId", postId);
-      formData.append("userId", userId);
+      formData.append("userId", currUserId);
       await axios.post(
         "http://localhost:3000/api/post/create-comment",
         formData,
