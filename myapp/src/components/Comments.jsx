@@ -65,8 +65,7 @@ function Comments({ postId }) {
                   e.target.src = 'https://via.placeholder.com/40';
                 }}
               />
-              <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
-            </div>
+             </div>
             
             {/* Comment Content */}
             <div className="flex-1 min-w-0">
