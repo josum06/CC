@@ -3,8 +3,15 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import Comments from "./Comments";
-import { Heart, MessageCircle, Share2, Bookmark, MoreHorizontal } from 'lucide-react';
+import {
+  Heart,
+  MessageCircle,
+  Share2,
+  Bookmark,
+  MoreHorizontal,
+} from "lucide-react";
 import { useUser } from "@clerk/clerk-react";
+import { useNavigate } from "react-router";
 
 const PostCard = ({
   avatar,
@@ -19,11 +26,13 @@ const PostCard = ({
   comments,
 }) => {
   const { user } = useUser();
-  const [currUserId , setCurrUserId] = useState(null);
+  const navigate = useNavigate();
+  const [currUserId, setCurrUserId] = useState(null);
   const [likes, setLikes] = useState(initialLikes);
   const [likedByCurrentUser, setLikedByCurrentUser] = useState(
     likedByUsers.includes(currUserId)
   );
+  const [showOptions, setShowOptions] = useState(false);
   const [commentModal, setCommentModal] = useState(false);
   const [commentText, setCommentText] = useState("");
 
@@ -33,7 +42,6 @@ const PostCard = ({
     }
   }, [user]);
 
-
   const fetchUserProfile = async () => {
     try {
       const response = await axios.get(
@@ -41,7 +49,6 @@ const PostCard = ({
       );
       const data = response.data;
       setCurrUserId(data._id);
-     
     } catch (error) {
       console.error("Error fetching profile:", error);
       toast.error("Failed to load profile.");
@@ -54,9 +61,10 @@ const PostCard = ({
 
   const handleLike = async () => {
     try {
-      console.log(currUserId)
+      console.log(currUserId);
       const response = await axios.patch(
-        `http://localhost:3000/api/post/like/${postId}/like-toggle`,{userId : currUserId}
+        `http://localhost:3000/api/post/like/${postId}/like-toggle`,
+        { userId: currUserId }
       );
       setLikes(response.data.post.likes);
       setLikedByCurrentUser(response.data.hasLiked);
@@ -69,7 +77,7 @@ const PostCard = ({
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!commentText.trim()) return;
-    
+
     try {
       const formData = new FormData();
       formData.append("text", commentText);
@@ -91,17 +99,20 @@ const PostCard = ({
   };
 
   const handleOptionClick = (action) => {
-    switch(action) {
-      case 'profile':
-        console.log('View profile clicked');
+    switch (action) {
+      case "profile":
+        navigate("/NetworkProfile", {
+          state: { userData: { userId } },
+        });
+        console.log("View profile clicked");
         break;
-      case 'message':
-        console.log('Message clicked');
+      case "message":
+        console.log("Message clicked");
         break;
-      case 'share':
-        console.log('Share clicked');
+      case "share":
+        console.log("Share clicked");
         break;
-      
+
       default:
         break;
     }
@@ -123,56 +134,55 @@ const PostCard = ({
             </div>
           </div>
           <div>
-            <p className="font-semibold text-sm hover:underline cursor-pointer">{username}</p>
+            <p className="font-semibold text-sm hover:underline cursor-pointer">
+              {username}
+            </p>
             <p className="text-xs text-gray-500">{time}</p>
           </div>
         </div>
-        
+
         {/* Three Dots Menu */}
         <div className="relative">
-          <button 
+          <button
             className="p-1.5 hover:bg-gray-50 rounded-full transition-colors group"
             onClick={() => setShowOptions(!showOptions)}
           >
-            <MoreHorizontal size={18} className="text-gray-400 group-hover:text-gray-600" />
+            <MoreHorizontal
+              size={18}
+              className="text-gray-400 group-hover:text-gray-600"
+            />
           </button>
 
           {/* Dropdown Menu */}
           {showOptions && (
             <>
-              <div 
+              <div
                 className="fixed inset-0 z-10"
                 onClick={() => setShowOptions(false)}
               />
-              
+
               <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-100 py-1 z-20">
                 <button
-                  onClick={() => handleOptionClick('profile')}
+                  onClick={() => handleOptionClick("profile")}
                   className="flex items-center space-x-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 w-full text-left"
                 >
-                  <User size={16} />
                   <span>View Profile</span>
                 </button>
-                
+
                 <button
-                  onClick={() => handleOptionClick('message')}
+                  onClick={() => handleOptionClick("message")}
                   className="flex items-center space-x-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 w-full text-left"
                 >
-                  <Mail size={16} />
                   <span>Send Message</span>
                 </button>
-                
+
                 <button
-                  onClick={() => handleOptionClick('share')}
+                  onClick={() => handleOptionClick("share")}
                   className="flex items-center space-x-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 w-full text-left"
                 >
-                  <Link size={16} />
+                  {/* <Link size={16} /> */}
                   <span>Copy Link</span>
                 </button>
-
-             
-                
-                
               </div>
             </>
           )}
@@ -189,13 +199,14 @@ const PostCard = ({
               className="w-full max-h-[32rem] object-contain bg-black/5"
               onError={(e) => {
                 e.target.onerror = null;
-                e.target.src = 'https://via.placeholder.com/400?text=Image+Not+Found';
+                e.target.src =
+                  "https://via.placeholder.com/400?text=Image+Not+Found";
               }}
               loading="lazy"
             />
-            <div 
+            <div
               className="absolute inset-0 bg-black opacity-0 group-hover:opacity-10 transition-all duration-300"
-              style={{ height: '100%' }}
+              style={{ height: "100%" }}
             />
           </>
         ) : (
@@ -226,13 +237,18 @@ const PostCard = ({
               onClick={inputComment}
               className="p-1.5 hover:bg-gray-50 rounded-full transition-all duration-200 transform hover:scale-110"
             >
-              <MessageCircle size={22} className="stroke-gray-700 hover:stroke-blue-500" />
+              <MessageCircle
+                size={22}
+                className="stroke-gray-700 hover:stroke-blue-500"
+              />
             </button>
             <button className="p-1.5 hover:bg-gray-50 rounded-full transition-all duration-200 transform hover:scale-110">
-              <Share2 size={22} className="stroke-gray-700 hover:stroke-green-500" />
+              <Share2
+                size={22}
+                className="stroke-gray-700 hover:stroke-green-500"
+              />
             </button>
           </div>
-         
         </div>
 
         {/* Likes Count */}
@@ -241,7 +257,9 @@ const PostCard = ({
         {/* Caption */}
         {content && (
           <div className="mb-2">
-            <span className="font-semibold text-sm mr-2 hover:underline cursor-pointer">{username}</span>
+            <span className="font-semibold text-sm mr-2 hover:underline cursor-pointer">
+              {username}
+            </span>
             <span className="text-sm text-gray-800">{content}</span>
           </div>
         )}
@@ -255,7 +273,10 @@ const PostCard = ({
         </button>
 
         {/* Comment Input */}
-        <form onSubmit={handleSubmit} className="flex items-center py-3 border-t border-gray-50">
+        <form
+          onSubmit={handleSubmit}
+          className="flex items-center py-3 border-t border-gray-50"
+        >
           <input
             type="text"
             value={commentText}

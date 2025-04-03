@@ -20,7 +20,6 @@ const Network = () => {
         `http://localhost:3000/api/post/getAll-post?page=${pageNum}`
       );
       const newPost = res.data.post;
-
       if (newPost.length === 0) {
         setHasMore(false); // No more notices to fetch
         return;
@@ -51,7 +50,7 @@ const Network = () => {
               key={index}
               postId={post._id}
               userId={post?.author?._id}
-              avatar={post?.author?.profileImage}
+              avatar={post.author.profileImage}
               username={post?.author?.fullName}
               time={format(parseISO(post?.createdAt), "dd MMM yyyy, hh:mm a")}
               content={post.caption}

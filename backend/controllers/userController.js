@@ -1,6 +1,6 @@
 const User = require("../models/User");
 const imagekit = require("../imageKit");
-
+const Post = require("../models/Post");
 // Function to handle profile upload
 const uploadProfile = async (req, res) => {
   try {
@@ -88,4 +88,37 @@ const getUserProfile = async (req, res) => {
   }
 };
 
-module.exports = { uploadProfile, getUserProfile };
+const getUserProfileById = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    console.log(userId);
+    const user = await User.findOne({ _id: userId });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.status(200).json(user);
+  } catch (error) {
+    console.error("Error fetching user profile:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+const getPostsById = async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const posts = await Post.find({ author: userId });
+
+    res.status(200).json(posts);
+  } catch (error) {
+    console.error("Error fetching user posts:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+module.exports = {
+  uploadProfile,
+  getUserProfile,
+  getUserProfileById,
+  getPostsById,
+};
