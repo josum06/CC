@@ -8,6 +8,7 @@ const {
   createComment,
   getComments,
   likePost,
+  getLikedUser,
 } = require("../controllers/userPostController");
 
 // Configure storage for videos and images
@@ -43,6 +44,7 @@ router.get("/getAll-post", getPosts);
 router.post("/create-comment", createComment);
 router.get("/get-comments/:postId", getComments);
 router.patch("/like/:postId/like-toggle", likePost);
+router.get("/like/:postId", getLikedUser);
 // router.get("/get-post", getPosts);
 
 module.exports = router;

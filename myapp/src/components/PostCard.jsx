@@ -29,9 +29,7 @@ const PostCard = ({
   const navigate = useNavigate();
   const [currUserId, setCurrUserId] = useState(null);
   const [likes, setLikes] = useState(initialLikes);
-  const [likedByCurrentUser, setLikedByCurrentUser] = useState(
-    likedByUsers.includes(currUserId)
-  );
+  const [likedByCurrentUser, setLikedByCurrentUser] = useState(false);
   const [showOptions, setShowOptions] = useState(false);
   const [commentModal, setCommentModal] = useState(false);
   const [commentText, setCommentText] = useState("");
@@ -41,6 +39,24 @@ const PostCard = ({
       fetchUserProfile();
     }
   }, [user]);
+  useEffect(() => {
+    const fetchLikes = async () => {
+      if (!currUserId) return;
+      try {
+        const response = await axios.get(
+          `http://localhost:3000/api/post/like/${postId}`
+        );
+        const likedUsers = response.data.likedByUsers;
+        setLikedByCurrentUser(likedUsers.some((user) => user === currUserId));
+      } catch (error) {
+        console.error("Error fetching likes:", error);
+      }
+    };
+
+    if (currUserId) {
+      fetchLikes();
+    }
+  }, [currUserId, postId]);
 
   const fetchUserProfile = async () => {
     try {
@@ -67,6 +83,7 @@ const PostCard = ({
         { userId: currUserId }
       );
       setLikes(response.data.post.likes);
+      console.log(response.data.hasLiked);
       setLikedByCurrentUser(response.data.hasLiked);
     } catch (error) {
       console.error("Error liking post:", error);
