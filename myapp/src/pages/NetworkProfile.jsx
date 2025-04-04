@@ -22,25 +22,38 @@ function NetworkProfile() {
   const userData = location.state?.userData;
   console.log(userData.userId);
   const [activeTab, setActiveTab] = useState("posts"); // 'posts' or 'projects'
+  const [currUserId, setCurrUserId] = useState(null);
   const [selectedPost, setSelectedPost] = useState(null);
+  const [commentModalOpen, setCommentModalOpen] = useState(false);
+   const [commentText, setCommentText] = useState("");
+  const [likes, setLikes] = useState();
+  const [likedByCurrentUser, setLikedByCurrentUser] = useState(false);
   const [user, setUser] = useState(null);
   const [posts, setPosts] = useState(null);
   const { user: clerkUser } = useUser();
+  
   useEffect(() => {
-    if (userData.userId) {
+    if (userData.userId && clerkUser?.id) {
       fetchuser();
     }
-  }, [userData]);
+  }, [userData,clerkUser?.id]);
+
+
   const fetchuser = async () => {
     try {
-      const [userResponse, postResponse] = await Promise.all([
+      const [userResponse, postResponse,userAuthResponse] = await Promise.all([
         axios.get(
           `http://localhost:3000/api/user/profileById/${userData.userId}`
         ),
         axios.get(`http://localhost:3000/api/user/posts/${userData.userId}`),
+        axios.get(
+          `http://localhost:3000/api/user/profile/${clerkUser.id}`
+        )
       ]);
       const data = userResponse.data;
+      const currUserData = userAuthResponse.data;
       setUser(data);
+      setCurrUserId(currUserData._id);
       const post = postResponse.data;
       setPosts(post);
       console.log("User data:", data);
@@ -51,38 +64,73 @@ function NetworkProfile() {
     }
   };
 
-  const handleLike = async (postId, currUserId) => {
+
+  useEffect(() => {
+    const fetchLikes = async () => {
+      try {
+        const response = await axios.get(
+          `http://localhost:3000/api/post/like/${selectedPost._id}`
+        );
+        const likedUsers = response.data.likedByUsers;
+        console.log("Liked users:", likedUsers);
+        setLikedByCurrentUser(likedUsers.some((user) => user === currUserId));
+      } catch (error) {
+        console.error("Error fetching likes:", error);
+      }
+    };
+
+    if (currUserId && selectedPost?._id) {
+      fetchLikes();
+    }
+  }, [currUserId, selectedPost?._id]);
+
+  const handleLike = async () => {
     try {
       const response = await axios.patch(
-        `http://localhost:3000/api/post/like/${postId}/like-toggle`,
+        `http://localhost:3000/api/post/like/${selectedPost._id}/like-toggle`,
         { userId: currUserId }
       );
-      toast.success("LIKED");
+      const updatedPost = {
+        ...selectedPost,
+        likes: response.data.post.likes,
+      };
+      setSelectedPost(updatedPost);
+      setLikedByCurrentUser(response.data.hasLiked);
+      
     } catch (error) {
       console.error("Error liking post:", error);
       toast.error("Failed to like post");
     }
   };
 
-  // Dummy data - replace with actual data from your backend
-
-  // Dummy posts data - replace with actual data
-  //   const posts = [
-  //     {
-  //       id: 1,
-  //       imageUrl: "https://source.unsplash.com/random/800x800?1",
-  //       likes: 124,
-  //       comments: 8,
-  //       content: "This is a sample post caption",
-  //       username: "John Doe",
-  //       avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e",
-  //       time: "2 hours ago",
-  //     },
-  //     // Add more posts...
-  //   ];
-
   const handlePostClick = (post) => {
     setSelectedPost(post);
+  };
+
+
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!commentText.trim()) return;
+
+    try {
+      const formData = new FormData();
+      formData.append("text", commentText);
+      formData.append("postId", selectedPost._id);
+      formData.append("userId", currUserId);
+      await axios.post(
+        "http://localhost:3000/api/post/create-comment",
+        formData,
+        {
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+      setCommentText("");
+      toast.success(`Comment posted successfully!`);
+    } catch (e) {
+      console.error("Error posting comment:", e);
+      toast.error("Something went wrong");
+    }
   };
 
   return (
@@ -245,20 +293,59 @@ function NetworkProfile() {
                   <div className="p-4 border-t border-gray-400 bg-gray-100">
                     <div className="flex items-center justify-between mb-3">
                       <div className="flex items-center space-x-4">
-                        <button className="p-2 hover:bg-gray-100 rounded-full">
-                          <Heart size={24} className="text-gray-700" />
+                        <button 
+                         onClick={handleLike}
+                         className="p-2 hover:bg-gray-100 rounded-full">
+                         <Heart
+                             size={22}
+                             className={`${
+                               likedByCurrentUser
+                                 ? "fill-red-500 stroke-red-500"
+                                 : "stroke-gray-700 hover:stroke-red-500"
+                             } transition-colors`}
+                            />
                         </button>
-                        <button className="p-2 hover:bg-gray-100 rounded-full">
+
+                        <button 
+                          onClick={() => setCommentModalOpen(!commentModalOpen)}
+                          className="p-2 hover:bg-gray-100 rounded-full">
                           <MessageCircle size={24} className="text-gray-700" />
                         </button>
+
                         <button className="p-2 hover:bg-gray-100 rounded-full">
                           <Share2 size={24} className="text-gray-700" />
                         </button>
+
+               
                       </div>
+                   
                     </div>
                     <p className="font-semibold text-sm mb-2">
                       {selectedPost.likes} likes
                     </p>
+                    {commentModalOpen &&  <form
+                      onSubmit={handleSubmit}
+                      className="flex items-center py-3 border-t border-gray-50 "
+                    >
+                      <input
+                        type="text"
+                        value={commentText}
+                        onChange={(e) => setCommentText(e.target.value)}
+                        placeholder="Add a comment..."
+                        className="flex-1 text-sm p-2 focus:outline-none placeholder-gray-400"
+                      />
+                      <button
+                        type="submit"
+                        disabled={!commentText.trim()}
+                        className={`px-3 py-1 text-sm font-semibold rounded-full transition-colors ${
+                          commentText.trim()
+                            ? "text-blue-500 hover:text-blue-600 hover:bg-blue-50"
+                            : "text-gray-200 cursor-not-allowed"
+                        }`}
+                      >
+                        Post
+          </button>
+        </form>}
                     <p className="text-sm text-gray-500">{selectedPost.time}</p>
                   </div>
                 </div>

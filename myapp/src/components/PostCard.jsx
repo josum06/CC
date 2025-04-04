@@ -39,6 +39,8 @@ const PostCard = ({
       fetchUserProfile();
     }
   }, [user]);
+
+  
   useEffect(() => {
     const fetchLikes = async () => {
       if (!currUserId) return;
