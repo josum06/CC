@@ -52,7 +52,7 @@ function Comments({ postId }) {
       {comments.map((comment) => (
         <div 
           key={comment._id} 
-          className="mb-4 group hover:bg-gray-50 rounded-lg p-2 transition-colors duration-200"
+          className="mb-4 group hover:bg-gray-200 rounded-lg p-3 transition-colors duration-200"
         >
           <div className="flex items-start space-x-3">
             {/* User Avatar */}

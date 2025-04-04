@@ -88,12 +88,12 @@ function NetworkProfile() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Top Navigation */}
-      <div className="sticky top-0 z-50  border-b bg-gray-200 px-4 py-3 flex items-center justify-between">
+      <div className="sticky top-0 z-50  px-4 py-3 flex items-center justify-between">
         <button
           onClick={() => navigate("/Network")}
-          className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+          className="p-2 hover:bg-gray-300 bg-gray-200 cursor-pointer rounded-full transition-colors"
         >
-          <X size={24} className="text-gray-600" />
+          <X size={24} className="text-gray-700" />
         </button>
         <div className="w-10" /> {/* Spacer for alignment */}
       </div>
@@ -198,29 +198,29 @@ function NetworkProfile() {
 
           {/* Post Modal */}
           {selectedPost && (
-            <div className="fixed inset-0 z-50 overflow-y-auto bg-black bg-opacity-75 flex items-center justify-center p-4">
-              <div className="relative bg-white rounded-xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col md:flex-row">
+            <div className="fixed inset-0 z-50 overflow-y-auto bg-black/70  backdrop-blur-sm flex items-center justify-center p-4">
+              <div className="relative bg-gray-100 border border-gray-400 rounded-xl max-w-4xl w-full max-h-[90vh]  min-h-[90vh] overflow-hidden flex flex-col md:flex-row">
                 {/* Close button */}
                 <button
                   onClick={() => setSelectedPost(null)}
-                  className="absolute top-4 right-4 p-2 bg-white rounded-full shadow-lg hover:bg-gray-100 z-50"
+                  className="absolute top-4 right-4 p-2 bg-gray-200 rounded-full cursor-pointer hover:bg-gray-300 z-50"
                 >
-                  <X size={20} className="text-gray-600" />
+                  <X size={20} className="text-gray-800" />
                 </button>
 
                 {/* Image Section */}
-                <div className="w-full md:w-7/12 bg-black flex items-center">
+                <div className="w-full md:w-7/12 bg-gray-100 flex items-center justify-center ">
                   <img
                     src={selectedPost.mediaUrl}
                     alt="Post content"
-                    className="w-full h-full object-contain"
+                    className="w-auto h-full object-contain"
                   />
                 </div>
 
                 {/* Details Section */}
-                <div className="w-full md:w-5/12 flex flex-col h-full">
+                <div className="w-full md:w-5/12 flex border-s border-gray-400 flex-col min-h-full">
                   {/* Post Header */}
-                  <div className="p-4 border-b">
+                  <div className="p-4 border-b border-gray-400">
                     <div className="flex items-center space-x-3">
                       <img
                         src={user.profileImage}
@@ -242,7 +242,7 @@ function NetworkProfile() {
                   </div>
 
                   {/* Action Buttons */}
-                  <div className="p-4 border-t bg-white">
+                  <div className="p-4 border-t border-gray-400 bg-gray-100">
                     <div className="flex items-center justify-between mb-3">
                       <div className="flex items-center space-x-4">
                         <button className="p-2 hover:bg-gray-100 rounded-full">
@@ -282,7 +282,9 @@ function NetworkProfile() {
                       className="w-full h-full object-cover"
                     />
                     {/* Hover Overlay */}
-                    <div className="absolute inset-0 not-open: bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-300 flex items-center justify-center">
+                    
+                    
+                    <div className="absolute inset-0 not-open: bg-opacity-0 group-hover:bg-black/60 transition-all duration-300 flex items-center justify-center">
                       <div className="flex items-center space-x-6 opacity-0 group-hover:opacity-100 transition-all duration-300">
                         <div className="flex items-center text-white">
                           <button
