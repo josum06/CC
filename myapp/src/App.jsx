@@ -23,6 +23,7 @@ import ClassRoom from "./pages/ClassRoom";
 import AuthorityRegister from "./pages/AuthorityRegister"; // Added missing import
 import CompleteYourProfile from "./pages/CompleteYourProfile";
 import YourProfile from "./pages/YourProfile";
+import NetworkProfile from "./pages/NetworkProfile";
 import { ToastContainer } from "react-toastify";
 
 const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
@@ -62,6 +63,7 @@ function App() {
             <Route path="/AuthorityRegister" element={<AuthorityRegister />} />
             <Route path="/CompleteYourProfile" element={<CompleteYourProfile />} />
             <Route path="/YourProfile" element={<YourProfile />} />
+            <Route path="/NetworkProfile" element={<NetworkProfile />} />
           </Route>
 
           {/* Protected Routes */}
@@ -81,6 +83,7 @@ function App() {
             <Route path="/YourAccount" element={<YourAccount />} />
             <Route path="/FacultyPost" element={<FacultyPost />} />
             <Route path="/ClassRoom" element={<ClassRoom />} />
+          
           </Route>
 
           {/* Fallback Route */}

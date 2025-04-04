@@ -52,7 +52,7 @@ function Comments({ postId }) {
       {comments.map((comment) => (
         <div 
           key={comment._id} 
-          className="mb-4 group hover:bg-gray-50 rounded-lg p-2 transition-colors duration-200"
+          className="mb-4 group hover:bg-gray-200 rounded-lg p-3 transition-colors duration-200"
         >
           <div className="flex items-start space-x-3">
             {/* User Avatar */}
@@ -65,8 +65,7 @@ function Comments({ postId }) {
                   e.target.src = 'https://via.placeholder.com/40';
                 }}
               />
-              <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
-            </div>
+             </div>
             
             {/* Comment Content */}
             <div className="flex-1 min-w-0">

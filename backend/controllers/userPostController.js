@@ -145,3 +145,20 @@ exports.likePost = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
+exports.getLikedUser = async (req, res) => {
+  try {
+    const postId = req.params.postId;
+    if (!postId) {
+      return res.status(400).json({ message: "Missing postId parameter" });
+    }
+    const post = await Post.findById(postId).populate("likedByUsers");
+    if (!post) {
+      return res.status(404).json({ message: "Post not found" });
+    }
+    res.json({ likedByUsers: post.likedByUsers });
+  } catch (error) {
+    console.error("Error fetching liked users:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
