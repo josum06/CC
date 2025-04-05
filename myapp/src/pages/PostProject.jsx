@@ -89,6 +89,7 @@ const PostProject = () => {
       );
       const data = response.data;
       const userId = data._id;
+      console.log("User ID:", userId);
       const form = new FormData();
       form.append("title", formData.title);
       form.append("description", formData.description);
@@ -98,11 +99,9 @@ const PostProject = () => {
       const validContributors = formData.contributors.filter(
         (c) => c.trim() !== ""
       );
-      if (validContributors.length > 0) {
-        form.append("contributors", JSON.stringify(validContributors));
-      }
+      form.append("contributors", JSON.stringify(validContributors));
 
-      form.append("TechStack", JSON.stringify(formData.skills));
+      formData.skills.forEach((skill) => form.append("TechStack", skill));
       form.append("userId", userId);
       await axios.post(
         "http://localhost:3000/api/project/create-project",
@@ -120,6 +119,7 @@ const PostProject = () => {
     } finally {
       setIsSubmitting(false);
     }
+    
   };
 
   return (
@@ -375,8 +375,9 @@ const PostProject = () => {
                     <input
                       type="file"
                       name="file"
-                      accept="image/*,video/*"
+                      accept="image/*"
                       onChange={handleChange}
+                      required
                       className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                     />
                   </div>

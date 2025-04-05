@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Heart,
   MessageCircle,
@@ -12,31 +12,32 @@ import {
 } from "lucide-react";
 
 const ProjectCard = ({
-  avatar = "https://avatars.githubusercontent.com/u/1234567",
-  username = "John Doe",
-  time = "2 hours ago",
-  title = "AI-Powered Chat Application",
-  description = "A real-time chat application built with React and Node.js, featuring AI-powered chat suggestions and real-time collaboration tools.",
-  projectUrl = "https://demo-project.com",
-  githubUrl = "https://github.com/project",
-  contributors = [
-    { name: "John Doe", avatar: "https://avatars.githubusercontent.com/u/1" },
-    { name: "Jane Smith", avatar: "https://avatars.githubusercontent.com/u/2" },
-    { name: "Mike Johnson", avatar: "https://avatars.githubusercontent.com/u/3" },
-  ],
-  mediaUrl = "https://images.unsplash.com/photo-1555066931-4365d14bab8c",
-  likes = 42,
-  comments = [],
+  avatar ,
+  username, 
+  time,
+  projectName ,
+  description,
+  projectUrl ,
+  githubUrl ,
+  contributors,
+  imageUrl ,
+  skills,
+  likes ,
+  comments ,
 }) => {
+
+  
   const [isLiked, setIsLiked] = useState(false);
   const [showComments, setShowComments] = useState(false);
-  const [isSaved, setIsSaved] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
 
   const handleCopyLink = () => {
     navigator.clipboard.writeText(projectUrl);
     setShowDropdown(false);
   };
+  
+  
+  
 
   return (
     <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100 hover:shadow-md transition-all duration-300">
@@ -104,13 +105,13 @@ const ProjectCard = ({
       {/* Project Content */}
       <div className="px-6 py-4">
         <h2 className="text-xl font-bold text-gray-900 mb-2 hover:text-blue-600 cursor-pointer">
-          {title}
+          {projectName}
         </h2>
         <p className="text-gray-600 text-sm leading-relaxed mb-4">{description}</p>
 
         {/* Tech Stack Tags */}
         <div className="flex flex-wrap gap-2 mb-4">
-          {["React", "Node.js", "MongoDB", "TailwindCSS"].map((tech) => (
+          {skills.length>0 && skills.map((tech) => (
             <span
               key={tech}
               className="px-3 py-1 bg-gray-50 text-gray-600 rounded-full text-sm font-medium"
@@ -154,8 +155,8 @@ const ProjectCard = ({
             {contributors.map((contributor, index) => (
               <img
                 key={index}
-                src={contributor.avatar}
-                alt={contributor.name}
+                src={contributor}
+                alt={`Contributor ${index + 1}`}
                 className="w-8 h-8 rounded-full border-2 border-white hover:z-10 transition-transform hover:scale-110"
                 title={contributor.name}
               />
@@ -169,7 +170,7 @@ const ProjectCard = ({
         {/* Project Media */}
         <div className="relative rounded-xl overflow-hidden bg-gray-50 mb-4">
           <img
-            src={mediaUrl}
+            src={imageUrl}
             alt="Project preview"
             className="w-full object-cover hover:scale-105 transition-transform duration-300"
             style={{ maxHeight: "400px" }}

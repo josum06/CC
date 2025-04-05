@@ -5,12 +5,14 @@ import Group from "../components/Group"; // Import the Group component
 import axios from "axios";
 import { format, parseISO } from "date-fns";
 import ProjectCard from "../components/ProjectCard";
+import { toast } from "react-toastify";
 
 const Network = () => {
   const [posts, setPost] = useState([]);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [activeTab, setActiveTab] = useState("posts");
+  const [projects, setProjects] = useState([]);
 
   useEffect(() => {
     fetchPosts(page);
@@ -29,7 +31,6 @@ const Network = () => {
 
       setPost((prev) => [...prev, ...newPost]);
       setPage(pageNum);
-      console.log("Post are:-", newPost);
     } catch (err) {
       console.error("Error fetching notices:", err);
     }
@@ -41,20 +42,21 @@ const Network = () => {
     // Add more groups as needed
   ];
 
-  // Add sample projects data (you can replace this with actual API call)
-  const projects = [
-    {
-      title: "AI-Powered Chat Application",
-      description:
-        "A real-time chat application built with React and Node.js, featuring AI-powered chat suggestions.",
-      projectUrl: "https://demo-project.com",
-      githubUrl: "https://github.com/project",
-      mediaUrl: "https://images.unsplash.com/photo-1555066931-4365d14bab8c",
-      likes: 42,
-      comments: [],
-    },
-    // Add more projects as needed
-  ];
+  useEffect(() => {
+    fetchProjects();
+  },[])
+   
+   const fetchProjects = async () => {
+    try{
+      const res = await axios.get('http://localhost:3000/api/project/get-projects');
+      const data = res.data;
+      console.log("Projects are:-", data);
+      setProjects(data);
+    }catch(err){
+      console.error("Error fetching projects:", err);
+      toast.error("Error fetching projects");
+    }
+   }
 
   return (
     <div className="min-h-screen py-4 px-4 sm:px-6 lg:px-8">
@@ -124,7 +126,7 @@ const Network = () => {
               Projects
               {activeTab === "projects" && (
                 <span className="ml-1 px-2 py-0.5 text-xs bg-blue-50 text-blue-600 rounded-full">
-                  {projects.length}
+                  {projects?.length}
                 </span>
               )}
             </button>
@@ -152,8 +154,23 @@ const Network = () => {
                   />
                 ))
               : // Projects Content
-                projects.map((project, index) => (
-                  <ProjectCard key={index} {...project} />
+                projects?.map((project, index) => (
+                  <ProjectCard key={index} 
+                    projectId={project._id}
+                    userId={project?.userId?._id}
+                    avatar={project?.userId?.profileImage}
+                    username={project?.userId?.fullName}
+                    time={project?.createdAt}
+                    content={project?.description}
+                    projectUrl={project?.projectUrl}
+                    githubUrl={project?.githubUrl}
+                    imageUrl={project?.mediaUrl}
+                    skills={project?.TechStack}
+                    likes={project?.likes}
+                    comments={project?.comments}
+                    contributors={project?.contributors} 
+                    projectName={project?.title}
+                  />
                 ))}
           </div>
         </div>

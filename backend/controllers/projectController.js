@@ -7,13 +7,15 @@ exports.createProject = async (req, res) => {
       title,
       description,
       githubUrl,
-      user,
+      projectUrl,
+      userId,
       category,
       TechStack,
       contributors,
     } = req.body;
 
     let mediaUrl = null;
+
 
     if (!req.file) {
       return res
@@ -33,7 +35,8 @@ exports.createProject = async (req, res) => {
       title,
       description,
       githubUrl,
-      user,
+      projectUrl,
+      userId,
       category,
       TechStack,
       mediaUrl,
@@ -71,9 +74,9 @@ exports.createProject = async (req, res) => {
 exports.getAllProjects = async (req, res) => {
   try {
     const projects = await Project.find().populate(
-      "user",
+      "userId",
       "fullName profileImage "
-    );
+    ).sort({ createdAt: -1 });
     res.status(200).json(projects);
   } catch (error) {
     console.error("Error fetching projects:", error);

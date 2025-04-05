@@ -33,7 +33,6 @@ const PostCard = ({
   const [showOptions, setShowOptions] = useState(false);
   const [commentModal, setCommentModal] = useState(false);
   const [commentText, setCommentText] = useState("");
-  console.log(imageUrl);
   useEffect(() => {
     if (user) {
       fetchUserProfile();

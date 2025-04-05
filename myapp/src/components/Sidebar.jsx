@@ -14,7 +14,7 @@ import {
   UserCircle,
   ChevronRight,
 } from "lucide-react";
-import { format, formatDate, parseISO } from "date-fns";
+import { format } from "date-fns";
 
 const Sidebar = ({ isOpen, toggleSidebar }) => {
   const navigate = useNavigate();
@@ -104,10 +104,12 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                   {user?.fullName}
                 </h2>
                 <div className="flex items-center gap-2">
-                  <span className="text-blue-100 text-sm">
-                    {mainUser?.role.slice(0, 1).toUpperCase() +
-                      mainUser?.role.slice(1)}
-                  </span>
+                <span className="text-blue-100 text-sm">
+                  {mainUser?.role
+                    ? mainUser.role.slice(0, 1).toUpperCase() + mainUser.role.slice(1)
+                    : "Role"}
+                </span>
+
                 </div>
               </div>
             </div>

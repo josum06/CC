@@ -5,13 +5,15 @@ const projectSchema = new mongoose.Schema({
   description: { type: "String", required: true },
   projectUrl: { type: "String" },
   githubUrl: { type: "String" },
-  TechStack: { type: [String], required: true },
+  TechStack: { type: Array },
   mediaUrl: { type: "String", required: true },
-  contributors: { type: [String] },
+  contributors: { type: Array },
   likes: { type: "Number", default: 0 },
-  user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
   comments: [{ type: mongoose.Schema.Types.ObjectId, ref: "Comment" }],
   likedByUsers: { type: [String], default: [] },
+},{
+  timestamps: true,
 });
 
 module.exports = mongoose.model("Project", projectSchema);
