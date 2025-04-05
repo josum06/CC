@@ -94,14 +94,14 @@ const PostPage = () => {
 
           <form onSubmit={handleSubmit} className="p-6">
             {/* Caption Input */}
-            <div className="mb-6">
+            <div className="mb-6 border border-gray-300 rounded-xl">
               <textarea
                 name="description"
                 value={formData.description}
                 onChange={handleChange}
                 placeholder="What's on your mind?"
                 rows="4"
-                className="w-full p-4 text-lg border-0 focus:ring-0 resize-none placeholder:text-gray-400"
+                className="w-full p-4 text-lg rounded-xl border-0 focus:ring-0 resize-none placeholder:text-gray-400"
                 required
               />
             </div>

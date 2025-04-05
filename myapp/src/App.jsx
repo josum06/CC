@@ -4,8 +4,6 @@ import { ClerkProvider, useAuth } from "@clerk/clerk-react";
 import AppLayout from "./ui/AppLayout";
 import NoNavFooterLayout from "./ui/NoNavFooterLayout";
 import Loader from "./components/Loader";
-
-// Pages
 import Notice from "./pages/Notice";
 import Post from "./pages/Post";
 import FacultyPost from "./pages/FacultyPost";
@@ -17,14 +15,13 @@ import SignUpPage from "./pages/SignUp";
 import Login from "./pages/Login";
 import Home from "./pages/Home";
 import YourAccount from "./pages/YourAccount";
-
 import PostProject from "./pages/PostProject";
 import ClassRoom from "./pages/ClassRoom";
-import AuthorityRegister from "./pages/AuthorityRegister"; // Added missing import
 import CompleteYourProfile from "./pages/CompleteYourProfile";
 import YourProfile from "./pages/YourProfile";
 import NetworkProfile from "./pages/NetworkProfile";
 import { ToastContainer } from "react-toastify";
+import FacultyRole from "./pages/FacultyRole";
 
 const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 
@@ -60,10 +57,12 @@ function App() {
             <Route path="/Login" element={<Login />} />
             <Route path="/Post" element={<Post />} />
             <Route path="/PostProject" element={<PostProject />} />
-            <Route path="/AuthorityRegister" element={<AuthorityRegister />} />
+            <Route path="/FacultyRole" element={<FacultyRole/>} />
             <Route path="/CompleteYourProfile" element={<CompleteYourProfile />} />
             <Route path="/YourProfile" element={<YourProfile />} />
             <Route path="/NetworkProfile" element={<NetworkProfile />} />
+            <Route path="/YourAccount" element={<YourAccount />} />
+            <Route path="/ClassRoom" element={<ClassRoom />} />
           </Route>
 
           {/* Protected Routes */}
@@ -80,9 +79,9 @@ function App() {
             <Route path="/Network" element={<Network />} />
             <Route path="/Companies" element={<Companies />} />
             <Route path="/Chats" element={<Chats />} />
-            <Route path="/YourAccount" element={<YourAccount />} />
+            
             <Route path="/FacultyPost" element={<FacultyPost />} />
-            <Route path="/ClassRoom" element={<ClassRoom />} />
+            
           
           </Route>
 

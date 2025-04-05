@@ -165,41 +165,73 @@ const UserProfile = () => {
             <div className="absolute bottom-0 left-0 right-0 px-6 py-6 bg-gradient-to-t from-black/60 to-transparent">
               <div className="flex items-end space-x-4">
                 <div className="relative">
-                  <img
-                    src={editMode ? tempUser.imageUrl : user?.imageUrl}
-                    alt="Profile"
-                    className="w-24 h-24 sm:w-32 sm:h-32 rounded-2xl border-4 border-white object-cover shadow-lg transform -translate-y-1/3"
-                  />
-                  {editMode && (
-                    <button
-                      onClick={() => triggerFileInput(profilePicInputRef)}
-                      className="absolute bottom-0 right-0 p-2 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 transition-colors"
-                    >
-                      <svg
-                        className="w-5 h-5"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
-                        />
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"
-                        />
+                  <div className="relative w-24 h-24 sm:w-32 sm:h-32">
+                    <img
+                      src={editMode ? tempUser.imageUrl : user?.imageUrl}
+                      alt="Profile"
+                      className="w-full h-full rounded-2xl border-4 border-white object-cover shadow-lg"
+                    />
+                    <div className="absolute -top-2 -right-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-1.5 rounded-full shadow-lg">
+                      <svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" />
                       </svg>
-                    </button>
-                  )}
+                    </div>
+                    {editMode && (
+                      <button
+                        onClick={() => triggerFileInput(profilePicInputRef)}
+                        className="absolute -top-3 left-1/2 -translate-x-1/2 p-2 bg-white text-blue-600 rounded-full shadow-lg hover:bg-blue-50 transition-all duration-200 group"
+                      >
+                        <svg
+                          className="w-5 h-5"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
+                          />
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"
+                          />
+                        </svg>
+                        <span className="absolute opacity-0 group-hover:opacity-100 bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 text-xs text-white bg-gray-900 rounded whitespace-nowrap transition-opacity duration-200">
+                          Change Photo
+                        </span>
+                      </button>
+                    )}
+                  </div>
+                  <input
+                    type="file"
+                    ref={profilePicInputRef}
+                    onChange={(e) => handleImageUpload(e, "imageUrl")}
+                    accept="image/*"
+                    className="hidden"
+                  />
                 </div>
                 <div className="flex-1 text-white">
-                  <h2 className="text-2xl sm:text-3xl font-bold">{user?.fullName}</h2>
-                  <p className="text-blue-100">{branch}</p>
+                  <div className="flex items-center gap-3 mb-1">
+                    <h2 className="text-2xl sm:text-3xl font-bold">{user?.fullName}</h2>
+                    {/* Role Badge */}
+                    <span className="px-3 py-1 text-sm font-medium bg-white/20 rounded-full backdrop-blur-sm border border-white/30">
+                      Student
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <p className="text-blue-100">{branch}</p>
+                    {/* Verification Status */}
+                    <span className="flex items-center text-sm text-blue-100">
+                      <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                      </svg>
+                      Verified Account
+                    </span>
+                  </div>
                 </div>
                 <div>
                   {!editMode ? (

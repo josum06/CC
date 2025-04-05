@@ -1,11 +1,19 @@
 import { SignOutButton } from "@clerk/clerk-react";
 import React, { useEffect, useState } from "react";
-import { FaTimes } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import { IoSettings } from "react-icons/io5";
 import { useUser } from "@clerk/clerk-react";
 import axios from "axios";
 import { toast } from "react-toastify";
+import {
+  X,
+  Settings,
+  User,
+  BookOpen,
+  Shield,
+  LogOut,
+  UserCircle,
+  ChevronRight,
+} from "lucide-react";
 
 const Sidebar = ({ isOpen, toggleSidebar }) => {
   const navigate = useNavigate();
@@ -31,98 +39,157 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
     }
   };
 
-  return (
-    <div
-      className={`fixed top-0 right-0 w-64 h-full bg-white shadow-lg z-50 transform transition-transform ${
-        isOpen ? "translate-x-0" : "translate-x-full"
-      }`}
-    >
-      <div className="flex justify-between items-center p-4">
-        <h2 className="text-lg font-bold">Sidebar</h2>
-        <FaTimes className="text-xl cursor-pointer" onClick={toggleSidebar} />
-      </div>
+  const MenuItem = ({ icon: Icon, label, onClick, variant = "default" }) => {
+    const variants = {
+      default: "bg-gray-50 text-gray-700 hover:bg-gray-100",
+      primary: "bg-blue-50 text-blue-700 hover:bg-blue-100",
+      warning: "bg-orange-50 text-orange-700 hover:bg-orange-100",
+      danger: "bg-red-50 text-red-700 hover:bg-red-100",
+    };
 
-      <div className="p-4">
-        <div className="py-2 -mt-5 px-1 flex justify-between items-center mb-2">
-          <span className="text-lg text-black">{user?.fullName}</span>
-          <img
-            className="w-10 h-10 rounded-full"
-            src={user?.imageUrl}
-            alt="user img"
-          />
+    return (
+      <button
+        onClick={onClick}
+        className={`group w-full cursor-pointer px-4 py-3 rounded-xl mb-2 transition-all duration-200 ${variants[variant]} flex items-center justify-between`}
+      >
+        <div className="flex items-center gap-3">
+          <Icon className="w-5 h-5" />
+          <span className="font-medium">{label}</span>
+        </div>
+        <ChevronRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transform group-hover:translate-x-1 transition-all duration-200" />
+      </button>
+    );
+  };
+
+  return (
+    <>
+      {/* Backdrop */}
+      {isOpen && (
+        <div
+          className="fixed inset-0 bg-black/20 z-40"
+          onClick={toggleSidebar}
+        />
+      )}
+
+      {/* Sidebar */}
+      <div
+        className={`fixed top-0 right-0 w-[320px] h-full bg-white shadow-2xl z-50 transform transition-transform duration-300 ease-in-out  ${
+          isOpen ? "translate-x-0" : "translate-x-full"
+        }`}
+      >
+        {/* Header */}
+        <div className="relative h-28 bg-gradient-to-br  from-blue-600 to-indigo-600 rounded-bl-[2rem]">
+          {/* Close Button - Fixed positioning and improved styling */}
+          <button
+            onClick={toggleSidebar}
+            className="absolute top-6 right-2  cursor-pointer p-2.5 rounded-full bg-white/10 hover:bg-white/20 text-white transition-all duration-200 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-white/50 z-50"
+            aria-label="Close sidebar"
+          >
+            <X className="w-5 h-5 stroke-[2.5]" />
+          </button>
+
+          <div className="absolute bottom-0 left-0 right-0 p-6">
+            <div className="flex items-center gap-4">
+              <div className="relative">
+                <img
+                  src={user?.imageUrl}
+                  alt="Profile"
+                  className="w-16 h-16 rounded-full border-2 border-white object-cover shadow-lg"
+                />
+                {/* Online Status Indicator */}
+               
+              </div>
+              <div className="flex-1">
+                <h2 className="text-white font-semibold text-lg leading-tight">
+                  {user?.fullName}
+                </h2>
+                <div className="flex items-center gap-2">
+                  <span className="text-blue-100 text-sm">Student</span>
+                 
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <button
-          onClick={() => {
-            navigate("/YourAccount");
-            toggleSidebar();
-          }}
-          className="mb-2 bg-purple-400 hover:bg-purple-500 hover:shadow w-full px-4 py-2 text-white font-semibold rounded-md cursor-pointer justify-center flex items-center"
-        >
-          Account
-        </button>
-
-        {!mainUser?.profileComplete && (
-          <button
+        {/* Menu Items */}
+        <div className="p-6 space-y-2 ">
+          <MenuItem
+            icon={User}
+            label="Account"
+            
             onClick={() => {
-              navigate("/CompleteYourProfile");
+              navigate("/YourAccount");
               toggleSidebar();
             }}
-            className="mb-2 bg-orange-400 hover:bg-orange-500 hover:shadow w-full px-4 py-2 text-white font-semibold rounded-md cursor-pointer justify-center flex items-center"
-          >
-            Complete Your Profile
-          </button>
-        )}
+            variant="primary"
+          />
 
-        {mainUser?.profileComplete && (
-          <button
+          {!mainUser?.profileComplete ? (
+            <MenuItem
+              icon={UserCircle}
+              label="Complete Your Profile"
+              onClick={() => {
+                navigate("/CompleteYourProfile");
+                toggleSidebar();
+              }}
+              variant="warning"
+            />
+          ) : (
+            <MenuItem
+              icon={UserCircle}
+              label="Your Profile"
+              onClick={() => {
+                navigate("/YourProfile");
+                toggleSidebar();
+              }}
+              variant="warning"
+            />
+          )}
+
+          <MenuItem
+            icon={BookOpen}
+            label="Class Room"
             onClick={() => {
-              navigate("/YourProfile");
+              navigate("/ClassRoom");
               toggleSidebar();
             }}
-            className="mb-2 bg-orange-400 hover:bg-orange-500 hover:shadow w-full px-4 py-2 text-white font-semibold rounded-md cursor-pointer justify-center flex items-center"
-          >
-            Your Profile
-          </button>
-        )}
+          />
 
-        <button
-          onClick={() => {
-            navigate("/ClassRoom");
-            toggleSidebar();
-          }}
-          className="mb-2 bg-blue-400 hover:bg-blue-500 hover:shadow w-full px-4 py-2 text-white font-semibold rounded-md cursor-pointer justify-center flex items-center"
-        >
-          Class Room
-        </button>
+          
 
-        <button
-          onClick={() => {
-            navigate("/Settings");
-            toggleSidebar();
-          }}
-          className="mb-2 bg-gray-200 hover:bg-gray-300 hover:shadow w-full px-4 py-2 text-gray-900 font-semibold rounded-md cursor-pointer justify-center flex items-center"
-        >
-          <IoSettings className="me-1" /> Settings
-        </button>
+          <MenuItem
+            icon={Shield}
+            label="Faculty Role"
+            onClick={() => {
+              navigate("/FacultyRole");
+              toggleSidebar();
+            }}
+          />
 
-        <SignOutButton
-          onClick={toggleSidebar}
-          className="bg-red-400 w-full px-4 py-2 hover:bg-red-500 hover:shadow text-white font-semibold rounded-md cursor-pointer"
-          redirectUrl="/Signup"
-        />
+          {/* Sign Out Button */}
+          <div className="pt-56">
+            <SignOutButton
+              onClick={toggleSidebar}
+              redirectUrl="/Signup"
+            >
+              <button className="w-full px-4 cursor-pointer py-3 rounded-xl bg-red-50 text-red-700 hover:bg-red-100 transition-colors flex items-center gap-3">
+                <LogOut className="w-5 h-5" />
+                <span className="font-medium">Sign Out</span>
+              </button>
+            </SignOutButton>
+          </div>
+        </div>
 
-        <button
-          onClick={() => {
-            navigate("/AuthorityRegister");
-            toggleSidebar();
-          }}
-          className="mb-2 bg-gray-200 hover:bg-gray-300 hover:shadow w-full px-4 py-2 text-gray-900 font-semibold rounded-md cursor-pointer justify-center flex items-center"
-        >
-          <IoSettings className="me-1" /> Authority
-        </button>
+        {/* Footer */}
+        <div className="absolute bottom-0 left-0 right-0 p-6">
+          <div className="text-center text-sm text-gray-500">
+            <p>© 2024 Your App Name</p>
+            <p className="text-xs mt-1">Version 1.0.0</p>
+          </div>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 
