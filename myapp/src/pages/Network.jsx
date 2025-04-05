@@ -10,7 +10,7 @@ const Network = () => {
   const [posts, setPost] = useState([]);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
-  const [activeTab, setActiveTab] = useState('posts');
+  const [activeTab, setActiveTab] = useState("posts");
 
   useEffect(() => {
     fetchPosts(page);
@@ -45,12 +45,13 @@ const Network = () => {
   const projects = [
     {
       title: "AI-Powered Chat Application",
-      description: "A real-time chat application built with React and Node.js, featuring AI-powered chat suggestions.",
+      description:
+        "A real-time chat application built with React and Node.js, featuring AI-powered chat suggestions.",
       projectUrl: "https://demo-project.com",
       githubUrl: "https://github.com/project",
       mediaUrl: "https://images.unsplash.com/photo-1555066931-4365d14bab8c",
       likes: 42,
-      comments: []
+      comments: [],
     },
     // Add more projects as needed
   ];
@@ -62,16 +63,16 @@ const Network = () => {
         <div className="lg:w-3/4 w-full">
           <div className="bg-gray-50/50 backdrop-blur-xl rounded-2xl shadow-sm p-2 mb-6 inline-flex items-center gap-2 border border-gray-100">
             <button
-              onClick={() => setActiveTab('posts')}
+              onClick={() => setActiveTab("posts")}
               className={`px-6 py-3 rounded-xl text-sm font-semibold transition-all duration-300 flex items-center gap-2 ${
-                activeTab === 'posts'
-                  ? 'bg-white text-blue-600 shadow-md shadow-blue-100 transform scale-[1.02] border border-gray-100'
-                  : 'text-gray-600 hover:text-gray-900 hover:bg-white/50'
+                activeTab === "posts"
+                  ? "bg-white text-blue-600 shadow-md shadow-blue-100 transform scale-[1.02] border border-gray-100"
+                  : "text-gray-600 hover:text-gray-900 hover:bg-white/50"
               }`}
             >
               <svg
                 className={`w-4 h-4 ${
-                  activeTab === 'posts' ? 'text-blue-600' : 'text-gray-500'
+                  activeTab === "posts" ? "text-blue-600" : "text-gray-500"
                 }`}
                 fill="none"
                 stroke="currentColor"
@@ -91,23 +92,23 @@ const Network = () => {
                 />
               </svg>
               Posts
-              {activeTab === 'posts' && (
+              {activeTab === "posts" && (
                 <span className="ml-1 px-2 py-0.5 text-xs bg-blue-50 text-blue-600 rounded-full">
                   {posts.length}
                 </span>
               )}
             </button>
             <button
-              onClick={() => setActiveTab('projects')}
+              onClick={() => setActiveTab("projects")}
               className={`px-6 py-3 rounded-xl text-sm font-semibold transition-all duration-300 flex items-center gap-2 ${
-                activeTab === 'projects'
-                  ? 'bg-white text-blue-600 shadow-md shadow-blue-100 transform scale-[1.02] border border-gray-100'
-                  : 'text-gray-600 hover:text-gray-900 hover:bg-white/50'
+                activeTab === "projects"
+                  ? "bg-white text-blue-600 shadow-md shadow-blue-100 transform scale-[1.02] border border-gray-100"
+                  : "text-gray-600 hover:text-gray-900 hover:bg-white/50"
               }`}
             >
               <svg
                 className={`w-4 h-4 ${
-                  activeTab === 'projects' ? 'text-blue-600' : 'text-gray-500'
+                  activeTab === "projects" ? "text-blue-600" : "text-gray-500"
                 }`}
                 fill="none"
                 stroke="currentColor"
@@ -121,7 +122,7 @@ const Network = () => {
                 />
               </svg>
               Projects
-              {activeTab === 'projects' && (
+              {activeTab === "projects" && (
                 <span className="ml-1 px-2 py-0.5 text-xs bg-blue-50 text-blue-600 rounded-full">
                   {projects.length}
                 </span>
@@ -131,28 +132,29 @@ const Network = () => {
 
           {/* Content Area */}
           <div className="flex flex-col space-y-6">
-            {activeTab === 'posts' ? (
-              // Posts Content
-              posts?.map((post, index) => (
-                <PostCard
-                  key={index}
-                  postId={post._id}
-                  userId={post?.author?._id}
-                  avatar={post.author.profileImage}
-                  username={post?.author?.fullName}
-                  time={format(parseISO(post?.createdAt), "dd MMM yyyy, hh:mm a")}
-                  content={post.caption}
-                  imageUrl={post.mediaUrl}
-                  likes={post.likes}
-                  comments={post.comments}
-                />
-              ))
-            ) : (
-              // Projects Content
-              projects.map((project, index) => (
-                <ProjectCard key={index} {...project} />
-              ))
-            )}
+            {activeTab === "posts"
+              ? // Posts Content
+                posts?.map((post, index) => (
+                  <PostCard
+                    key={index}
+                    postId={post._id}
+                    userId={post?.author?._id}
+                    avatar={post.author.profileImage}
+                    username={post?.author?.fullName}
+                    time={format(
+                      parseISO(post?.createdAt),
+                      "dd MMM yyyy, hh:mm a"
+                    )}
+                    content={post.caption}
+                    imageUrl={post.mediaUrl}
+                    likes={post.likes}
+                    comments={post.comments}
+                  />
+                ))
+              : // Projects Content
+                projects.map((project, index) => (
+                  <ProjectCard key={index} {...project} />
+                ))}
           </div>
         </div>
 

@@ -1,9 +1,9 @@
 const mongoose = require("mongoose");
-const commentSchema = new mongoose.Schema(
+const commentProjectSchema = new mongoose.Schema(
   {
-    postId: {
+    projectId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Post",
+      ref: "Project",
       required: true,
     },
 
@@ -18,5 +18,4 @@ const commentSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
-
-module.exports = mongoose.model("Comment", commentSchema);
+const CommentProject = mongoose.model("CommentProject", commentProjectSchema);

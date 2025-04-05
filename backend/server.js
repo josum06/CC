@@ -9,6 +9,7 @@ const cors = require("cors");
 const userRouter = require("./routes/userRoute");
 const adminRouter = require("./routes/adminPostRoute");
 const postRouter = require("./routes/userPostRoute");
+const projectRouter = require("./routes/projectRoute");
 const app = express();
 connectDb();
 
@@ -26,7 +27,7 @@ app.use(
 app.use("/api/user", userRouter);
 app.use("/api/admin-post", adminRouter);
 app.use("/api/post", postRouter);
-
+app.use("/api/project", projectRouter);
 app.post(
   "/api/webhooks",
   express.raw({ type: "application/json" }),

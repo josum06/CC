@@ -134,7 +134,9 @@ const UserProfile = () => {
       {/* Modern Floating Header */}
       <div className="fixed top-0 left-0 right-0 bg-white/80 backdrop-blur-md z-50 border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <h1 className="text-xl font-semibold text-gray-900">Student Profile</h1>
+          <h1 className="text-xl font-semibold text-gray-900">
+            Student Profile
+          </h1>
           <button
             onClick={() => navigate("/home")}
             className="p-2 rounded-full cursor-pointer bg-gray-100 hover:bg-gray-200 transition-colors duration-200"
@@ -172,7 +174,11 @@ const UserProfile = () => {
                       className="w-full h-full rounded-2xl border-4 border-white object-cover shadow-lg"
                     />
                     <div className="absolute -top-2 -right-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-1.5 rounded-full shadow-lg">
-                      <svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
+                      <svg
+                        className="w-4 h-4"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                      >
                         <path d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" />
                       </svg>
                     </div>
@@ -216,20 +222,31 @@ const UserProfile = () => {
                 </div>
                 <div className="flex-1 text-white">
                   <div className="flex items-center gap-3 mb-1">
-                    <h2 className="text-2xl sm:text-3xl font-bold">{user?.fullName}</h2>
+                    <h2 className="text-2xl sm:text-3xl font-bold">
+                      {user?.fullName}
+                    </h2>
                     {/* Role Badge */}
                     <span className="px-3 py-1 text-sm font-medium bg-white/20 rounded-full backdrop-blur-sm border border-white/30">
-                      Student
+                      {user2?.role.slice(0, 1).toUpperCase() +
+                        user2?.role.slice(1).toLowerCase()}
                     </span>
                   </div>
                   <div className="flex items-center gap-3">
                     <p className="text-blue-100">{branch}</p>
                     {/* Verification Status */}
                     <span className="flex items-center text-sm text-blue-100">
-                      <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                      <svg
+                        className="w-4 h-4 mr-1"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                          clipRule="evenodd"
+                        />
                       </svg>
-                      Verified Account
+                      {user2?.status ? "Verified Account" : "Not Verified"}
                     </span>
                   </div>
                 </div>
@@ -282,7 +299,9 @@ const UserProfile = () => {
           <div className="space-y-8">
             {/* ID Card Section */}
             <div className="bg-white rounded-2xl shadow-lg p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">University ID Card</h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                University ID Card
+              </h3>
               <div className="relative aspect-[4/3] rounded-xl overflow-hidden bg-gray-100">
                 <img
                   src={editMode ? tempUser.collegeIDCard : user2?.collegeIDCard}
@@ -296,8 +315,18 @@ const UserProfile = () => {
                         onClick={() => triggerFileInput(idCardInputRef)}
                         className="p-3 bg-white/90 rounded-full transform scale-90 opacity-0 group-hover:opacity-100 group-hover:scale-100 transition-all duration-200"
                       >
-                        <svg className="w-6 h-6 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        <svg
+                          className="w-6 h-6 text-gray-900"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                          />
                         </svg>
                       </button>
                     </div>
@@ -315,22 +344,36 @@ const UserProfile = () => {
 
             {/* Social Links Section */}
             <div className="bg-white rounded-2xl shadow-lg p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Social Profiles</h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                Social Profiles
+              </h3>
               <div className="space-y-4">
                 {/* GitHub */}
                 <div>
-                  <label className="text-sm font-medium text-gray-600 block mb-1">GitHub</label>
+                  <label className="text-sm font-medium text-gray-600 block mb-1">
+                    GitHub
+                  </label>
                   {editMode ? (
                     <div className="relative">
                       <span className="absolute inset-y-0 left-0 pl-3 flex items-center">
-                        <svg className="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
-                          <path fillRule="evenodd" d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.17 6.839 9.49.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.167 22 16.418 22 12c0-5.523-4.477-10-10-10z" clipRule="evenodd" />
+                        <svg
+                          className="w-5 h-5 text-gray-400"
+                          fill="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.17 6.839 9.49.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.167 22 16.418 22 12c0-5.523-4.477-10-10-10z"
+                            clipRule="evenodd"
+                          />
                         </svg>
                       </span>
                       <input
                         type="url"
                         value={tempUser.githubUrl}
-                        onChange={(e) => handleInputChange("githubUrl", e.target.value)}
+                        onChange={(e) =>
+                          handleInputChange("githubUrl", e.target.value)
+                        }
                         className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                         placeholder="GitHub URL"
                       />
@@ -342,8 +385,16 @@ const UserProfile = () => {
                       rel="noopener noreferrer"
                       className="flex items-center space-x-2 text-gray-600 hover:text-blue-600 transition-colors"
                     >
-                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                        <path fillRule="evenodd" d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.17 6.839 9.49.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.167 22 16.418 22 12c0-5.523-4.477-10-10-10z" clipRule="evenodd" />
+                      <svg
+                        className="w-5 h-5"
+                        fill="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.17 6.839 9.49.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.167 22 16.418 22 12c0-5.523-4.477-10-10-10z"
+                          clipRule="evenodd"
+                        />
                       </svg>
                       <span>{user2?.githubUrl || "Not added yet"}</span>
                     </a>
@@ -352,18 +403,26 @@ const UserProfile = () => {
 
                 {/* LinkedIn */}
                 <div>
-                  <label className="text-sm font-medium text-gray-600 block mb-1">LinkedIn</label>
+                  <label className="text-sm font-medium text-gray-600 block mb-1">
+                    LinkedIn
+                  </label>
                   {editMode ? (
                     <div className="relative">
                       <span className="absolute inset-y-0 left-0 pl-3 flex items-center">
-                        <svg className="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
-                          <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+                        <svg
+                          className="w-5 h-5 text-gray-400"
+                          fill="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
                         </svg>
                       </span>
                       <input
                         type="url"
                         value={tempUser.linkedinUrl}
-                        onChange={(e) => handleInputChange("linkedinUrl", e.target.value)}
+                        onChange={(e) =>
+                          handleInputChange("linkedinUrl", e.target.value)
+                        }
                         className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                         placeholder="LinkedIn URL"
                       />
@@ -375,8 +434,12 @@ const UserProfile = () => {
                       rel="noopener noreferrer"
                       className="flex items-center space-x-2 text-gray-600 hover:text-blue-600 transition-colors"
                     >
-                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+                      <svg
+                        className="w-5 h-5"
+                        fill="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
                       </svg>
                       <span>{user2?.linkedinUrl || "Not added yet"}</span>
                     </a>
@@ -390,19 +453,29 @@ const UserProfile = () => {
           <div className="lg:col-span-2 space-y-8">
             {/* Personal Information */}
             <div className="bg-white rounded-2xl shadow-lg p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Personal Information</h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                Personal Information
+              </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div>
-                  <label className="text-sm font-medium text-gray-600 block mb-1">Email Address</label>
-                  <p className="text-gray-900">{user?.primaryEmailAddress?.emailAddress}</p>
+                  <label className="text-sm font-medium text-gray-600 block mb-1">
+                    Email Address
+                  </label>
+                  <p className="text-gray-900">
+                    {user?.primaryEmailAddress?.emailAddress}
+                  </p>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-600 block mb-1">Enrollment Number</label>
+                  <label className="text-sm font-medium text-gray-600 block mb-1">
+                    Enrollment Number
+                  </label>
                   {editMode ? (
                     <input
                       type="text"
                       value={tempUser.enrollmentNumber}
-                      onChange={(e) => handleInputChange("enrollmentNumber", e.target.value)}
+                      onChange={(e) =>
+                        handleInputChange("enrollmentNumber", e.target.value)
+                      }
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     />
                   ) : (
@@ -415,12 +488,16 @@ const UserProfile = () => {
             {/* Skills Section */}
             <div className="bg-white rounded-2xl shadow-lg p-6">
               <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-semibold text-gray-900">Technical Skills</h3>
+                <h3 className="text-lg font-semibold text-gray-900">
+                  Technical Skills
+                </h3>
                 {editMode && (
-                  <span className="text-sm text-gray-500">{tempUser?.skills?.length || 0} skills added</span>
+                  <span className="text-sm text-gray-500">
+                    {tempUser?.skills?.length || 0} skills added
+                  </span>
                 )}
               </div>
-              
+
               {editMode ? (
                 <div className="space-y-4">
                   <div className="flex flex-wrap gap-2">
@@ -434,8 +511,18 @@ const UserProfile = () => {
                           onClick={() => handleSkillRemove(index)}
                           className="ml-2 text-blue-400 hover:text-blue-600 transition-colors"
                         >
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                          <svg
+                            className="w-4 h-4"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M6 18L18 6M6 6l12 12"
+                            />
                           </svg>
                         </button>
                       </div>
@@ -477,7 +564,9 @@ const UserProfile = () => {
 
             {/* About Me Section */}
             <div className="bg-white rounded-2xl shadow-lg p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">About Me</h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                About Me
+              </h3>
               {editMode ? (
                 <textarea
                   value={tempUser.aboutMe}

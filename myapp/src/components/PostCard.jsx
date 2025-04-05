@@ -33,14 +33,13 @@ const PostCard = ({
   const [showOptions, setShowOptions] = useState(false);
   const [commentModal, setCommentModal] = useState(false);
   const [commentText, setCommentText] = useState("");
-
+  console.log(imageUrl);
   useEffect(() => {
     if (user) {
       fetchUserProfile();
     }
   }, [user]);
 
-  
   useEffect(() => {
     const fetchLikes = async () => {
       if (!currUserId) return;
@@ -210,29 +209,36 @@ const PostCard = ({
 
       {/* Image */}
       <div className="relative group">
+        {/* Image or Video */}
         {imageUrl ? (
-          <>
-            <img
-              src={imageUrl}
-              alt="Post content"
+          imageUrl.endsWith(".mp4") ? (
+            <video
+              controls
               className="w-full max-h-[32rem] object-contain bg-black/5"
-              onError={(e) => {
-                e.target.onerror = null;
-                e.target.src =
-                  "https://via.placeholder.com/400?text=Image+Not+Found";
-              }}
-              loading="lazy"
-            />
-            <div
-              className="absolute inset-0 bg-black opacity-0 group-hover:opacity-10 transition-all duration-300"
-              style={{ height: "100%" }}
-            />
-          </>
+            >
+              <source src={imageUrl} type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
+          ) : (
+            <>
+              <img
+                src={imageUrl}
+                alt="Post content"
+                className="w-full max-h-[32rem] object-contain bg-black/5"
+                loading="lazy"
+              />
+              <div
+                className="absolute inset-0 bg-black opacity-0 group-hover:opacity-10 transition-all duration-300"
+                style={{ height: "100%" }}
+              />
+            </>
+          )
         ) : (
           <div className="w-full h-64 flex items-center justify-center bg-gray-100">
-            <span className="text-gray-400">No image available</span>
+            <span className="text-gray-400">No media available</span>
           </div>
         )}
+        ``
       </div>
 
       {/* Action Buttons */}

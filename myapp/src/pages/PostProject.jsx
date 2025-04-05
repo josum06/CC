@@ -11,9 +11,13 @@ import {
   Image as ImageIcon,
   Plus,
 } from "lucide-react";
+import axios from "axios";
+import { useUser } from "@clerk/clerk-react";
+import { toast } from "react-toastify";
 
 const PostProject = () => {
   const navigate = useNavigate();
+  const { user } = useUser();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     title: "",
@@ -21,7 +25,7 @@ const PostProject = () => {
     file: null,
     projectUrl: "",
     githubUrl: "",
-    contributors: [""],
+    contributors: [],
     skills: [],
   });
   const [skillInput, setSkillInput] = useState("");
@@ -61,28 +65,61 @@ const PostProject = () => {
   const handleAddSkill = (e) => {
     e.preventDefault();
     if (skillInput.trim() && !formData.skills.includes(skillInput.trim())) {
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
-        skills: [...prev.skills, skillInput.trim()]
+        skills: [...prev.skills, skillInput.trim()],
       }));
       setSkillInput("");
     }
   };
 
   const handleRemoveSkill = (skillToRemove) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      skills: prev.skills.filter(skill => skill !== skillToRemove)
+      skills: prev.skills.filter((skill) => skill !== skillToRemove),
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Form Data:", formData);
+    try {
+      console.log("Form Data:", formData);
+      const response = await axios.get(
+        `http://localhost:3000/api/user/profile/${user.id}`
+      );
+      const data = response.data;
+      const userId = data._id;
+      const form = new FormData();
+      form.append("title", formData.title);
+      form.append("description", formData.description);
+      form.append("image", formData.file);
+      if (formData.githubUrl) form.append("githubUrl", formData.githubUrl);
+      form.append("projectUrl", formData.projectUrl);
+      const validContributors = formData.contributors.filter(
+        (c) => c.trim() !== ""
+      );
+      if (validContributors.length > 0) {
+        form.append("contributors", JSON.stringify(validContributors));
+      }
 
-    // Handle form submission logic (API call, etc.)
-    alert("Post submitted successfully!");
-    navigate("/home"); // Navigate to the home page after submitting
+      form.append("TechStack", JSON.stringify(formData.skills));
+      form.append("userId", userId);
+      await axios.post(
+        "http://localhost:3000/api/project/create-project",
+        form,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      );
+      setIsSubmitting(true);
+      toast.success("Project submitted successfully!");
+      navigate("/");
+    } catch (err) {
+      console.error("Error:", err);
+      toast.error("Failed to submit project. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -91,9 +128,11 @@ const PostProject = () => {
       <div className="fixed top-0 left-0 right-0 bg-white/80 backdrop-blur-sm z-50 border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
-            <h1 className="text-xl font-semibold text-gray-900">Share Your Project</h1>
+            <h1 className="text-xl font-semibold text-gray-900">
+              Share Your Project
+            </h1>
             <button
-              onClick={() => navigate("/home")}
+              onClick={() => navigate("/")}
               className="p-2 rounded-full hover:bg-gray-100 transition-colors duration-200"
               aria-label="Close"
             >
@@ -109,7 +148,9 @@ const PostProject = () => {
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Title Input */}
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">Project Title</label>
+                <label className="text-sm font-medium text-gray-700">
+                  Project Title
+                </label>
                 <div className="relative">
                   <FileText className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                   <input
@@ -126,7 +167,9 @@ const PostProject = () => {
 
               {/* Description Input */}
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">Project Description</label>
+                <label className="text-sm font-medium text-gray-700">
+                  Project Description
+                </label>
                 <textarea
                   name="description"
                   value={formData.description}
@@ -142,7 +185,9 @@ const PostProject = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Project URL */}
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-700">Project URL</label>
+                  <label className="text-sm font-medium text-gray-700">
+                    Project URL
+                  </label>
                   <div className="relative">
                     <Link className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                     <input
@@ -158,7 +203,9 @@ const PostProject = () => {
 
                 {/* GitHub URL */}
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-700">GitHub Repository</label>
+                  <label className="text-sm font-medium text-gray-700">
+                    GitHub Repository
+                  </label>
                   <div className="relative">
                     <Github className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                     <input
@@ -175,7 +222,9 @@ const PostProject = () => {
 
               {/* Skills Section */}
               <div className="space-y-3">
-                <label className="text-sm font-medium text-gray-700">Technologies & Skills Used</label>
+                <label className="text-sm font-medium text-gray-700">
+                  Technologies & Skills Used
+                </label>
                 <div className="space-y-3">
                   {/* Skills Input */}
                   <div className="flex gap-2">
@@ -185,7 +234,7 @@ const PostProject = () => {
                         value={skillInput}
                         onChange={(e) => setSkillInput(e.target.value)}
                         onKeyPress={(e) => {
-                          if (e.key === 'Enter') {
+                          if (e.key === "Enter") {
                             handleAddSkill(e);
                           }
                         }}
@@ -229,7 +278,9 @@ const PostProject = () => {
               {/* Contributors Section */}
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <label className="text-sm font-medium text-gray-700">Project Contributors</label>
+                  <label className="text-sm font-medium text-gray-700">
+                    Project Contributors
+                  </label>
                   <button
                     type="button"
                     onClick={handleAddContributor}
@@ -258,8 +309,14 @@ const PostProject = () => {
                         <button
                           type="button"
                           onClick={() => {
-                            const newContributors = formData.contributors.filter((_, i) => i !== index);
-                            setFormData(prev => ({ ...prev, contributors: newContributors }));
+                            const newContributors =
+                              formData.contributors.filter(
+                                (_, i) => i !== index
+                              );
+                            setFormData((prev) => ({
+                              ...prev,
+                              contributors: newContributors,
+                            }));
                           }}
                           className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors duration-200"
                         >
@@ -273,7 +330,9 @@ const PostProject = () => {
 
               {/* File Upload Section */}
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">Project Media</label>
+                <label className="text-sm font-medium text-gray-700">
+                  Project Media
+                </label>
                 <div className="relative group">
                   <div className="relative border-2 border-dashed border-gray-300 rounded-xl transition-all duration-200 hover:border-blue-500">
                     {formData.file ? (

@@ -14,6 +14,7 @@ import {
   UserCircle,
   ChevronRight,
 } from "lucide-react";
+import { format, formatDate, parseISO } from "date-fns";
 
 const Sidebar = ({ isOpen, toggleSidebar }) => {
   const navigate = useNavigate();
@@ -97,15 +98,16 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                   className="w-16 h-16 rounded-full border-2 border-white object-cover shadow-lg"
                 />
                 {/* Online Status Indicator */}
-               
               </div>
               <div className="flex-1">
                 <h2 className="text-white font-semibold text-lg leading-tight">
                   {user?.fullName}
                 </h2>
                 <div className="flex items-center gap-2">
-                  <span className="text-blue-100 text-sm">Student</span>
-                 
+                  <span className="text-blue-100 text-sm">
+                    {mainUser?.role.slice(0, 1).toUpperCase() +
+                      mainUser?.role.slice(1)}
+                  </span>
                 </div>
               </div>
             </div>
@@ -117,7 +119,6 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
           <MenuItem
             icon={User}
             label="Account"
-            
             onClick={() => {
               navigate("/YourAccount");
               toggleSidebar();
@@ -156,8 +157,6 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
             }}
           />
 
-          
-
           <MenuItem
             icon={Shield}
             label="Faculty Role"
@@ -168,11 +167,8 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
           />
 
           {/* Sign Out Button */}
-          <div className="pt-56">
-            <SignOutButton
-              onClick={toggleSidebar}
-              redirectUrl="/Signup"
-            >
+          <div className="pt-10">
+            <SignOutButton onClick={toggleSidebar} redirectUrl="/Signup">
               <button className="w-full px-4 cursor-pointer py-3 rounded-xl bg-red-50 text-red-700 hover:bg-red-100 transition-colors flex items-center gap-3">
                 <LogOut className="w-5 h-5" />
                 <span className="font-medium">Sign Out</span>
@@ -184,7 +180,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
         {/* Footer */}
         <div className="absolute bottom-0 left-0 right-0 p-6">
           <div className="text-center text-sm text-gray-500">
-            <p>© 2024 Your App Name</p>
+            <p>© {format(new Date(), "yyyy")} Campus Connect</p>
             <p className="text-xs mt-1">Version 1.0.0</p>
           </div>
         </div>
