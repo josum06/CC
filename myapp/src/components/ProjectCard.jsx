@@ -10,34 +10,88 @@ import {
   ExternalLink,
   Bookmark,
 } from "lucide-react";
-
+import axios from "axios";
+import { useUser } from "@clerk/clerk-react";
 const ProjectCard = ({
-  avatar ,
-  username, 
+  avatar,
+  username,
   time,
-  projectName ,
+  projectName,
   description,
-  projectUrl ,
-  githubUrl ,
+  projectUrl,
+  githubUrl,
   contributors,
-  imageUrl ,
+  imageUrl,
   skills,
-  likes ,
-  comments ,
+  likes,
+  comments,
+  projectId,
 }) => {
-
-  
-  const [isLiked, setIsLiked] = useState(false);
   const [showComments, setShowComments] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
+  const [user, setUser] = useState(null);
+  const [likedByCurrentUser, setLikedByCurrentUser] = useState(false);
+  const [likesCount, setLikesCount] = useState(likes);
 
+  const { user: clerkUser } = useUser();
+  useEffect(() => {
+    if (clerkUser) {
+      fetchUser();
+    }
+  }, [clerkUser]);
+  useEffect(() => {
+    if (user) {
+      fetchLikes();
+    }
+  }, [user]);
+
+  const fetchLikes = async () => {
+    try {
+      const response = await axios.get(
+        `http://localhost:3000/api/project/like/${projectId}`
+      );
+      const likedUsers = response.data.likes;
+      setLikedByCurrentUser(
+        likedUsers.some((databaseUser) => databaseUser === user._id)
+      );
+    } catch (error) {
+      console.error("Error fetching likes:", error);
+    }
+  };
+
+  const fetchUser = async () => {
+    try {
+      const response = await axios.get(
+        `http://localhost:3000/api/user/profile/${clerkUser.id}`
+      );
+      setUser(response.data);
+    } catch (error) {
+      console.error("Error fetching user:", error);
+    }
+  };
   const handleCopyLink = () => {
     navigator.clipboard.writeText(projectUrl);
     setShowDropdown(false);
   };
-  
-  
-  
+
+  const handleLike = async () => {
+    setLikedByCurrentUser(!likedByCurrentUser);
+    const newLikedState = !likedByCurrentUser;
+    setLikesCount((prev) => prev + (newLikedState ? 1 : -1));
+    try {
+      const response = await axios.patch(
+        `http://localhost:3000/api/project/like/${projectId}`,
+        {
+          userId: user?._id,
+        }
+      );
+      console.log(response.data);
+    } catch (error) {
+      setLikedByCurrentUser(!newLikedState);
+      setLikesCount((prev) => prev + (newLikedState ? -1 : 1));
+      console.log(error);
+    }
+  };
 
   return (
     <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100 hover:shadow-md transition-all duration-300">
@@ -61,13 +115,13 @@ const ProjectCard = ({
         </div>
         <div className="flex items-center space-x-2">
           <div className="relative">
-            <button 
+            <button
               className="p-2 hover:bg-gray-50 rounded-full transition-colors"
               onClick={() => setShowDropdown(!showDropdown)}
             >
               <MoreHorizontal className="w-5 h-5 text-gray-400" />
             </button>
-            
+
             {showDropdown && (
               <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-100 z-10">
                 <div className="py-1">
@@ -107,18 +161,21 @@ const ProjectCard = ({
         <h2 className="text-xl font-bold text-gray-900 mb-2 hover:text-blue-600 cursor-pointer">
           {projectName}
         </h2>
-        <p className="text-gray-600 text-sm leading-relaxed mb-4">{description}</p>
+        <p className="text-gray-600 text-sm leading-relaxed mb-4">
+          {description}
+        </p>
 
         {/* Tech Stack Tags */}
         <div className="flex flex-wrap gap-2 mb-4">
-          {skills.length>0 && skills.map((tech) => (
-            <span
-              key={tech}
-              className="px-3 py-1 bg-gray-50 text-gray-600 rounded-full text-sm font-medium"
-            >
-              {tech}
-            </span>
-          ))}
+          {skills.length > 0 &&
+            skills.map((tech) => (
+              <span
+                key={tech}
+                className="px-3 py-1 bg-gray-50 text-gray-600 rounded-full text-sm font-medium"
+              >
+                {tech}
+              </span>
+            ))}
         </div>
 
         {/* Project Links */}
@@ -149,7 +206,9 @@ const ProjectCard = ({
         <div className="mb-4">
           <div className="flex items-center gap-2 mb-2">
             <Users className="w-4 h-4 text-gray-400" />
-            <span className="text-sm font-medium text-gray-700">Contributors</span>
+            <span className="text-sm font-medium text-gray-700">
+              Contributors
+            </span>
           </div>
           <div className="flex -space-x-2">
             {contributors.map((contributor, index) => (
@@ -181,15 +240,17 @@ const ProjectCard = ({
         <div className="flex items-center justify-between pt-4 border-t border-gray-50">
           <div className="flex items-center space-x-6">
             <button
-              onClick={() => setIsLiked(!isLiked)}
+              onClick={handleLike}
               className="flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-blue-600 transition-colors group"
             >
               <Heart
                 className={`w-5 h-5 group-hover:scale-110 transition-transform ${
-                  isLiked ? "fill-red-500 stroke-red-500" : "stroke-current"
+                  likedByCurrentUser
+                    ? "fill-red-500 stroke-red-500"
+                    : "stroke-current"
                 }`}
               />
-              <span>{isLiked ? likes + 1 : likes}</span>
+              <span>{likesCount}</span>
             </button>
             <button
               onClick={() => setShowComments(!showComments)}

@@ -16,7 +16,6 @@ exports.createProject = async (req, res) => {
 
     let mediaUrl = null;
 
-
     if (!req.file) {
       return res
         .status(400)
@@ -73,13 +72,67 @@ exports.createProject = async (req, res) => {
 };
 exports.getAllProjects = async (req, res) => {
   try {
-    const projects = await Project.find().populate(
-      "userId",
-      "fullName profileImage "
-    ).sort({ createdAt: -1 });
+    const projects = await Project.find()
+      .populate("userId", "fullName profileImage ")
+      .sort({ createdAt: -1 });
     res.status(200).json(projects);
   } catch (error) {
     console.error("Error fetching projects:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+exports.likeProject = async (req, res) => {
+  try {
+    const { projectId } = req.params;
+    const { userId } = req.body; // Get user ID from request
+
+    if (!projectId || !userId) {
+      return res.status(400).json({ message: "Missing projectId or userId" });
+    }
+
+    const project = await Project.findById(projectId);
+    if (!project) {
+      return res.status(404).json({ message: "project not found" });
+    }
+
+    const hasLiked = project.likedByUsers.includes(userId);
+
+    if (hasLiked) {
+      // If user has already liked, remove like
+      project.likes -= 1;
+      project.likedByUsers = project.likedByUsers.filter((id) => id !== userId);
+    } else {
+      // If user has not liked, add like
+      project.likes += 1;
+      project.likedByUsers.push(userId);
+    }
+
+    await project.save();
+
+    res.json({
+      message: hasLiked ? "Like removed" : "project liked",
+      project,
+      hasLiked: !hasLiked, // Send new like status
+    });
+  } catch (error) {
+    console.error("Error toggling like:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+exports.getLikes = async (req, res) => {
+  try {
+    const { projectId } = req.params;
+    const project = await Project.findById(projectId);
+
+    if (!project) {
+      return res.status(404).json({ message: "Project not found" });
+    }
+
+    res.status(200).json({ likes: project.likedByUsers });
+  } catch (error) {
+    console.error("Error fetching likes:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 };
