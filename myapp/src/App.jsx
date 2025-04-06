@@ -63,6 +63,7 @@ function App() {
             <Route path="/NetworkProfile" element={<NetworkProfile />} />
             <Route path="/YourAccount" element={<YourAccount />} />
             <Route path="/ClassRoom" element={<ClassRoom />} />
+            <Route path="/Chats" element={<Chats />} />
           </Route>
 
           {/* Protected Routes */}
@@ -78,7 +79,7 @@ function App() {
             <Route path="/Events" element={<Events />} />
             <Route path="/Network" element={<Network />} />
             <Route path="/Companies" element={<Companies />} />
-            <Route path="/Chats" element={<Chats />} />
+            
             
             <Route path="/FacultyPost" element={<FacultyPost />} />
             
