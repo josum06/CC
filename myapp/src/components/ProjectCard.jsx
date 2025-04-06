@@ -10,6 +10,11 @@ import {
   ExternalLink,
   Bookmark,
 } from "lucide-react";
+import axios from "axios";
+import { toast } from "react-toastify";
+import { useUser } from "@clerk/clerk-react";
+import CommentProject from "./CommentProject";
+
 
 const ProjectCard = ({
   avatar ,
@@ -23,20 +28,71 @@ const ProjectCard = ({
   imageUrl ,
   skills,
   likes ,
-  comments ,
+  projectId,
+  comments,
 }) => {
-
-  
+ 
+  const {user} = useUser();
+  const [currUserId, setCurrUserId] = useState(null); 
   const [isLiked, setIsLiked] = useState(false);
-  const [showComments, setShowComments] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
+  const [commentModal, setCommentModal] = useState(false);
+  const [commentText, setCommentText] = useState("");
+
+
+   useEffect(() => {
+      if (user) {
+        fetchUserProfile();
+      }
+    }, [user]);
 
   const handleCopyLink = () => {
     navigator.clipboard.writeText(projectUrl);
     setShowDropdown(false);
   };
+
+
+  const inputComment = () => {
+    setCommentModal(!commentModal);
+  };
+
+
+  const fetchUserProfile = async () => {
+    try {
+      const response = await axios.get(
+        `http://localhost:3000/api/user/profile/${user.id}`
+      );
+      const data = response.data;
+      setCurrUserId(data._id);
+    } catch (error) {
+      console.error("Error fetching profile:", error);
+      toast.error("Failed to load profile.");
+    }
+  };
   
-  
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!commentText.trim()) return;
+
+    try {
+      const formData = new FormData();
+      formData.append("text", commentText);
+      formData.append("projectId", projectId);
+      formData.append("userId", currUserId);
+      await axios.post(
+        "http://localhost:3000/api/project/create-project-comment",
+        formData,
+        {
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+      setCommentText("");
+      toast.success(`Comment posted successfully!`);
+    } catch (e) {
+      console.error("Error posting comment:", e);
+      toast.error("Something went wrong");
+    }
+  };
   
 
   return (
@@ -192,11 +248,10 @@ const ProjectCard = ({
               <span>{isLiked ? likes + 1 : likes}</span>
             </button>
             <button
-              onClick={() => setShowComments(!showComments)}
+              onClick={inputComment}
               className="flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-blue-600 transition-colors group"
             >
               <MessageCircle className="w-5 h-5 group-hover:scale-110 transition-transform" />
-              <span>{comments.length}</span>
             </button>
             <button className="flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-blue-600 transition-colors group">
               <Share2 className="w-5 h-5 group-hover:scale-110 transition-transform" />
@@ -207,18 +262,35 @@ const ProjectCard = ({
       </div>
 
       {/* Comment Input */}
-      <div className="px-6 py-4 border-t border-gray-50">
-        <div className="flex items-center gap-3">
+      <form
+          onSubmit={handleSubmit}
+          className="flex items-center py-3 border-t border-gray-50"
+        >
           <input
             type="text"
+            value={commentText}
+            onChange={(e) => setCommentText(e.target.value)}
             placeholder="Add a comment..."
-            className="flex-1 text-sm p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="flex-1 text-sm p-2 focus:outline-none placeholder-gray-400"
           />
-          <button className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">
+          <button
+            type="submit"
+            disabled={!commentText.trim()}
+            className={`px-3 py-1 text-sm font-semibold rounded-full transition-colors ${
+              commentText.trim()
+                ? "text-blue-500 hover:text-blue-600 hover:bg-blue-50"
+                : "text-gray-200 cursor-not-allowed"
+            }`}
+          >
             Post
           </button>
+        </form>
+
+        {commentModal && (
+        <div className="border-t border-gray-50">
+          <CommentProject projectId={projectId} />
         </div>
-      </div>
+      )}
     </div>
   );
 };

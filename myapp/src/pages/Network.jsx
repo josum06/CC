@@ -57,6 +57,9 @@ const Network = () => {
       toast.error("Error fetching projects");
     }
    }
+  
+   
+
 
   return (
     <div className="min-h-screen py-4 px-4 sm:px-6 lg:px-8">

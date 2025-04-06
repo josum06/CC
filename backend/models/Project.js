@@ -10,7 +10,7 @@ const projectSchema = new mongoose.Schema({
   contributors: { type: Array },
   likes: { type: "Number", default: 0 },
   userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-  comments: [{ type: mongoose.Schema.Types.ObjectId, ref: "Comment" }],
+  comments: [{ type: mongoose.Schema.Types.ObjectId, ref: "CommentProject" }],
   likedByUsers: { type: [String], default: [] },
 },{
   timestamps: true,
