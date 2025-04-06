@@ -83,7 +83,6 @@ const PostCard = ({
         { userId: currUserId }
       );
       setLikes(response.data.post.likes);
-      console.log(response.data.hasLiked);
       setLikedByCurrentUser(response.data.hasLiked);
     } catch (error) {
       console.error("Error liking post:", error);
@@ -237,7 +236,6 @@ const PostCard = ({
             <span className="text-gray-400">No media available</span>
           </div>
         )}
-        ``
       </div>
 
       {/* Action Buttons */}

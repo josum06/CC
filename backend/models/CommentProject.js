@@ -18,4 +18,4 @@ const commentProjectSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
-const CommentProject = mongoose.model("CommentProject", commentProjectSchema);
+module.exports = mongoose.model("CommentProject", commentProjectSchema);

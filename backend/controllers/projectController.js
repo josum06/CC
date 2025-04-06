@@ -1,5 +1,6 @@
 const imagekit = require("../imageKit");
 const Project = require("../models/Project");
+const CommentProject = require("../models/CommentProject");
 
 exports.createProject = async (req, res) => {
   try {
@@ -79,6 +80,51 @@ exports.getAllProjects = async (req, res) => {
   } catch (error) {
     console.error("Error fetching projects:", error);
     res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+exports.createCommentProject = async (req, res) => {
+  try {
+    const { text, projectId, userId } = req.body;
+    console.log(text, projectId, userId);
+
+    // Check if project exists
+    const project = await Project.findById(projectId);
+    if (!project) {
+      return res.status(404).json({ message: "Project not found" });
+    }
+
+    // Create new comment
+    const newCommentProject = new CommentProject({ text, projectId, userId });
+    await newCommentProject.save();
+
+    // Push the comment ID into the project's comments array
+    project.comments.push(newCommentProject._id);
+    await project.save();
+
+    res.status(201).json({
+      message: "Comment added successfully",
+      comment: newCommentProject,
+    });
+  } catch (error) {
+    console.error("Error creating comment:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+exports.getProjectComments = async (req, res) => {
+  try {
+    const projectId = req.params.projectId;
+    if (!projectId) {
+      return res.status(400).json({ message: "Missing projectId parameter" });
+    }
+    const comments = await CommentProject.find({ projectId })
+      .populate("userId", "fullName profileImage")
+      .sort({ createdAt: -1 });
+    res.json({ comments });
+  } catch (error) {
+    console.error("Error fetching comments:", error);
+    res.status(500).json({ message: "Server error" });
   }
 };
 

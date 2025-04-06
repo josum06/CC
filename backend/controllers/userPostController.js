@@ -94,10 +94,9 @@ exports.getComments = async (req, res) => {
     if (!postId) {
       return res.status(400).json({ message: "Missing postId parameter" });
     }
-    const comments = await Comment.find({ postId }).populate(
-      "userId",
-      "fullName profileImage"
-    );
+    const comments = await Comment.find({ postId })
+      .populate("userId", "fullName profileImage")
+      .sort({ createdAt: -1 });
     res.json({ comments });
   } catch (error) {
     console.error("Error fetching comments:", error);
