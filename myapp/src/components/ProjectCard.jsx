@@ -43,6 +43,8 @@ const ProjectCard = ({
       fetchUser();
     }
   }, [clerkUser]);
+
+  
   useEffect(() => {
     if (user) {
       fetchLikes();

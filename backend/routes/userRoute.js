@@ -5,6 +5,7 @@ const {
   getUserProfile,
   getUserProfileById,
   getPostsById,
+  getAllUsers
 } = require("../controllers/userController");
 
 const router = express.Router();
@@ -18,4 +19,5 @@ router.patch("/upload-profile", upload.single("idCardPhoto"), uploadProfile);
 router.get("/profile/:clerkId", getUserProfile);
 router.get("/profileById/:userId", getUserProfileById);
 router.get("/posts/:userId", getPostsById);
+router.get("/getAllUsers", getAllUsers); // Assuming you have a function to get all users
 module.exports = router;

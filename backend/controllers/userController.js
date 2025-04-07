@@ -116,9 +116,21 @@ const getPostsById = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+const getAllUsers = async (req, res) => {
+  try {
+    const users = await User.find();// Exclude password field
+    res.status(200).json(users);
+  } catch (error) {
+    console.error("Error fetching all users:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+}
 module.exports = {
   uploadProfile,
   getUserProfile,
   getUserProfileById,
   getPostsById,
+  getAllUsers,
 };
+
+
