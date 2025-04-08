@@ -6,8 +6,8 @@ const connectDb = require("./db");
 const User = require("./models/User"); // ✅ Import User model
 const ngrok = require("@ngrok/ngrok");
 const cors = require("cors");
-const http = require('http');
-const { Server } = require('socket.io');
+const http = require("http");
+const { Server } = require("socket.io");
 const userRouter = require("./routes/userRoute");
 const adminRouter = require("./routes/adminPostRoute");
 const postRouter = require("./routes/userPostRoute");
@@ -19,16 +19,14 @@ connectDb();
 
 const io = new Server(server, {
   cors: {
-    origin: 'http://localhost:5173', // your frontend origin
-    methods: ['GET', 'POST'],
+    origin: "http://localhost:5173", // your frontend origin
+    methods: ["GET", "POST"],
   },
 });
 
 // ✅ Move webhook route above `express.json()`
 app.use("/api/webhooks", express.raw({ type: "application/json" }));
 app.use(express.json()); // ✅ Move this down
-
-
 
 app.use(
   cors({
@@ -41,7 +39,7 @@ app.use("/api/user", userRouter);
 app.use("/api/admin-post", adminRouter);
 app.use("/api/post", postRouter);
 app.use("/api/project", projectRouter);
-app.use("/api/chat" , chatRouter);
+app.use("/api/chat", chatRouter);
 
 app.post(
   "/api/webhooks",
@@ -119,23 +117,26 @@ app.post(
   }
 );
 
-
-io.on('connection', (socket) => {
+io.on("connection", (socket) => {
   console.log(`User connected: ${socket.id}`);
 
-  socket.on('send_message', (data) => {
-    console.log(data);
-    socket.to(data.recipientSocketId).emit('receive_message', data);
-
-  });
-
-  socket.on('join_room', (room) => {
+  socket.on("join_room", (room) => {
     socket.join(room);
     console.log(`User joined room: ${room}`);
   });
 
-  socket.on('disconnect', () => {
-    console.log('User disconnected', socket.id);
+  socket.on("send_message", (data) => {
+    console.log("Sending message:", data);
+
+    // Use the roomId from the data directly
+    const roomId = data.roomId;
+
+    // Emit to the room so all users in that room receive the message
+    socket.to(roomId).emit("receive_message", data);
+  });
+
+  socket.on("disconnect", () => {
+    console.log("User disconnected", socket.id);
   });
 });
 

@@ -1,20 +1,19 @@
-const Message = require('../models/Message');
-const { requireAuth } = require('@clerk/clerk-sdk-node'); // Adjust if you're using your own middleware
+const Message = require("../models/Message");
+const { requireAuth } = require("@clerk/clerk-sdk-node"); // Adjust if you're using your own middleware
 
 // Get messages between two users
 exports.getChats = async (req, res) => {
   try {
     const recipientId = req.params.id;
     const senderId = req.query.senderId;
-    console.log('Sender ID:', senderId);
-    console.log('Recipient ID:', recipientId);
-
+    console.log("Sender ID:", senderId);
+    console.log("Recipient ID:", recipientId);
     const messages = await Message.find({
       $or: [
         { sender: senderId, recipient: recipientId },
-        { sender: senderId, recipient: senderId },
+        { sender: recipientId, recipient: senderId },
       ],
-    }).populate('sender recipient');
+    }).populate("sender recipient");
 
     res.json(messages);
   } catch (err) {
@@ -24,7 +23,7 @@ exports.getChats = async (req, res) => {
 
 // Send a message
 exports.createChat = async (req, res) => {
-  const { recipientId, content ,userId} = req.body;
+  const { recipientId, content, userId } = req.body;
 
   try {
     const message = new Message({
@@ -39,4 +38,3 @@ exports.createChat = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
-
