@@ -13,6 +13,14 @@ const commentSchema = new mongoose.Schema(
       required: true,
     },
     text: { type: String, required: true },
+    replies: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Comment",
+      },
+    ],
+    isReply: { type: Boolean, default: false },
+    likes: {type: Number}
   },
   {
     timestamps: true,

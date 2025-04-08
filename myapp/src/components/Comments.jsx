@@ -2,20 +2,23 @@ import axios from "axios";
 import { format, parseISO } from "date-fns";
 import { useEffect, useState } from "react";
 import { Heart, MoreHorizontal } from 'lucide-react';
+import { useUser } from "@clerk/clerk-react";
 
 function Comments({ postId }) {
+  const { user } = useUser();
   const [comments, setComments] = useState([]);
   const [likedComments, setLikedComments] = useState(new Set());
+  const [replyModal, setReplyModal] = useState(false);
+  const [replyCommentId, setReplyCommentId] = useState(null);
+  const [replyText, setReplyText] = useState('');
 
   useEffect(() => {
-    // Fetch comments when component mounts
     const fetchComments = async () => {
       try {
         const response = await axios.get(
           `http://localhost:3000/api/post/get-comments/${postId}`
         );
-        const fetchedComments = response.data.comments;
-        setComments(fetchedComments);
+        setComments(response.data.comments);
       } catch (error) {
         console.error("Error fetching comments:", error);
       }
@@ -23,6 +26,29 @@ function Comments({ postId }) {
 
     fetchComments();
   }, [postId]);
+
+  const handleSubmit = async (e, commentId) => {
+    e.preventDefault();
+    try {
+      const res = await axios.post("http://localhost:3000/api/post/reply-comment", {
+        text: replyText,
+        clerkId: user.id,
+        commentId: commentId
+      });
+      console.log(res.data);
+
+      // Clear reply state
+      setReplyText('');
+      setReplyModal(false);
+      setReplyCommentId(null);
+
+      // Optional: re-fetch comments
+      const refreshed = await axios.get(`http://localhost:3000/api/post/get-comments/${postId}`);
+      setComments(refreshed.data.comments);
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   const handleLikeComment = (commentId) => {
     setLikedComments(prev => {
@@ -50,8 +76,8 @@ function Comments({ postId }) {
   return (
     <div className="px-4 py-2 max-h-[400px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
       {comments.map((comment) => (
-        <div 
-          key={comment._id} 
+        <div
+          key={comment._id}
           className="mb-4 group hover:bg-gray-200 rounded-lg p-3 transition-colors duration-200"
         >
           <div className="flex items-start space-x-3">
@@ -65,8 +91,8 @@ function Comments({ postId }) {
                   e.target.src = 'https://via.placeholder.com/40';
                 }}
               />
-             </div>
-            
+            </div>
+
             {/* Comment Content */}
             <div className="flex-1 min-w-0">
               <div className="flex items-start justify-between">
@@ -83,15 +109,15 @@ function Comments({ postId }) {
                     {comment.text}
                   </p>
                 </div>
-                
+
                 {/* Actions */}
                 <div className="flex items-center space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <button 
+                  <button
                     onClick={() => handleLikeComment(comment._id)}
                     className="p-1 hover:bg-gray-100 rounded-full transition-colors"
                   >
-                    <Heart 
-                      size={14} 
+                    <Heart
+                      size={14}
                       className={`${
                         likedComments.has(comment._id)
                           ? "fill-red-500 stroke-red-500"
@@ -104,21 +130,54 @@ function Comments({ postId }) {
                   </button>
                 </div>
               </div>
-              
+
               {/* Comment Actions */}
               <div className="flex items-center space-x-4 mt-1">
-                <button className="text-xs font-medium text-gray-500 hover:text-gray-700">
+                <button
+                  onClick={() => {
+                    setReplyModal(true);
+                    setReplyCommentId(comment._id);
+                  }}
+                  className="text-xs font-medium text-gray-500 hover:text-gray-700"
+                >
                   Reply
                 </button>
                 {likedComments.has(comment._id) && (
                   <span className="text-xs text-gray-500">Liked</span>
                 )}
               </div>
+
+              {/* Reply Input */}
+              {replyModal && replyCommentId === comment._id && (
+                <form
+                  onSubmit={(e) => handleSubmit(e, comment._id)}
+                  className="flex items-center py-3 border-t border-gray-50"
+                >
+                  <input
+                    type="text"
+                    value={replyText}
+                    onChange={(e) => setReplyText(e.target.value)}
+                    placeholder="Add a reply..."
+                    className="flex-1 text-sm p-2 focus:outline-none placeholder-gray-400"
+                  />
+                  <button
+                    type="submit"
+                    disabled={!replyText.trim()}
+                    className={`px-3 py-1 text-sm font-semibold rounded-full transition-colors ${
+                      replyText.trim()
+                        ? "text-blue-500 hover:text-blue-600 hover:bg-blue-50"
+                        : "text-gray-200 cursor-not-allowed"
+                    }`}
+                  >
+                    Post
+                  </button>
+                </form>
+              )}
             </div>
           </div>
         </div>
       ))}
-      
+
       {comments.length === 0 && (
         <div className="flex flex-col items-center justify-center py-8 text-gray-500">
           <svg

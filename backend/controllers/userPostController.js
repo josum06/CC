@@ -2,6 +2,7 @@ const Post = require("../models/Post");
 const imagekit = require("../imageKit");
 const fs = require("fs");
 const Comment = require("../models/Comment");
+const User = require("../models/User");
 
 exports.createPost = async (req, res) => {
   try {
@@ -94,7 +95,7 @@ exports.getComments = async (req, res) => {
     if (!postId) {
       return res.status(400).json({ message: "Missing postId parameter" });
     }
-    const comments = await Comment.find({ postId })
+    const comments = await Comment.find({ postId, isReply: false })
       .populate("userId", "fullName profileImage")
       .sort({ createdAt: -1 });
     res.json({ comments });
@@ -161,3 +162,47 @@ exports.getLikedUser = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
+exports.replyComment = async (req, res) => {
+  try {
+    const { commentId, text, clerkId } = req.body;
+    if (!commentId || !text || !clerkId) {
+      return res.status(400).json({ message: "Missing parameters" });
+    }
+
+    const user = await User.findOne({ clerkId });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const userId = user._id;
+
+    console.log("Comment ID:", userId);
+    const comment = await Comment.findById(commentId);
+    if (!comment) {
+      return res.status(404).json({ message: "Comment not found" });
+    }
+
+    // Create new reply
+    const newReply = new Comment({
+      text,
+      userId,
+      postId: comment.postId,
+      isReply: true,
+    });
+    await newReply.save();
+
+    // Push the new reply's ID into the parent comment's replies array
+    comment.replies.push(newReply._id);
+    await comment.save();
+
+    res.status(201).json({
+      message: "Reply added successfully",
+      reply: newReply,
+    });
+  } catch (error) {
+    console.error("Error replying to comment:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+}
