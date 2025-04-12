@@ -33,6 +33,8 @@ function Chats() {
   const [selectedImage, setSelectedImage] = useState(null);
   const [recipients, setRecipients] = useState(null);
 
+  // Add state for mobile view
+  const [showChatList, setShowChatList] = useState(true);
   
   useEffect(() => {
     fetchAllUsers();
@@ -555,12 +557,23 @@ function Chats() {
     );
   };
 
+  // Handle chat selection for mobile view
+  const handleChatSelect = (chat) => {
+    setSelectedChat(chat);
+    setShowChatList(false);
+  };
+
+  // Handle back button for mobile view
+  const handleBackClick = () => {
+    setShowChatList(true);
+  };
+
   return (
-    <div className="w-full h-screen flex bg-gray-100 overflow-hidden">
+    <div className="w-full h-screen flex bg-[#111b21] overflow-hidden">
       {/* Left sidebar - Chat list */}
       <div className={`${
-        selectedChat && window.innerWidth < 768 ? 'hidden' : 'block'
-      } w-full md:w-1/3 border-r border-gray-300 bg-white flex flex-col`}>
+        showChatList ? 'block' : 'hidden md:block'
+      } w-full md:w-[30%] lg:w-[25%] xl:w-[20%] border-r border-[#2a3942] bg-[#111b21] flex flex-col`}>
         <ChatListHeader 
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
@@ -569,27 +582,31 @@ function Chats() {
         <ChatList 
           chats={filteredChats} 
           selectedChat={selectedChat} 
-          setSelectedChat={setSelectedChat} 
+          setSelectedChat={handleChatSelect} 
         />
       </div>
 
       {/* Right side - Chat area */}
       <div className={`${
-        !selectedChat && window.innerWidth < 768 ? 'hidden' : 'block'
-      } w-full md:w-2/3 flex flex-col bg-[#f0f2f5]`}>
+        !showChatList ? 'block' : 'hidden md:block'
+      } w-full md:w-[70%] lg:w-[75%] xl:w-[80%] flex flex-col bg-[#0b141a]`}>
         {selectedChat ? (
           <>
             <ChatHeader 
               selectedChat={selectedChat}
               setShowMediaGallery={setShowMediaGallery}
               setShowGroupInfo={setShowGroupInfo}
-              onBackClick={() => setSelectedChat(null)}
+              onBackClick={handleBackClick}
             />
             <MessageList 
               messages={selectedChat.messages}
               selectedChat={selectedChat}
               selectedMessages={selectedMessages}
               isTyping={isTyping}
+              handleReplyMessage={handleReplyMessage}
+              handleEditMessage={handleEditMessage}
+              setShowEmojiReactionPicker={setShowEmojiReactionPicker}
+              handleStarMessage={handleStarMessage}
             />
             <MessageInput 
               message={message}

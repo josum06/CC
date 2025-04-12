@@ -12,7 +12,7 @@ const MessageList = ({
   handleStarMessage 
 }) => {
   return (
-    <div className="flex-1 p-2 md:p-4 overflow-y-auto bg-[#efeae2]">
+    <div className="flex-1 p-2 md:p-4 overflow-y-auto bg-[#0b141a] bg-[url('https://web.whatsapp.com/img/chat-bg-pattern-light.90cdb3ec7b.png')]">
       <div className="space-y-2 md:space-y-4">
         {messages.map((msg) => (
           <div 
@@ -21,8 +21,8 @@ const MessageList = ({
           >
             <div className={`max-w-[85%] md:max-w-[70%] p-2 md:p-3 rounded-lg ${
               msg.sender === 'me' 
-                ? 'bg-[#dcf8c6] ml-auto' 
-                : 'bg-white'
+                ? 'bg-[#005c4b] text-[#e9edef]' 
+                : 'bg-[#202c33] text-[#e9edef]'
             }`}>
               <MessageContent 
                 message={msg} 
@@ -39,11 +39,11 @@ const MessageList = ({
         
         {isTyping && (
           <div className="flex justify-start">
-            <div className="bg-white p-3 rounded-lg">
+            <div className="bg-[#202c33] p-3 rounded-lg">
               <div className="flex space-x-1">
-                <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce"></div>
-                <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce delay-100"></div>
-                <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce delay-200"></div>
+                <div className="w-2 h-2 bg-[#8696a0] rounded-full animate-bounce"></div>
+                <div className="w-2 h-2 bg-[#8696a0] rounded-full animate-bounce delay-100"></div>
+                <div className="w-2 h-2 bg-[#8696a0] rounded-full animate-bounce delay-200"></div>
               </div>
             </div>
           </div>

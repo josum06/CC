@@ -5,7 +5,7 @@ const ChatListHeader = ({ searchQuery, setSearchQuery, setShowCreateGroup }) => 
   const navigate = useNavigate();
 
   return (
-    <div className="p-4 bg-white shadow-sm">
+    <div className="p-3 bg-[#111b21] border-b border-[#2a3942]">
       {/* Profile and Close Button */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center space-x-2">
@@ -16,13 +16,13 @@ const ChatListHeader = ({ searchQuery, setSearchQuery, setShowCreateGroup }) => 
               className="w-full h-full object-cover" 
             />
           </div>
-          <span className="font-semibold">My Profile</span>
+          <span className="font-medium text-[#e9edef]">My Profile</span>
         </div>
         <div className="flex items-center space-x-2">
           {/* Add New Group Button */}
           <button
             onClick={() => setShowCreateGroup(true)}
-            className="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-full"
+            className="p-2 text-[#8696a0] hover:text-[#e9edef] hover:bg-[#2a3942] rounded-full"
             title="Create New Group"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -33,7 +33,7 @@ const ChatListHeader = ({ searchQuery, setSearchQuery, setShowCreateGroup }) => 
           {/* Close Button */}
           <button 
             onClick={() => navigate("/Home")} 
-            className="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-full"
+            className="p-2 text-[#8696a0] hover:text-[#e9edef] hover:bg-[#2a3942] rounded-full"
             title="Close"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -50,10 +50,10 @@ const ChatListHeader = ({ searchQuery, setSearchQuery, setShowCreateGroup }) => 
           placeholder="Search chats..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full p-2 pl-10 bg-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+          className="w-full p-2 pl-10 bg-[#202c33] text-[#e9edef] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00a884] placeholder-[#8696a0]"
         />
         <svg 
-          className="w-5 h-5 absolute left-3 top-3 text-gray-400" 
+          className="w-5 h-5 absolute left-3 top-3 text-[#8696a0]" 
           fill="none" 
           stroke="currentColor" 
           viewBox="0 0 24 24"
