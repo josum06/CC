@@ -18,6 +18,8 @@ const ChatWindow = ({ user, recipient }) => {
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const emojiPickerRef = useRef(null);
   const fileInputRef = useRef(null);
+  const cameraInputRef = useRef(null);
+  const galleryInputRef = useRef(null);
   const [selectedFile, setSelectedFile] = useState(null);
   const [showProfilePhoto, setShowProfilePhoto] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
@@ -25,6 +27,9 @@ const ChatWindow = ({ user, recipient }) => {
   const [messageStatus, setMessageStatus] = useState({});
   const [showReactions, setShowReactions] = useState(null);
   const [reactions, setReactions] = useState({});
+  const [isRecording, setIsRecording] = useState(false);
+  const [audioBlob, setAudioBlob] = useState(null);
+  const mediaRecorderRef = useRef(null);
   const typingTimeoutRef = useRef(null);
   const attachMenuRef = useRef(null);
 
@@ -197,10 +202,65 @@ const ChatWindow = ({ user, recipient }) => {
     }
   };
 
+  const handleCameraCapture = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      setSelectedFile(file);
+    }
+  };
+
+  const handleGallerySelect = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      setSelectedFile(file);
+    }
+  };
+
   const removeSelectedFile = () => {
     setSelectedFile(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
+    }
+    if (cameraInputRef.current) {
+      cameraInputRef.current.value = "";
+    }
+    if (galleryInputRef.current) {
+      galleryInputRef.current.value = "";
+    }
+  };
+
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mediaRecorder = new MediaRecorder(stream);
+      mediaRecorderRef.current = mediaRecorder;
+      
+      const audioChunks = [];
+      mediaRecorder.ondataavailable = (event) => {
+        audioChunks.push(event.data);
+      };
+      
+      mediaRecorder.onstop = () => {
+        const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+        setAudioBlob(audioBlob);
+        setSelectedFile(new File([audioBlob], 'voice-message.wav', { type: 'audio/wav' }));
+        
+        // Stop all tracks
+        stream.getTracks().forEach(track => track.stop());
+      };
+      
+      mediaRecorder.start();
+      setIsRecording(true);
+    } catch (err) {
+      console.error("Error accessing microphone:", err);
+      alert("Could not access microphone. Please check permissions.");
+    }
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorderRef.current && isRecording) {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
     }
   };
 
@@ -212,6 +272,11 @@ const ChatWindow = ({ user, recipient }) => {
       roomId
     });
     setShowReactions(null);
+  };
+
+  const onEmojiClick = (emojiObject) => {
+    setMessage((prevMessage) => prevMessage + emojiObject.emoji);
+    setShowEmojiPicker(false);
   };
 
   const sendMessage = async () => {
@@ -243,6 +308,7 @@ const ChatWindow = ({ user, recipient }) => {
     setChat((prev) => [...prev, msg]);
     setMessage("");
     setSelectedFile(null);
+    setAudioBlob(null);
     setShouldScroll(true);
     setMessageStatus(prev => ({
       ...prev,
@@ -370,8 +436,24 @@ const ChatWindow = ({ user, recipient }) => {
                   >
                     {msg.file && (
                       <div className="mb-2 p-2 bg-black bg-opacity-10 rounded-lg flex items-center gap-2">
-                        <BsFileEarmark className="w-5 h-5 text-gray-600" />
-                        <span className="text-sm truncate">{msg.file.name}</span>
+                        {msg.file.type && msg.file.type.startsWith('audio/') ? (
+                          <div className="flex items-center gap-2 w-full">
+                            <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                              <FaMicrophone className="w-4 h-4 text-white" />
+                            </div>
+                            <div className="flex-1">
+                              <p className="text-sm font-medium">Voice Message</p>
+                              <div className="w-full bg-gray-200 rounded-full h-1.5">
+                                <div className="bg-blue-500 h-1.5 rounded-full" style={{ width: '70%' }}></div>
+                              </div>
+                            </div>
+                          </div>
+                        ) : (
+                          <>
+                            <BsFileEarmark className="w-5 h-5 text-gray-600" />
+                            <span className="text-sm truncate">{msg.file.name}</span>
+                          </>
+                        )}
                       </div>
                     )}
                     <p className="text-sm md:text-base">{msg.content}</p>
@@ -449,15 +531,132 @@ const ChatWindow = ({ user, recipient }) => {
                 <IoClose className="w-6 h-6" />
               </button>
               <div className="bg-white rounded-lg overflow-hidden shadow-xl">
-                <div className="p-4 bg-white">
-                  <h3 className="text-lg font-semibold text-gray-800 text-center">{recipient.fullName}</h3>
-                  <p className="text-sm text-gray-500 text-center">{recipient.designation || "Student"}</p>
+                <div className="relative">
+                  <div className="h-24 bg-gradient-to-r from-[#008069] to-[#00a884]"></div>
+                  <div className="absolute -bottom-12 left-1/2 transform -translate-x-1/2">
+                    <div className="relative">
+                      <img
+                        src={recipient.profileImage || "default-user.jpg"}
+                        alt={recipient.fullName}
+                        className="w-24 h-24 rounded-full object-cover border-4 border-white shadow-lg"
+                      />
+                      <div className="absolute bottom-0 right-0 w-6 h-6 bg-green-500 rounded-full border-2 border-white"></div>
+                    </div>
+                  </div>
                 </div>
-                <img
-                  src={recipient.profileImage || "default-user.jpg"}
-                  alt={recipient.fullName}
-                  className="w-full h-auto object-contain max-h-[400px]"
-                />
+                
+                <div className="pt-16 pb-6 px-6 text-center">
+                  <h3 className="text-xl font-semibold text-gray-800">{recipient.fullName}</h3>
+                  <p className="text-sm text-gray-500">{recipient.designation || "Student"}</p>
+                  
+                  <div className="mt-4 flex justify-center space-x-4">
+                    <button className="flex flex-col items-center text-gray-600 hover:text-[#008069] transition-colors">
+                      <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        </svg>
+                      </div>
+                      <span className="text-xs mt-1">Message</span>
+                    </button>
+                    
+                    <button className="flex flex-col items-center text-gray-600 hover:text-[#008069] transition-colors">
+                      <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                        </svg>
+                      </div>
+                      <span className="text-xs mt-1">Video</span>
+                    </button>
+                    
+                    <button className="flex flex-col items-center text-gray-600 hover:text-[#008069] transition-colors">
+                      <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                        </svg>
+                      </div>
+                      <span className="text-xs mt-1">Call</span>
+                    </button>
+                  </div>
+                </div>
+                
+                <div className="border-t border-gray-200">
+                  <div className="p-4">
+                    <h4 className="text-sm font-medium text-gray-700 mb-2">About</h4>
+                    <p className="text-sm text-gray-600">
+                      {recipient.bio || "No bio available"}
+                    </p>
+                  </div>
+                  
+                  <div className="p-4 border-t border-gray-200">
+                    <h4 className="text-sm font-medium text-gray-700 mb-2">Contact Info</h4>
+                    <div className="space-y-3">
+                      <div className="flex items-start">
+                        <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center mr-3">
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                          </svg>
+                        </div>
+                        <div>
+                          <p className="text-xs text-gray-500">Email</p>
+                          <p className="text-sm text-gray-800">{recipient.email || "Not available"}</p>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-start">
+                        <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center mr-3">
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                          </svg>
+                        </div>
+                        <div>
+                          <p className="text-xs text-gray-500">Phone</p>
+                          <p className="text-sm text-gray-800">{recipient.phone || "Not available"}</p>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-start">
+                        <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center mr-3">
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                          </svg>
+                        </div>
+                        <div>
+                          <p className="text-xs text-gray-500">Location</p>
+                          <p className="text-sm text-gray-800">{recipient.location || "Not available"}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="p-4 border-t border-gray-200">
+                    <h4 className="text-sm font-medium text-gray-700 mb-2">Shared Media</h4>
+                    <div className="grid grid-cols-4 gap-2">
+                      {chat.filter(msg => msg.file && (msg.file.type?.startsWith('image/') || msg.file.type?.startsWith('video/'))).slice(0, 8).map((msg, i) => (
+                        <div key={i} className="aspect-square bg-gray-100 rounded overflow-hidden">
+                          {msg.file.type?.startsWith('image/') ? (
+                            <img 
+                              src={URL.createObjectURL(new Blob([msg.file], { type: msg.file.type }))} 
+                              alt="Shared media" 
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center bg-gray-200">
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                              </svg>
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                      {chat.filter(msg => msg.file && (msg.file.type?.startsWith('image/') || msg.file.type?.startsWith('video/'))).length === 0 && (
+                        <div className="col-span-4 text-center py-4 text-gray-500 text-sm">
+                          No shared media yet
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
               </div>
             </motion.div>
           </motion.div>
@@ -469,8 +668,19 @@ const ChatWindow = ({ user, recipient }) => {
         {selectedFile && (
           <div className="mb-2 p-2 bg-white rounded-lg flex items-center justify-between shadow-sm">
             <div className="flex items-center gap-2">
-              <BsFileEarmark className="w-5 h-5 text-gray-600" />
-              <span className="text-sm text-gray-600 truncate">{selectedFile.name}</span>
+              {selectedFile.type && selectedFile.type.startsWith('audio/') ? (
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                    <FaMicrophone className="w-4 h-4 text-white" />
+                  </div>
+                  <span className="text-sm text-gray-600">Voice Message</span>
+                </div>
+              ) : (
+                <>
+                  <BsFileEarmark className="w-5 h-5 text-gray-600" />
+                  <span className="text-sm text-gray-600 truncate">{selectedFile.name}</span>
+                </>
+              )}
             </div>
             <button
               onClick={removeSelectedFile}
@@ -541,7 +751,7 @@ const ChatWindow = ({ user, recipient }) => {
                   <button 
                     className="flex flex-col items-center justify-center p-2 hover:bg-gray-100 rounded-lg transition-colors"
                     onClick={() => {
-                      // Handle camera
+                      cameraInputRef.current?.click();
                       setShowAttachMenu(false);
                     }}
                   >
@@ -551,7 +761,7 @@ const ChatWindow = ({ user, recipient }) => {
                   <button 
                     className="flex flex-col items-center justify-center p-2 hover:bg-gray-100 rounded-lg transition-colors"
                     onClick={() => {
-                      // Handle gallery
+                      galleryInputRef.current?.click();
                       setShowAttachMenu(false);
                     }}
                   >
@@ -570,6 +780,23 @@ const ChatWindow = ({ user, recipient }) => {
             className="hidden"
           />
           
+          <input
+            type="file"
+            accept="image/*"
+            capture="environment"
+            ref={cameraInputRef}
+            onChange={handleCameraCapture}
+            className="hidden"
+          />
+          
+          <input
+            type="file"
+            accept="image/*"
+            ref={galleryInputRef}
+            onChange={handleGallerySelect}
+            className="hidden"
+          />
+          
           {message.trim() || selectedFile ? (
             <button
               onClick={sendMessage}
@@ -578,7 +805,14 @@ const ChatWindow = ({ user, recipient }) => {
               <FaRegPaperPlane className="w-5 h-5" />
             </button>
           ) : (
-            <button className="text-gray-500 hover:text-gray-700 transition-colors p-1">
+            <button 
+              className={`text-gray-500 hover:text-gray-700 transition-colors p-1 ${isRecording ? 'text-red-500 animate-pulse' : ''}`}
+              onMouseDown={startRecording}
+              onMouseUp={stopRecording}
+              onMouseLeave={stopRecording}
+              onTouchStart={startRecording}
+              onTouchEnd={stopRecording}
+            >
               <FaMicrophone className="w-5 h-5" />
             </button>
           )}
