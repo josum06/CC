@@ -3,10 +3,10 @@ import socket from "../utils/socket";
 import axios from "axios";
 import dayjs from "dayjs";
 import { motion, AnimatePresence } from "framer-motion";
-import { IoSend } from "react-icons/io5";
-import { BsEmojiSmile, BsFileEarmark, BsX } from "react-icons/bs";
-import { IoMdAttach } from "react-icons/io";
-import { IoClose } from "react-icons/io5";
+import { IoSend, IoCheckmarkDone, IoCheckmark } from "react-icons/io5";
+import { BsEmojiSmile, BsFileEarmark, BsX, BsThreeDotsVertical, BsMic, BsCamera, BsPaperclip } from "react-icons/bs";
+import { IoMdAttach, IoMdClose } from "react-icons/io";
+import { FaRegSmile, FaRegPaperPlane, FaMicrophone, FaPaperclip, FaCamera } from "react-icons/fa";
 import EmojiPicker from "emoji-picker-react";
 
 const ChatWindow = ({ user, recipient }) => {
@@ -20,6 +20,13 @@ const ChatWindow = ({ user, recipient }) => {
   const fileInputRef = useRef(null);
   const [selectedFile, setSelectedFile] = useState(null);
   const [showProfilePhoto, setShowProfilePhoto] = useState(false);
+  const [isTyping, setIsTyping] = useState(false);
+  const [showAttachMenu, setShowAttachMenu] = useState(false);
+  const [messageStatus, setMessageStatus] = useState({});
+  const [showReactions, setShowReactions] = useState(null);
+  const [reactions, setReactions] = useState({});
+  const typingTimeoutRef = useRef(null);
+  const attachMenuRef = useRef(null);
 
   const roomId = useMemo(() => {
     return user && recipient ? [user._id, recipient._id].sort().join("_") : "";
@@ -37,8 +44,15 @@ const ChatWindow = ({ user, recipient }) => {
 
     const handleReceiveMessage = (data) => {
       console.log("Received message:", data);
-
       setChat((prev) => [...prev, data]);
+      
+      // Update message status for received messages
+      if (data.sender._id !== user._id) {
+        setMessageStatus(prev => ({
+          ...prev,
+          [data._id || Date.now()]: 'received'
+        }));
+      }
 
       const container = chatContainerRef.current;
       if (container) {
@@ -51,13 +65,86 @@ const ChatWindow = ({ user, recipient }) => {
       }
     };
 
+    const handleTyping = (data) => {
+      if (data.userId === recipient._id) {
+        setIsTyping(true);
+        if (typingTimeoutRef.current) {
+          clearTimeout(typingTimeoutRef.current);
+        }
+        typingTimeoutRef.current = setTimeout(() => {
+          setIsTyping(false);
+        }, 3000);
+      }
+    };
+
+    const handleMessageStatus = (data) => {
+      setMessageStatus(prev => ({
+        ...prev,
+        [data.messageId]: data.status
+      }));
+    };
+
+    const handleReaction = (data) => {
+      setReactions(prev => {
+        const messageReactions = prev[data.messageId] || [];
+        const existingIndex = messageReactions.findIndex(r => r.userId === data.userId);
+        
+        if (existingIndex >= 0) {
+          if (data.reaction === null) {
+            // Remove reaction
+            return {
+              ...prev,
+              [data.messageId]: messageReactions.filter((_, i) => i !== existingIndex)
+            };
+          } else {
+            // Update reaction
+            const updated = [...messageReactions];
+            updated[existingIndex] = { userId: data.userId, reaction: data.reaction };
+            return { ...prev, [data.messageId]: updated };
+          }
+        } else {
+          // Add new reaction
+          return {
+            ...prev,
+            [data.messageId]: [...messageReactions, { userId: data.userId, reaction: data.reaction }]
+          };
+        }
+      });
+    };
+
     socket.on("receive_message", handleReceiveMessage);
-    return () => socket.off("receive_message", handleReceiveMessage);
+    socket.on("typing", handleTyping);
+    socket.on("message_status", handleMessageStatus);
+    socket.on("reaction", handleReaction);
+    
+    return () => {
+      socket.off("receive_message", handleReceiveMessage);
+      socket.off("typing", handleTyping);
+      socket.off("message_status", handleMessageStatus);
+      socket.off("reaction", handleReaction);
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+      }
+    };
   }, [user, recipient, roomId]);
 
   useEffect(() => {
     if (shouldScroll) scrollToBottom("auto");
   }, [chat, shouldScroll]);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (emojiPickerRef.current && !emojiPickerRef.current.contains(event.target)) {
+        setShowEmojiPicker(false);
+      }
+      if (attachMenuRef.current && !attachMenuRef.current.contains(event.target)) {
+        setShowAttachMenu(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const fetchMessages = async () => {
     try {
@@ -65,6 +152,18 @@ const ChatWindow = ({ user, recipient }) => {
         `http://localhost:3000/api/chat/chats/${recipient._id}?senderId=${user._id}`
       );
       setChat(res.data);
+      
+      // Initialize message statuses
+      const initialStatuses = {};
+      res.data.forEach(msg => {
+        if (msg.sender._id === user._id) {
+          initialStatuses[msg._id || Date.now()] = 'sent';
+        } else {
+          initialStatuses[msg._id || Date.now()] = 'received';
+        }
+      });
+      setMessageStatus(initialStatuses);
+      
       setTimeout(() => scrollToBottom("auto"), 0);
     } catch (err) {
       console.error(
@@ -85,6 +184,12 @@ const ChatWindow = ({ user, recipient }) => {
     setShouldScroll(isNearBottom);
   };
 
+  const handleTyping = () => {
+    if (message.trim()) {
+      socket.emit("typing", { userId: user._id, roomId });
+    }
+  };
+
   const handleFileSelect = (event) => {
     const file = event.target.files[0];
     if (file) {
@@ -99,9 +204,20 @@ const ChatWindow = ({ user, recipient }) => {
     }
   };
 
+  const handleReaction = (messageId, reaction) => {
+    socket.emit("reaction", {
+      messageId,
+      userId: user._id,
+      reaction,
+      roomId
+    });
+    setShowReactions(null);
+  };
+
   const sendMessage = async () => {
     if ((!message.trim() && !selectedFile) || !user || !recipient) return;
 
+    const messageId = Date.now().toString();
     const formData = new FormData();
     formData.append("userId", user._id);
     formData.append("recipientId", recipient._id);
@@ -111,6 +227,7 @@ const ChatWindow = ({ user, recipient }) => {
     }
 
     const msg = {
+      _id: messageId,
       sender: { _id: user._id, fullName: user.fullName },
       content: message,
       roomId,
@@ -127,54 +244,185 @@ const ChatWindow = ({ user, recipient }) => {
     setMessage("");
     setSelectedFile(null);
     setShouldScroll(true);
+    setMessageStatus(prev => ({
+      ...prev,
+      [messageId]: 'sent'
+    }));
 
     try {
-      await axios.post("http://localhost:3000/api/chat/chats", formData, {
+      const res = await axios.post("http://localhost:3000/api/chat/chats", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
       });
+      
+      // Update message status to delivered
+      if (res.data._id) {
+        setMessageStatus(prev => ({
+          ...prev,
+          [messageId]: 'delivered'
+        }));
+        
+        // Simulate message read after a delay
+        setTimeout(() => {
+          setMessageStatus(prev => ({
+            ...prev,
+            [messageId]: 'read'
+          }));
+        }, 2000);
+      }
     } catch (err) {
       console.error("Error sending message:", err.response?.data || err.message);
     }
   };
 
-  const onEmojiClick = (emojiObject) => {
-    setMessage((prevMessage) => prevMessage + emojiObject.emoji);
-    setShowEmojiPicker(false);
+  const getMessageStatusIcon = (status) => {
+    switch (status) {
+      case 'sent':
+        return <IoCheckmark className="w-4 h-4" />;
+      case 'delivered':
+        return <IoCheckmarkDone className="w-4 h-4" />;
+      case 'read':
+        return <IoCheckmarkDone className="w-4 h-4 text-blue-500" />;
+      default:
+        return null;
+    }
   };
 
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (emojiPickerRef.current && !emojiPickerRef.current.contains(event.target)) {
-        setShowEmojiPicker(false);
-      }
+  const getReactionEmoji = (reaction) => {
+    const emojiMap = {
+      'like': '👍',
+      'love': '❤️',
+      'laugh': '😂',
+      'sad': '😢',
+      'angry': '😠',
+      'wow': '😮'
     };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+    return emojiMap[reaction] || reaction;
+  };
 
   return (
-    <div className="flex flex-col h-full bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl shadow-lg overflow-hidden">
+    <div className="flex flex-col h-full bg-[#f0f2f5]">
       {/* Header */}
-      <div className="flex items-center px-6 py-4 border-b bg-white shadow-sm">
-        <div className="relative">
-          <img
-            src={recipient.profileImage || "default-user.jpg"}
-            alt={recipient.fullName}
-            className="w-12 h-12 rounded-full object-cover ring-2 ring-blue-500 ring-offset-2 cursor-pointer hover:opacity-90 transition-opacity"
-            onClick={() => setShowProfilePhoto(true)}
-          />
-          <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
+      <div className="flex items-center justify-between px-4 py-3 bg-[#008069] text-white shadow-md">
+        <div className="flex items-center">
+          <div className="relative">
+            <img
+              src={recipient.profileImage || "default-user.jpg"}
+              alt={recipient.fullName}
+              className="w-10 h-10 rounded-full object-cover ring-2 ring-white ring-offset-2 ring-offset-[#008069] cursor-pointer hover:opacity-90 transition-opacity"
+              onClick={() => setShowProfilePhoto(true)}
+            />
+            <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
+          </div>
+          <div className="ml-3">
+            <h2 className="font-semibold text-lg">{recipient.fullName}</h2>
+            <p className="text-xs text-gray-200 flex items-center">
+              {isTyping ? (
+                <span className="text-gray-200">typing...</span>
+              ) : (
+                <>
+                  <span className="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
+                  online
+                </>
+              )}
+            </p>
+          </div>
         </div>
-        <div className="ml-4">
-          <h2 className="font-semibold text-lg text-gray-800">{recipient.fullName}</h2>
-          <p className="text-sm text-gray-500 flex items-center">
-            <span className="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
-            {recipient.designation || "Student"}
-          </p>
+        <div className="flex items-center space-x-4">
+          <button className="p-2 hover:bg-white/10 rounded-full transition-colors">
+            <BsThreeDotsVertical className="w-5 h-5" />
+          </button>
         </div>
+      </div>
+
+      {/* Chat Messages */}
+      <div
+        className="flex-1 overflow-y-auto p-4 space-y-3 bg-[#e5ddd5] bg-opacity-50"
+        ref={chatContainerRef}
+        onScroll={handleScroll}
+      >
+        <AnimatePresence>
+          {chat.map((msg, i) => {
+            const isMe = msg.sender?._id === user._id;
+            const messageId = msg._id || i;
+            const messageReactions = reactions[messageId] || [];
+            
+            return (
+              <motion.div
+                key={messageId}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                className={`flex ${isMe ? "justify-end" : "justify-start"} group`}
+              >
+                <div className="relative max-w-[75%] md:max-w-[60%]">
+                  <div
+                    className={`relative px-4 py-2 rounded-lg ${
+                      isMe
+                        ? "bg-[#dcf8c6] text-gray-800 rounded-br-none"
+                        : "bg-white text-gray-800 rounded-bl-none shadow-sm"
+                    }`}
+                    onContextMenu={(e) => {
+                      e.preventDefault();
+                      setShowReactions(messageId);
+                    }}
+                  >
+                    {msg.file && (
+                      <div className="mb-2 p-2 bg-black bg-opacity-10 rounded-lg flex items-center gap-2">
+                        <BsFileEarmark className="w-5 h-5 text-gray-600" />
+                        <span className="text-sm truncate">{msg.file.name}</span>
+                      </div>
+                    )}
+                    <p className="text-sm md:text-base">{msg.content}</p>
+                    <div className="flex items-center justify-end mt-1 gap-1">
+                      <p className={`text-xs ${isMe ? "text-gray-500" : "text-gray-500"}`}>
+                        {dayjs(msg.timestamp).format("hh:mm A")}
+                      </p>
+                      {isMe && (
+                        <span className="ml-1">
+                          {getMessageStatusIcon(messageStatus[messageId])}
+                        </span>
+                      )}
+                    </div>
+                    
+                    {/* Message reactions */}
+                    {messageReactions.length > 0 && (
+                      <div className="absolute -top-3 right-0 flex items-center bg-white rounded-full shadow-md px-1 py-0.5">
+                        {messageReactions.map((reaction, idx) => (
+                          <span key={idx} className="text-xs">
+                            {getReactionEmoji(reaction.reaction)}
+                          </span>
+                        ))}
+                        {messageReactions.length > 1 && (
+                          <span className="text-xs text-gray-500 ml-1">
+                            {messageReactions.length}
+                          </span>
+                        )}
+                      </div>
+                    )}
+                    
+                    {/* Reaction menu */}
+                    {showReactions === messageId && (
+                      <div className="absolute -top-12 right-0 bg-white rounded-full shadow-lg p-1 flex items-center space-x-1 z-10">
+                        {['like', 'love', 'laugh', 'sad', 'angry', 'wow'].map((reaction) => (
+                          <button
+                            key={reaction}
+                            className="w-8 h-8 flex items-center justify-center hover:scale-110 transition-transform"
+                            onClick={() => handleReaction(messageId, reaction)}
+                          >
+                            {getReactionEmoji(reaction)}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </motion.div>
+            );
+          })}
+        </AnimatePresence>
+        <div ref={messagesEndRef} />
       </div>
 
       {/* Profile Photo Modal */}
@@ -216,57 +464,10 @@ const ChatWindow = ({ user, recipient }) => {
         )}
       </AnimatePresence>
 
-      {/* Chat Messages */}
-      <div
-        className="flex-1 overflow-y-auto p-6 space-y-4 scroll-smooth"
-        ref={chatContainerRef}
-        onScroll={handleScroll}
-      >
-        <AnimatePresence>
-          {chat.map((msg, i) => {
-            const isMe = msg.sender?._id === user._id;
-            return (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                className={`flex ${isMe ? "justify-end" : "justify-start"}`}
-              >
-                <div
-                  className={`group relative max-w-[70%] md:max-w-[60%] px-4 py-2 rounded-2xl ${
-                    isMe
-                      ? "bg-blue-600 text-white rounded-br-none"
-                      : "bg-white text-gray-800 rounded-bl-none shadow-md"
-                  }`}
-                >
-                  {msg.file && (
-                    <div className="mb-2 p-2 bg-opacity-20 bg-black rounded-lg flex items-center gap-2">
-                      <BsFileEarmark className="w-5 h-5" />
-                      <span className="text-sm truncate">{msg.file.name}</span>
-                    </div>
-                  )}
-                  <p className="text-sm md:text-base">{msg.content}</p>
-                  <p className={`text-xs mt-1 ${isMe ? "text-blue-100" : "text-gray-500"}`}>
-                    {dayjs(msg.timestamp).format("hh:mm A")}
-                  </p>
-                  {isMe && (
-                    <div className="absolute -right-2 top-1/2 transform -translate-y-1/2 w-0 h-0 
-                      border-t-8 border-t-transparent border-l-8 border-l-blue-600 border-b-8 border-b-transparent">
-                    </div>
-                  )}
-                </div>
-              </motion.div>
-            );
-          })}
-        </AnimatePresence>
-        <div ref={messagesEndRef} />
-      </div>
-
       {/* Chat Input */}
-      <div className="p-4 border-t bg-white relative">
+      <div className="p-3 bg-[#f0f2f5] border-t border-gray-200">
         {selectedFile && (
-          <div className="mb-2 p-2 bg-gray-100 rounded-lg flex items-center justify-between">
+          <div className="mb-2 p-2 bg-white rounded-lg flex items-center justify-between shadow-sm">
             <div className="flex items-center gap-2">
               <BsFileEarmark className="w-5 h-5 text-gray-600" />
               <span className="text-sm text-gray-600 truncate">{selectedFile.name}</span>
@@ -279,13 +480,13 @@ const ChatWindow = ({ user, recipient }) => {
             </button>
           </div>
         )}
-        <div className="flex items-center gap-2 bg-gray-100 rounded-full px-4 py-2">
-          <div className="relative items-center flex" ref={emojiPickerRef}>
+        <div className="flex items-center gap-2 bg-white rounded-full px-3 py-2 shadow-sm">
+          <div className="relative" ref={emojiPickerRef}>
             <button 
-              className="text-gray-500 hover:text-gray-700 transition-colors"
+              className="text-gray-500 hover:text-gray-700 transition-colors p-1"
               onClick={() => setShowEmojiPicker(!showEmojiPicker)}
             >
-              <BsEmojiSmile className="w-6 h-6" />
+              <FaRegSmile className="w-5 h-5" />
             </button>
             {showEmojiPicker && (
               <div className="absolute bottom-full left-0 mb-2 z-50">
@@ -299,11 +500,15 @@ const ChatWindow = ({ user, recipient }) => {
               </div>
             )}
           </div>
+          
           <input
             className="flex-1 bg-transparent border-none focus:outline-none text-gray-700 placeholder-gray-500"
             placeholder="Type a message..."
             value={message}
-            onChange={(e) => setMessage(e.target.value)}
+            onChange={(e) => {
+              setMessage(e.target.value);
+              handleTyping();
+            }}
             onKeyDown={(e) => {
               if (e.key === "Enter" && !e.shiftKey) {
                 e.preventDefault();
@@ -311,29 +516,72 @@ const ChatWindow = ({ user, recipient }) => {
               }
             }}
           />
+          
+          <div className="relative" ref={attachMenuRef}>
+            <button 
+              className="text-gray-500 hover:text-gray-700 transition-colors p-1"
+              onClick={() => setShowAttachMenu(!showAttachMenu)}
+            >
+              <FaPaperclip className="w-5 h-5" />
+            </button>
+            
+            {showAttachMenu && (
+              <div className="absolute bottom-full right-0 mb-2 bg-white rounded-lg shadow-lg p-2 w-48 z-50">
+                <div className="grid grid-cols-3 gap-2">
+                  <button 
+                    className="flex flex-col items-center justify-center p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                    onClick={() => {
+                      fileInputRef.current?.click();
+                      setShowAttachMenu(false);
+                    }}
+                  >
+                    <FaPaperclip className="w-6 h-6 text-blue-500 mb-1" />
+                    <span className="text-xs text-gray-700">Document</span>
+                  </button>
+                  <button 
+                    className="flex flex-col items-center justify-center p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                    onClick={() => {
+                      // Handle camera
+                      setShowAttachMenu(false);
+                    }}
+                  >
+                    <FaCamera className="w-6 h-6 text-green-500 mb-1" />
+                    <span className="text-xs text-gray-700">Camera</span>
+                  </button>
+                  <button 
+                    className="flex flex-col items-center justify-center p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                    onClick={() => {
+                      // Handle gallery
+                      setShowAttachMenu(false);
+                    }}
+                  >
+                    <BsCamera className="w-6 h-6 text-purple-500 mb-1" />
+                    <span className="text-xs text-gray-700">Gallery</span>
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+          
           <input
             type="file"
             ref={fileInputRef}
             onChange={handleFileSelect}
             className="hidden"
           />
-          <button 
-            className="text-gray-500 hover:text-gray-700 transition-colors"
-            onClick={() => fileInputRef.current?.click()}
-          >
-            <IoMdAttach className="w-6 h-6" />
-          </button>
-          <button
-            onClick={sendMessage}
-            disabled={!message.trim() && !selectedFile}
-            className={`p-2 rounded-full transition-all duration-200 ${
-              message.trim() || selectedFile
-                ? "bg-blue-600 text-white hover:bg-blue-700"
-                : "bg-gray-300 text-gray-500 cursor-not-allowed"
-            }`}
-          >
-            <IoSend className="w-5 h-5" />
-          </button>
+          
+          {message.trim() || selectedFile ? (
+            <button
+              onClick={sendMessage}
+              className="bg-[#008069] text-white p-2 rounded-full hover:bg-[#006d5a] transition-colors"
+            >
+              <FaRegPaperPlane className="w-5 h-5" />
+            </button>
+          ) : (
+            <button className="text-gray-500 hover:text-gray-700 transition-colors p-1">
+              <FaMicrophone className="w-5 h-5" />
+            </button>
+          )}
         </div>
       </div>
     </div>
