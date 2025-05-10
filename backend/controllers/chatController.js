@@ -26,10 +26,15 @@ exports.createChat = async (req, res) => {
   const { recipientId, content, userId } = req.body;
 
   try {
+    // Generate roomId consistently
+    const sortedIds = [userId, recipientId].sort();
+    const roomId = sortedIds.join("_");
+
     const message = new Message({
       sender: userId,
       recipient: recipientId,
       content,
+      roomId,
     });
 
     await message.save();

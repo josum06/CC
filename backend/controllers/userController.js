@@ -118,19 +118,33 @@ const getPostsById = async (req, res) => {
 };
 const getAllUsers = async (req, res) => {
   try {
-    const users = await User.find();// Exclude password field
+    const users = await User.find(); // Exclude password field
     res.status(200).json(users);
   } catch (error) {
     console.error("Error fetching all users:", error);
     res.status(500).json({ message: "Internal Server Error" });
   }
-}
+};
+
+const searchUser = async (req, res) => {
+  try {
+    const { query } = req.query;
+    // Search for users by name or email
+    const users = await User.find({
+      fullName: { $regex: query, $options: "i" },
+    });
+    res.status(200).json(users);
+  } catch (error) {
+    console.error("Error searching for users:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
 module.exports = {
   uploadProfile,
   getUserProfile,
   getUserProfileById,
   getPostsById,
   getAllUsers,
+  searchUser,
 };
-
-

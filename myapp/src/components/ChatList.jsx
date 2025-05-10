@@ -1,5 +1,5 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import React from "react";
+import { useNavigate } from "react-router-dom";
 
 const ChatList = ({ chats, onChatSelect }) => {
   const navigate = useNavigate();
@@ -19,7 +19,10 @@ const ChatList = ({ chats, onChatSelect }) => {
         >
           <div className="relative">
             <img
-              src={chat.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${chat.name}`}
+              src={
+                chat.avatar ||
+                `https://api.dicebear.com/7.x/avataaars/svg?seed=${chat.name}`
+              }
               alt={chat.name}
               className="w-12 h-12 rounded-full"
             />
@@ -30,11 +33,13 @@ const ChatList = ({ chats, onChatSelect }) => {
           <div className="ml-3 flex-1">
             <div className="flex justify-between items-center">
               <h3 className="text-[#e9edef] font-medium">{chat.name}</h3>
-              <span className="text-xs text-[#8696a0]">{chat.lastMessage?.time}</span>
+              <span className="text-xs text-[#8696a0]">
+                {chat.lastMessage?.time}
+              </span>
             </div>
             <div className="flex justify-between items-center">
               <p className="text-sm text-[#8696a0] truncate max-w-[200px]">
-                {chat.lastMessage?.text || 'No messages yet'}
+                {chat.lastMessage?.text || "No messages yet"}
               </p>
               {chat.unreadCount > 0 && (
                 <span className="bg-[#00a884] text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">

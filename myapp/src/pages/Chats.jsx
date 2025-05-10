@@ -13,14 +13,14 @@ const ChatApp = () => {
 
   useEffect(() => {
     if (clerkUser) fetchCurrentUser();
-    
+
     // Handle responsive behavior
     const handleResize = () => {
       setIsMobile(window.innerWidth < 768);
     };
-    
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, [clerkUser]);
 
   const fetchCurrentUser = async () => {
@@ -50,8 +50,13 @@ const ChatApp = () => {
   return (
     <div className="flex h-screen bg-[#f0f2f5]">
       {/* Sidebar - Hidden on mobile when chat is open */}
-      <div className={`${isMobile && showChat ? 'hidden' : 'block'} w-full md:w-1/3 lg:w-1/4 border-r bg-white flex flex-col`}>
+      <div
+        className={`${
+          isMobile && showChat ? "hidden" : "block"
+        } w-full md:w-1/3 lg:w-1/4 border-r bg-white flex flex-col`}
+      >
         {/* Header */}
+
         <div className="p-4 bg-[#008069] text-white">
           <div className="flex items-center">
             <img
@@ -116,9 +121,9 @@ const ChatApp = () => {
                     {u.designation?.slice(0, 1).toUpperCase() +
                       u.designation?.slice(1) || "Student"}
                   </p>
-                  <div className="bg-green-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                  {/* <div className="bg-green-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
                     2
-                  </div>
+                  </div> */}
                 </div>
               </div>
             </div>
@@ -127,18 +132,30 @@ const ChatApp = () => {
       </div>
 
       {/* Chat Window */}
-      <div className={`${isMobile && !showChat ? 'hidden' : 'block'} w-full md:w-2/3 lg:w-3/4 flex flex-col bg-[#f0f2f5]`}>
+      <div
+        className={`${
+          isMobile && !showChat ? "hidden" : "block"
+        } w-full md:w-2/3 lg:w-3/4 flex flex-col bg-[#f0f2f5]`}
+      >
         {recipient ? (
           <>
             {/* Mobile back button */}
             {isMobile && (
               <div className="md:hidden p-3 bg-[#008069] text-white flex items-center">
-                <button 
-                  onClick={handleBackToContacts}
-                  className="mr-3"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                <button onClick={handleBackToContacts} className="mr-3">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-6 w-6"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M15 19l-7-7 7-7"
+                    />
                   </svg>
                 </button>
                 <div className="flex items-center">
@@ -159,12 +176,29 @@ const ChatApp = () => {
         ) : (
           <div className="flex-1 flex flex-col items-center justify-center text-gray-500 bg-[#f0f2f5]">
             <div className="bg-white p-8 rounded-lg shadow-md text-center max-w-md">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 mx-auto text-[#008069] mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-16 w-16 mx-auto text-[#008069] mb-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                />
               </svg>
-              <h3 className="text-xl font-semibold mb-2">Welcome to Campus Connect</h3>
-              <p className="mb-4">Select a contact from the list to start chatting</p>
-              <p className="text-sm text-gray-400">Your messages are end-to-end encrypted</p>
+              <h3 className="text-xl font-semibold mb-2">
+                Welcome to Campus Connect
+              </h3>
+              <p className="mb-4">
+                Select a contact from the list to start chatting
+              </p>
+              <p className="text-sm text-gray-400">
+                Your messages are end-to-end encrypted
+              </p>
             </div>
           </div>
         )}

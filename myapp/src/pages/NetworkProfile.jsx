@@ -20,35 +20,32 @@ function NetworkProfile() {
   const navigate = useNavigate();
   const location = useLocation();
   const userData = location.state?.userData;
-  console.log(userData.userId);
+  // console.log(userData.userId);
   const [activeTab, setActiveTab] = useState("posts"); // 'posts' or 'projects'
   const [currUserId, setCurrUserId] = useState(null);
   const [selectedPost, setSelectedPost] = useState(null);
   const [commentModalOpen, setCommentModalOpen] = useState(false);
-   const [commentText, setCommentText] = useState("");
+  const [commentText, setCommentText] = useState("");
   const [likes, setLikes] = useState();
   const [likedByCurrentUser, setLikedByCurrentUser] = useState(false);
   const [user, setUser] = useState(null);
   const [posts, setPosts] = useState(null);
   const { user: clerkUser } = useUser();
-  
+
   useEffect(() => {
     if (userData.userId && clerkUser?.id) {
       fetchuser();
     }
-  }, [userData,clerkUser?.id]);
-
+  }, [userData, clerkUser?.id]);
 
   const fetchuser = async () => {
     try {
-      const [userResponse, postResponse,userAuthResponse] = await Promise.all([
+      const [userResponse, postResponse, userAuthResponse] = await Promise.all([
         axios.get(
           `http://localhost:3000/api/user/profileById/${userData.userId}`
         ),
         axios.get(`http://localhost:3000/api/user/posts/${userData.userId}`),
-        axios.get(
-          `http://localhost:3000/api/user/profile/${clerkUser.id}`
-        )
+        axios.get(`http://localhost:3000/api/user/profile/${clerkUser.id}`),
       ]);
       const data = userResponse.data;
       const currUserData = userAuthResponse.data;
@@ -63,7 +60,6 @@ function NetworkProfile() {
       toast.error("Failed to load profile.");
     }
   };
-
 
   useEffect(() => {
     const fetchLikes = async () => {
@@ -96,7 +92,6 @@ function NetworkProfile() {
       };
       setSelectedPost(updatedPost);
       setLikedByCurrentUser(response.data.hasLiked);
-      
     } catch (error) {
       console.error("Error liking post:", error);
       toast.error("Failed to like post");
@@ -106,8 +101,6 @@ function NetworkProfile() {
   const handlePostClick = (post) => {
     setSelectedPost(post);
   };
-
-
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -293,59 +286,60 @@ function NetworkProfile() {
                   <div className="p-4 border-t border-gray-400 bg-gray-100">
                     <div className="flex items-center justify-between mb-3">
                       <div className="flex items-center space-x-4">
-                        <button 
-                         onClick={handleLike}
-                         className="p-2 hover:bg-gray-100 rounded-full">
-                         <Heart
-                             size={22}
-                             className={`${
-                               likedByCurrentUser
-                                 ? "fill-red-500 stroke-red-500"
-                                 : "stroke-gray-700 hover:stroke-red-500"
-                             } transition-colors`}
-                            />
+                        <button
+                          onClick={handleLike}
+                          className="p-2 hover:bg-gray-100 rounded-full"
+                        >
+                          <Heart
+                            size={22}
+                            className={`${
+                              likedByCurrentUser
+                                ? "fill-red-500 stroke-red-500"
+                                : "stroke-gray-700 hover:stroke-red-500"
+                            } transition-colors`}
+                          />
                         </button>
 
-                        <button 
+                        <button
                           onClick={() => setCommentModalOpen(!commentModalOpen)}
-                          className="p-2 hover:bg-gray-100 rounded-full">
+                          className="p-2 hover:bg-gray-100 rounded-full"
+                        >
                           <MessageCircle size={24} className="text-gray-700" />
                         </button>
 
                         <button className="p-2 hover:bg-gray-100 rounded-full">
                           <Share2 size={24} className="text-gray-700" />
                         </button>
-
-               
                       </div>
-                   
                     </div>
                     <p className="font-semibold text-sm mb-2">
                       {selectedPost.likes} likes
                     </p>
-                    {commentModalOpen &&  <form
-                      onSubmit={handleSubmit}
-                      className="flex items-center py-3 border-t border-gray-50 "
-                    >
-                      <input
-                        type="text"
-                        value={commentText}
-                        onChange={(e) => setCommentText(e.target.value)}
-                        placeholder="Add a comment..."
-                        className="flex-1 text-sm p-2 focus:outline-none placeholder-gray-400"
-                      />
-                      <button
-                        type="submit"
-                        disabled={!commentText.trim()}
-                        className={`px-3 py-1 text-sm font-semibold rounded-full transition-colors ${
-                          commentText.trim()
-                            ? "text-blue-500 hover:text-blue-600 hover:bg-blue-50"
-                            : "text-gray-200 cursor-not-allowed"
-                        }`}
+                    {commentModalOpen && (
+                      <form
+                        onSubmit={handleSubmit}
+                        className="flex items-center py-3 border-t border-gray-50 "
                       >
-                        Post
-          </button>
-        </form>}
+                        <input
+                          type="text"
+                          value={commentText}
+                          onChange={(e) => setCommentText(e.target.value)}
+                          placeholder="Add a comment..."
+                          className="flex-1 text-sm p-2 focus:outline-none placeholder-gray-400"
+                        />
+                        <button
+                          type="submit"
+                          disabled={!commentText.trim()}
+                          className={`px-3 py-1 text-sm font-semibold rounded-full transition-colors ${
+                            commentText.trim()
+                              ? "text-blue-500 hover:text-blue-600 hover:bg-blue-50"
+                              : "text-gray-200 cursor-not-allowed"
+                          }`}
+                        >
+                          Post
+                        </button>
+                      </form>
+                    )}
                     <p className="text-sm text-gray-500">{selectedPost.time}</p>
                   </div>
                 </div>
@@ -369,8 +363,7 @@ function NetworkProfile() {
                       className="w-full h-full object-cover"
                     />
                     {/* Hover Overlay */}
-                    
-                    
+
                     <div className="absolute inset-0 not-open: bg-opacity-0 group-hover:bg-black/60 transition-all duration-300 flex items-center justify-center">
                       <div className="flex items-center space-x-6 opacity-0 group-hover:opacity-100 transition-all duration-300">
                         <div className="flex items-center text-white">
