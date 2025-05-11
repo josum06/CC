@@ -30,7 +30,7 @@ app.use(express.json()); // ✅ Move this down
 
 app.use(
   cors({
-    origin: "http://localhost:5173", // Allow frontend to access backend
+    origin: "*", // Allow frontend to access backend
     methods: "GET,POST,PUT,DELETE,PATCH",
     allowedHeaders: "Content-Type,Authorization",
   })

@@ -7,6 +7,8 @@ const {
   getPostsById,
   getAllUsers,
   searchUser,
+  updateConnectionsPending,
+  getPendingConnections
 } = require("../controllers/userController");
 
 const router = express.Router();
@@ -22,4 +24,19 @@ router.get("/profileById/:userId", getUserProfileById);
 router.get("/posts/:userId", getPostsById);
 router.get("/getAllUsers", getAllUsers); // Assuming you have a function to get all users\
 router.get("/searchUser", searchUser);
+
+
+
+// updating connections
+router.patch("/updateConnectionsPending/:userId", updateConnectionsPending);
+// router.patch("/connectionsAccepted/:userId", connectionAccepted);
+// router.patch("/connectionsRejected/:userId", connectionRejected);
+
+
+
+
+// For getting the connections 
+router.get("/getPendingConnections/:userId",getPendingConnections);
+
+
 module.exports = router;

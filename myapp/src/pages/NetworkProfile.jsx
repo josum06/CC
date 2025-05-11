@@ -26,7 +26,6 @@ function NetworkProfile() {
   const [selectedPost, setSelectedPost] = useState(null);
   const [commentModalOpen, setCommentModalOpen] = useState(false);
   const [commentText, setCommentText] = useState("");
-  const [likes, setLikes] = useState();
   const [likedByCurrentUser, setLikedByCurrentUser] = useState(false);
   const [user, setUser] = useState(null);
   const [posts, setPosts] = useState(null);
@@ -80,6 +79,21 @@ function NetworkProfile() {
     }
   }, [currUserId, selectedPost?._id]);
 
+
+  const handleClick = async() => {
+    try{
+        const res = await axios.patch(`http://localhost:3000/api/user/updateConnectionsPending/${currUserId}`, {
+          receiverId: user._id,
+        })
+        console.log(res.data);
+        toast.success("Connection updated successfully!");
+    }catch(err){
+        console.error("Error updating connections:", err);
+        toast.error("Failed to update connections");
+    }
+    
+  }
+
   const handleLike = async () => {
     try {
       const response = await axios.patch(
@@ -98,6 +112,7 @@ function NetworkProfile() {
     }
   };
 
+  
   const handlePostClick = (post) => {
     setSelectedPost(post);
   };
@@ -158,7 +173,9 @@ function NetworkProfile() {
             <div className="flex flex-col md:flex-row md:items-center gap-4 mb-4">
               <h2 className="text-2xl font-bold">{user?.fullName}</h2>
               <div className="flex gap-2">
-                <button className="px-6 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-colors">
+                <button 
+                onClick={handleClick}
+                className="px-6 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-colors">
                   Message
                 </button>
                 <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">

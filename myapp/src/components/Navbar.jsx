@@ -3,7 +3,9 @@ import { useNavigate } from "react-router-dom";
 import { FaSearch, FaComments, FaUser } from "react-icons/fa";
 import Sidebar from "./Sidebar";
 import axios from "axios";
+import { useUser } from "@clerk/clerk-react";
 const Navbar = () => {
+  const {user} = useUser();
   const navigate = useNavigate();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [searchUsers, setSearchUsers] = useState([]);
@@ -34,6 +36,7 @@ const Navbar = () => {
     const res = await axios.get("http://localhost:3000/api/user/searchUser", {
       params: {
         query: searchQuery,
+        clerkId: user.id,
       },
     });
     setSearchUsers(res.data);
@@ -46,6 +49,7 @@ const Navbar = () => {
 
   const handleClick = async (userId) => {
     // console.log(userId);
+
     navigate("/NetworkProfile", {
       state: { userData: { userId } },
     });

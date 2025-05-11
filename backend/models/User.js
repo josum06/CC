@@ -23,6 +23,26 @@ const UserSchema = new mongoose.Schema(
     collegeId: { type: String },
     status: { type: Boolean, default: false },
     profileComplete: { type: Boolean, default: false },
+
+    connections : [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
+    connectionsPending : [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
+    connectionsAwaited : [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
+    
   },
   {
     timestamps: true,

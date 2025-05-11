@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useUser } from "@clerk/clerk-react";
 import axios from "axios";
 import { toast } from "react-toastify";
+
 import {
   X,
   Settings,
@@ -13,13 +14,18 @@ import {
   LogOut,
   UserCircle,
   ChevronRight,
+  Check,
+  UserPlus
 } from "lucide-react";
 import { format } from "date-fns";
+import { ModalWindow } from "./ModalWindow";
 
 const Sidebar = ({ isOpen, toggleSidebar }) => {
   const navigate = useNavigate();
   const { user } = useUser();
+  const [modal,setShowModal] = useState(false);
   const [mainUser, setMainUser] = useState();
+  const [requests, setRequests] = useState([]);
 
   useEffect(() => {
     if (user) {
@@ -39,6 +45,20 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
       toast.error("Failed to load profile.");
     }
   };
+
+  const handleClick = async () => {
+    try {
+      const response = await axios.get(
+        `http://localhost:3000/api/user/getPendingConnections/${mainUser._id}`
+      );
+      const data = response.data;
+      setRequests(data);
+      setShowModal(true);
+    } catch (error) {
+      console.error("Error fetching connections:", error);
+      toast.error("Failed to load connections.");
+    }
+  }
 
   const MenuItem = ({ icon: Icon, label, onClick, variant = "default" }) => {
     const variants = {
@@ -166,10 +186,22 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
               navigate("/FacultyRole");
               toggleSidebar();
             }}
-          />
+          /> 
+
+        <button
+        onClick={handleClick}
+        className="group w-full cursor-pointer px-4 py-3 rounded-xl mb-2 transition-all duration-200 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 flex items-center justify-between"
+      >
+        <div className="flex items-center gap-3">
+          <UserPlus className="w-5 h-5" />
+          <span className="font-medium">Connections Request</span>
+        </div>
+        <ChevronRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transform group-hover:translate-x-1 transition-all duration-200" />
+      </button>
+
 
           {/* Sign Out Button */}
-          <div className="pt-10">
+          <div className=" pt-10">
             <SignOutButton onClick={toggleSidebar} redirectUrl="/Signup">
               <button className="w-full px-4 cursor-pointer py-3 rounded-xl bg-red-50 text-red-700 hover:bg-red-100 transition-colors flex items-center gap-3">
                 <LogOut className="w-5 h-5" />
@@ -178,6 +210,66 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
             </SignOutButton>
           </div>
         </div>
+
+        {/* Modal for connections */}
+       
+
+      <ModalWindow isOpen={modal} onClose={() => setShowModal(false)}>
+        <h2 className="text-xl font-semibold mb-4 text-center text-gray-800">
+          Connection Requests
+        </h2>
+
+        {requests.length > 0 ? (
+          <ul className="space-y-3 max-h-80 overflow-y-auto pr-1">
+            {requests.map((request) => (
+              <li
+                key={request._id}
+                className="flex items-center justify-between p-3 bg-white border rounded-xl shadow-sm hover:shadow-md transition-shadow"
+              >
+                <div className="flex items-center gap-4">
+                  <img
+                    src={request.profileImage}
+                    alt="Profile"
+                    className="w-10 h-10 rounded-full object-cover border"
+                  />
+                  <span className="text-gray-700 font-medium">{request.fullName}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => {
+                      // Handle accept
+                    }}
+                    className="p-2 bg-green-100 hover:bg-green-200 text-green-700 rounded-full transition-colors"
+                    aria-label="Accept"
+                  >
+                    <Check className="w-5 h-5" />
+                  </button>
+                  <button
+                    onClick={() => {
+                      // Handle reject
+                    }}
+                    className="p-2 bg-red-100 hover:bg-red-200 text-red-700 rounded-full transition-colors"
+                    aria-label="Reject"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="text-gray-600 text-center">No connection requests.</p>
+        )}
+
+        <div className="mt-6 flex justify-center">
+          <button
+            className="px-5 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors"
+            onClick={() => setShowModal(false)}
+          >
+            Close
+          </button>
+        </div>
+      </ModalWindow>
 
         {/* Footer */}
         <div className="absolute bottom-0 left-0 right-0 p-6">

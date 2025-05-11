@@ -128,17 +128,85 @@ const getAllUsers = async (req, res) => {
 
 const searchUser = async (req, res) => {
   try {
-    const { query } = req.query;
+    const { query,clerkId } = req.query;
     // Search for users by name or email
-    const users = await User.find({
+
+    const allUsers = await User.find({
       fullName: { $regex: query, $options: "i" },
     });
+    const users= allUsers.filter((user) => {
+      if (user.clerkId === clerkId) {
+        return false; // Exclude the current user from the search results
+      }
+      return true; // Include other users
+    })
     res.status(200).json(users);
+
   } catch (error) {
     console.error("Error searching for users:", error);
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
+
+const updateConnectionsPending = async (req, res) => {
+  try {
+    const { userId} = req.params;
+    const { receiverId } = req.body;
+
+    
+    const senderId = userId;
+    // jo receiver ki id hai use hme connectionsAwaited(sender) me dalna hai 
+    const sender = await User.findByIdAndUpdate(
+      senderId,
+      { $addToSet: { connectionsAwaited: receiverId } },
+      { new: true }
+    );
+
+    // or jo sender ki id hai use hme connectionsPending(receiver) me dalna hai
+    const receiver = await User.findByIdAndUpdate(
+      receiverId,
+      { $addToSet: { connectionsPending: senderId } },
+      { new: true }
+    );
+    
+  
+    if (!sender || !receiver) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.status(200).json({
+      message: "Connection request sent successfully",
+    });
+  } catch (error) {
+    console.error("Error updating connections pending:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+}
+
+const getPendingConnections = async (req, res) => {
+  try {
+    const { userId } = req.params;
+     
+
+    // Fetch user from DB using Clerk ID
+    const user = await User.findById(userId).populate({
+      path: "connectionsPending",
+      select: "fullName profileImage", // Select only these fields
+    });
+    
+
+    console.log(user);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.status(200).json(user.connectionsPending);
+  } catch (error) {
+    console.error("Error fetching pending connections:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
 
 module.exports = {
   uploadProfile,
@@ -147,4 +215,6 @@ module.exports = {
   getPostsById,
   getAllUsers,
   searchUser,
+  updateConnectionsPending,
+  getPendingConnections,
 };
