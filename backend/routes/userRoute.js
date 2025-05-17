@@ -8,7 +8,10 @@ const {
   getAllUsers,
   searchUser,
   updateConnectionsPending,
-  getPendingConnections
+  getPendingConnections,
+  connectionAccepted,
+  connectionRejected,
+  getCurrentConnections,
 } = require("../controllers/userController");
 
 const router = express.Router();
@@ -29,14 +32,16 @@ router.get("/searchUser", searchUser);
 
 // updating connections
 router.patch("/updateConnectionsPending/:userId", updateConnectionsPending);
-// router.patch("/connectionsAccepted/:userId", connectionAccepted);
-// router.patch("/connectionsRejected/:userId", connectionRejected);
+router.patch("/connectionsAccepted/:userId", connectionAccepted);
+router.patch("/connectionsRejected/:userId", connectionRejected);
+
 
 
 
 
 // For getting the connections 
 router.get("/getPendingConnections/:userId",getPendingConnections);
+router.get("/isPending/:userId", getCurrentConnections);  
 
 
 module.exports = router;

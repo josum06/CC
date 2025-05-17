@@ -148,6 +148,8 @@ const searchUser = async (req, res) => {
   }
 };
 
+
+
 const updateConnectionsPending = async (req, res) => {
   try {
     const { userId} = req.params;
@@ -207,6 +209,108 @@ const getPendingConnections = async (req, res) => {
   }
 };
 
+const connectionAccepted = async (req, res) => {
+  try {
+    const { userId } = req.params;  // logged in user ki id. // vbhv 
+    const { senderId } = req.body; //  jo req bhej rha hai.    // sumit
+  
+    
+    // jo sender ki id hai use hme connectionsAccepted(sender) me dalna hai 
+    const receiver = await User.findByIdAndUpdate(
+      userId,
+      { $pull: { connectionsPending: senderId },
+       $addToSet: { connections: senderId } },
+      { new: true }
+    );
+
+    // or jo receiver ki id hai use hme connectionsPending(receiver) se hata dena hai
+    const sender = await User.findByIdAndUpdate(
+      senderId,
+      { $pull: { connectionsAwaited: userId } ,
+       $addToSet: { connections: userId } } ,
+      { new: true }
+    );
+
+  
+
+    if (!sender || !receiver) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.status(200).json({
+      message: "Connection request accepted successfully",
+    });
+  } catch (error) {
+    console.error("Error updating connections pending:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+}
+
+const connectionRejected = async (req, res) => {
+  try {
+    const { userId } = req.params;  // logged in user ki id.  // vbhv 
+    const { senderId } = req.body; //  jo req bhej rha hai.    // sumit
+  
+    
+    // jo sender ki id hai use hme connectionsAccepted(sender) me dalna hai 
+   
+    const receiver = await User.findByIdAndUpdate(
+      userId,
+      { $pull: { connectionsPending: senderId } },
+      { new: true }
+    );
+
+    // or jo receiver ki id hai use hme connectionsPending(receiver) se hata dena hai
+    const sender = await User.findByIdAndUpdate(
+      senderId,
+      { $pull: { connectionsAwaited: userId } },
+      { new: true }
+    );
+
+  
+
+    if (!sender || !receiver) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.status(200).json({
+      message: "Connection request rejected successfully",
+    });
+  } catch (error) {
+    console.error("Error updating connections pending:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+}
+
+const getCurrentConnections = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { receiverId } = req.query;
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ category: "rejected" });
+    }
+
+    if (user.connections.includes(receiverId)) {
+      return res.status(200).json({ category: "accepted" });
+    }
+
+    if (user.connectionsAwaited.includes(receiverId)) {
+      return res.status(200).json({ category: "pending" });
+    }
+
+    return res.status(200).json({ category: "rejected" });
+  } catch (error) {
+    console.error("Error checking connection status:", error);
+    return res.status(500).json({ category: "rejected" });
+  }
+};
+
+
+
+
+
 
 module.exports = {
   uploadProfile,
@@ -217,4 +321,7 @@ module.exports = {
   searchUser,
   updateConnectionsPending,
   getPendingConnections,
+  connectionAccepted,
+  connectionRejected,
+  getCurrentConnections,
 };

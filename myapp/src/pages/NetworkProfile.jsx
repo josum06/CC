@@ -10,6 +10,8 @@ import {
   Link as LinkIcon,
   Heart,
   MessageCircle,
+  Handshake,
+  Clock
 } from "lucide-react";
 import Comments from "../components/Comments";
 import axios from "axios";
@@ -30,6 +32,7 @@ function NetworkProfile() {
   const [user, setUser] = useState(null);
   const [posts, setPosts] = useState(null);
   const { user: clerkUser } = useUser();
+  const [category, setCategory] = useState("rejected");
 
   useEffect(() => {
     if (userData.userId && clerkUser?.id) {
@@ -78,6 +81,26 @@ function NetworkProfile() {
       fetchLikes();
     }
   }, [currUserId, selectedPost?._id]);
+
+   
+  useEffect(() => {
+    const checkCategoryStatus = async () => {
+      try {
+      const response = await axios.get(
+      `http://localhost:3000/api/user/isPending/${currUserId}?receiverId=${user._id}`
+    );
+        console.log("Pending status response:", response);
+        setCategory(response.data?.category);
+      } catch (error) {
+        console.error("Error checking pending status:", error);
+      }
+    };
+
+    if (currUserId && user) {
+      checkCategoryStatus();
+    }
+  },[currUserId, user]);
+
 
 
   const handleClick = async() => {
@@ -176,7 +199,10 @@ function NetworkProfile() {
                 <button 
                 onClick={handleClick}
                 className="px-6 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-colors">
-                  Message
+                 {category === "accepted" && <p className="text-white-600">Accepted</p>}
+                {category === "pending" && <p className="text-white-600">Pending</p>}
+                {category === "rejected" && <p className="text-white-600">Connect</p>}
+                                
                 </button>
                 <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
                   <Share2 size={20} className="text-gray-600" />

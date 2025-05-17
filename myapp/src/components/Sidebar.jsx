@@ -46,6 +46,36 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
     }
   };
 
+  const handleReject = async (reqId)=>{
+    try {
+      const response = await axios.patch(
+        `http://localhost:3000/api/user/connectionsRejected/${mainUser._id}`,
+        { senderId: reqId}
+      );
+      const data = response.data;
+      setRequests(data);
+      toast.success("Connection rejected successfully.");
+    } catch (error) {
+      console.error("Error rejecting connection:", error);
+      toast.error("Failed to reject connection.");
+    }
+  }
+
+  const handleAccept = async (reqId)=>{
+    try {
+      const response = await axios.patch(
+        `http://localhost:3000/api/user/connectionsAccepted/${mainUser._id}`,
+        { senderId: reqId}
+      );
+      const data = response.data;
+      setRequests(data);
+      toast.success("Connection accepted successfully.");
+    } catch (error) {
+      console.error("Error accepting connection:", error);
+      toast.error("Failed to accept connection.");
+    }
+  }
+
   const handleClick = async () => {
     try {
       const response = await axios.get(
@@ -236,18 +266,14 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                 </div>
                 <div className="flex items-center gap-2">
                   <button
-                    onClick={() => {
-                      // Handle accept
-                    }}
+                    onClick={() => handleAccept(request._id)}
                     className="p-2 bg-green-100 hover:bg-green-200 text-green-700 rounded-full transition-colors"
                     aria-label="Accept"
                   >
                     <Check className="w-5 h-5" />
                   </button>
                   <button
-                    onClick={() => {
-                      // Handle reject
-                    }}
+                    onClick={()=> handleReject(request._id)}
                     className="p-2 bg-red-100 hover:bg-red-200 text-red-700 rounded-full transition-colors"
                     aria-label="Reject"
                   >
