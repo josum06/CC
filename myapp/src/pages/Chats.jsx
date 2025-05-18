@@ -32,8 +32,11 @@ const ChatApp = () => {
   };
 
   const fetchAllUsers = async (currentUserId) => {
-    const res = await axios.get("http://localhost:3000/api/user/getAllUsers");
-    setUsers(res.data.filter((u) => u._id !== currentUserId));
+    const res = await axios.get(
+      `http://localhost:3000/api/user/getAllConnections/${currentUserId}`
+    );
+    console.log(res.data);
+    setUsers(res.data);
   };
 
   const handleUserSelect = (selectedUser) => {

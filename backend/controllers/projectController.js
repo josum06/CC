@@ -82,6 +82,25 @@ exports.getAllProjects = async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 };
+exports.getProject = async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    if (!userId) {
+      return res.status(400).json({ message: "Missing user id parameter" });
+    }
+    const project = await Project.find({ userId: userId }).sort({
+      createdAt: -1,
+    });
+
+    if (!project) {
+      return res.status(404).json({ message: "Project not found" });
+    }
+    res.status(200).json(project);
+  } catch (error) {
+    console.error("Error fetching project:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
 
 exports.createCommentProject = async (req, res) => {
   try {

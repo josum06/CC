@@ -11,7 +11,9 @@ import {
   Heart,
   MessageCircle,
   Handshake,
-  Clock
+  Clock,
+  Github,
+  ExternalLink,
 } from "lucide-react";
 import Comments from "../components/Comments";
 import axios from "axios";
@@ -33,7 +35,7 @@ function NetworkProfile() {
   const [posts, setPosts] = useState(null);
   const { user: clerkUser } = useUser();
   const [category, setCategory] = useState("rejected");
-
+  const [projects, setProjects] = useState([]);
   useEffect(() => {
     if (userData.userId && clerkUser?.id) {
       fetchuser();
@@ -42,21 +44,25 @@ function NetworkProfile() {
 
   const fetchuser = async () => {
     try {
-      const [userResponse, postResponse, userAuthResponse] = await Promise.all([
-        axios.get(
-          `http://localhost:3000/api/user/profileById/${userData.userId}`
-        ),
-        axios.get(`http://localhost:3000/api/user/posts/${userData.userId}`),
-        axios.get(`http://localhost:3000/api/user/profile/${clerkUser.id}`),
-      ]);
+      const [userResponse, postResponse, userAuthResponse, projectResponse] =
+        await Promise.all([
+          axios.get(
+            `http://localhost:3000/api/user/profileById/${userData.userId}`
+          ),
+          axios.get(`http://localhost:3000/api/user/posts/${userData.userId}`),
+          axios.get(`http://localhost:3000/api/user/profile/${clerkUser.id}`),
+          axios.get(
+            `http://localhost:3000/api/project/get-project/${userData.userId}`
+          ),
+        ]);
       const data = userResponse.data;
       const currUserData = userAuthResponse.data;
       setUser(data);
       setCurrUserId(currUserData._id);
       const post = postResponse.data;
       setPosts(post);
-      console.log("User data:", data);
-      console.log("Post data:", post);
+      const projects = projectResponse.data;
+      setProjects(projects);
     } catch (error) {
       console.error("Error fetching profile:", error);
       toast.error("Failed to load profile.");
@@ -82,13 +88,12 @@ function NetworkProfile() {
     }
   }, [currUserId, selectedPost?._id]);
 
-   
   useEffect(() => {
     const checkCategoryStatus = async () => {
       try {
-      const response = await axios.get(
-      `http://localhost:3000/api/user/isPending/${currUserId}?receiverId=${user._id}`
-    );
+        const response = await axios.get(
+          `http://localhost:3000/api/user/isPending/${currUserId}?receiverId=${user._id}`
+        );
         console.log("Pending status response:", response);
         setCategory(response.data?.category);
       } catch (error) {
@@ -99,23 +104,24 @@ function NetworkProfile() {
     if (currUserId && user) {
       checkCategoryStatus();
     }
-  },[currUserId, user]);
+  }, [currUserId, user]);
 
-
-
-  const handleClick = async() => {
-    try{
-        const res = await axios.patch(`http://localhost:3000/api/user/updateConnectionsPending/${currUserId}`, {
+  const handleClick = async () => {
+    try {
+      const res = await axios.patch(
+        `http://localhost:3000/api/user/updateConnectionsPending/${currUserId}`,
+        {
           receiverId: user._id,
-        })
-        console.log(res.data);
-        toast.success("Connection updated successfully!");
-    }catch(err){
-        console.error("Error updating connections:", err);
-        toast.error("Failed to update connections");
+        }
+      );
+      console.log(res.data);
+      setCategory("pending");
+      toast.success("Connection sent successfully!");
+    } catch (err) {
+      // console.error("Error updating connections:", err);
+      toast.error(err.response.data.message || "Something went wrong");
     }
-    
-  }
+  };
 
   const handleLike = async () => {
     try {
@@ -135,7 +141,6 @@ function NetworkProfile() {
     }
   };
 
-  
   const handlePostClick = (post) => {
     setSelectedPost(post);
   };
@@ -196,14 +201,22 @@ function NetworkProfile() {
             <div className="flex flex-col md:flex-row md:items-center gap-4 mb-4">
               <h2 className="text-2xl font-bold">{user?.fullName}</h2>
               <div className="flex gap-2">
-                <button 
-                onClick={handleClick}
-                className="px-6 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-colors">
-                 {category === "accepted" && <p className="text-white-600">Accepted</p>}
-                {category === "pending" && <p className="text-white-600">Pending</p>}
-                {category === "rejected" && <p className="text-white-600">Connect</p>}
-                                
-                </button>
+                {user?._id != currUserId && (
+                  <button
+                    onClick={handleClick}
+                    className="px-6 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-colors"
+                  >
+                    {category === "accepted" && (
+                      <p className="text-white-600">Accepted</p>
+                    )}
+                    {category === "pending" && (
+                      <p className="text-white-600">Pending</p>
+                    )}
+                    {category === "rejected" && (
+                      <p className="text-white-600">Connect</p>
+                    )}
+                  </button>
+                )}
                 <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
                   <Share2 size={20} className="text-gray-600" />
                 </button>
@@ -217,7 +230,7 @@ function NetworkProfile() {
                 <div className="text-sm text-gray-500">Posts</div>
               </div>
               <div className="text-center">
-                <div className="font-bold">{user?.projects || 0}</div>
+                <div className="font-bold">{projects.length || 0}</div>
                 <div className="text-sm text-gray-500">Projects</div>
               </div>
             </div>
@@ -431,19 +444,59 @@ function NetworkProfile() {
                   </div>
                 ))
               : // Projects Grid - Replace with actual projects data
-                Array(4)
-                  .fill(0)
-                  .map((_, i) => (
-                    <div
-                      key={i}
-                      className="bg-white p-4 rounded-lg shadow-sm border border-gray-100"
-                    >
-                      <h3 className="font-semibold mb-2">Project {i + 1}</h3>
-                      <p className="text-gray-600 text-sm">
-                        Project description goes here...
-                      </p>
+
+              projects.length > 0
+              ? projects.map((project, i) => (
+                  <div
+                    key={i}
+                    className="bg-white p-4 rounded-lg shadow-sm border border-gray-100"
+                  >
+                    <h3 className="font-semibold mb-2">{project.title}</h3>
+                    <p className="text-gray-600 text-sm">
+                      {project.description}
+                    </p>
+                    <div>
+                      <img
+                        src={project.mediaUrl}
+                        alt="Project"
+                        className="w-full h-32 object-cover rounded-lg mt-2"
+                      />
                     </div>
-                  ))}
+                    <div className="flex flex-wrap mt-4">
+                      {project?.TechStack?.map((tech, index) => (
+                        <span
+                          key={index}
+                          className="px-4 py-2 bg-blue-300 text-gray-800 rounded-full text-xs mr-2 mt-2"
+                        >
+                          {tech}
+                        </span>
+                      ))}
+                    </div>
+                    <div>
+                      <a
+                        href={project?.githubUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-500 hover:text-blue-400 mt-2 block"
+                      >
+                        <Github size={16} className="inline mr-1" />
+                        Github
+                      </a>
+                    </div>
+                    <div>
+                      <a
+                        href={project?.projectUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-500 hover:text-blue-400 mt-2 block"
+                      >
+                        <ExternalLink size={16} className="inline mr-1" />
+                        Live Demo
+                      </a>
+                    </div>
+                  </div>
+                ))
+              : "No projects to show"}
           </div>
         </div>
       </div>

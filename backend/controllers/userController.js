@@ -128,36 +128,44 @@ const getAllUsers = async (req, res) => {
 
 const searchUser = async (req, res) => {
   try {
-    const { query,clerkId } = req.query;
+    const { query, clerkId } = req.query;
     // Search for users by name or email
 
     const allUsers = await User.find({
       fullName: { $regex: query, $options: "i" },
     });
-    const users= allUsers.filter((user) => {
+    const users = allUsers.filter((user) => {
       if (user.clerkId === clerkId) {
         return false; // Exclude the current user from the search results
       }
       return true; // Include other users
-    })
+    });
     res.status(200).json(users);
-
   } catch (error) {
     console.error("Error searching for users:", error);
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
 
-
-
 const updateConnectionsPending = async (req, res) => {
   try {
-    const { userId} = req.params;
+    const { userId } = req.params;
     const { receiverId } = req.body;
-
-    
+    const user1 = await User.findById(userId);
+    if (user1.connections.includes(receiverId)) {
+      return res.status(400).json({ message: "Already connected" });
+    }
+    const user2 = await User.findById(receiverId);
+    if (user2.connections.includes(userId)) {
+      return res.status(400).json({ message: "Already connected" });
+    }
+    if (user1.connectionsPending.includes(receiverId)) {
+      return res.status(400).json({
+        message: `${user1.fullName || "User"} has sent you a request`,
+      });
+    }
     const senderId = userId;
-    // jo receiver ki id hai use hme connectionsAwaited(sender) me dalna hai 
+    // jo receiver ki id hai use hme connectionsAwaited(sender) me dalna hai
     const sender = await User.findByIdAndUpdate(
       senderId,
       { $addToSet: { connectionsAwaited: receiverId } },
@@ -170,8 +178,7 @@ const updateConnectionsPending = async (req, res) => {
       { $addToSet: { connectionsPending: senderId } },
       { new: true }
     );
-    
-  
+
     if (!sender || !receiver) {
       return res.status(404).json({ message: "User not found" });
     }
@@ -183,19 +190,17 @@ const updateConnectionsPending = async (req, res) => {
     console.error("Error updating connections pending:", error);
     res.status(500).json({ message: "Internal Server Error" });
   }
-}
+};
 
 const getPendingConnections = async (req, res) => {
   try {
     const { userId } = req.params;
-     
 
     // Fetch user from DB using Clerk ID
     const user = await User.findById(userId).populate({
       path: "connectionsPending",
       select: "fullName profileImage", // Select only these fields
     });
-    
 
     console.log(user);
     if (!user) {
@@ -211,27 +216,28 @@ const getPendingConnections = async (req, res) => {
 
 const connectionAccepted = async (req, res) => {
   try {
-    const { userId } = req.params;  // logged in user ki id. // vbhv 
+    const { userId } = req.params; // logged in user ki id. // vbhv
     const { senderId } = req.body; //  jo req bhej rha hai.    // sumit
-  
-    
-    // jo sender ki id hai use hme connectionsAccepted(sender) me dalna hai 
+
+    // jo sender ki id hai use hme connectionsAccepted(sender) me dalna hai
     const receiver = await User.findByIdAndUpdate(
       userId,
-      { $pull: { connectionsPending: senderId },
-       $addToSet: { connections: senderId } },
+      {
+        $pull: { connectionsPending: senderId },
+        $addToSet: { connections: senderId },
+      },
       { new: true }
     );
 
     // or jo receiver ki id hai use hme connectionsPending(receiver) se hata dena hai
     const sender = await User.findByIdAndUpdate(
       senderId,
-      { $pull: { connectionsAwaited: userId } ,
-       $addToSet: { connections: userId } } ,
+      {
+        $pull: { connectionsAwaited: userId },
+        $addToSet: { connections: userId },
+      },
       { new: true }
     );
-
-  
 
     if (!sender || !receiver) {
       return res.status(404).json({ message: "User not found" });
@@ -244,16 +250,15 @@ const connectionAccepted = async (req, res) => {
     console.error("Error updating connections pending:", error);
     res.status(500).json({ message: "Internal Server Error" });
   }
-}
+};
 
 const connectionRejected = async (req, res) => {
   try {
-    const { userId } = req.params;  // logged in user ki id.  // vbhv 
+    const { userId } = req.params; // logged in user ki id.  // vbhv
     const { senderId } = req.body; //  jo req bhej rha hai.    // sumit
-  
-    
-    // jo sender ki id hai use hme connectionsAccepted(sender) me dalna hai 
-   
+
+    // jo sender ki id hai use hme connectionsAccepted(sender) me dalna hai
+
     const receiver = await User.findByIdAndUpdate(
       userId,
       { $pull: { connectionsPending: senderId } },
@@ -267,8 +272,6 @@ const connectionRejected = async (req, res) => {
       { new: true }
     );
 
-  
-
     if (!sender || !receiver) {
       return res.status(404).json({ message: "User not found" });
     }
@@ -280,7 +283,7 @@ const connectionRejected = async (req, res) => {
     console.error("Error updating connections pending:", error);
     res.status(500).json({ message: "Internal Server Error" });
   }
-}
+};
 
 const getCurrentConnections = async (req, res) => {
   try {
@@ -307,10 +310,22 @@ const getCurrentConnections = async (req, res) => {
   }
 };
 
-
-
-
-
+const getUserConnections = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const user = await User.findById(userId).populate(
+      "connections",
+      "fullName profileImage"
+    );
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    res.status(200).json(user.connections);
+  } catch (error) {
+    console.error("Error fetching user connections:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
 
 module.exports = {
   uploadProfile,
@@ -324,4 +339,5 @@ module.exports = {
   connectionAccepted,
   connectionRejected,
   getCurrentConnections,
+  getUserConnections,
 };
