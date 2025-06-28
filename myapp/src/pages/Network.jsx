@@ -36,30 +36,23 @@ const Network = () => {
     }
   };
 
-  const groups = [
-    { name: "Cat Lovers", members: 150, topic: "Cats and Kittens" },
-    { name: "Kittens Club", members: 200, topic: "All About Kittens" },
-    // Add more groups as needed
-  ];
-
   useEffect(() => {
     fetchProjects();
-  },[])
-   
-   const fetchProjects = async () => {
-    try{
-      const res = await axios.get('http://localhost:3000/api/project/get-projects');
+  }, []);
+
+  const fetchProjects = async () => {
+    try {
+      const res = await axios.get(
+        "http://localhost:3000/api/project/get-projects"
+      );
       const data = res.data;
       console.log("Projects are:-", data);
       setProjects(data);
-    }catch(err){
+    } catch (err) {
       console.error("Error fetching projects:", err);
       toast.error("Error fetching projects");
     }
-   }
-  
-   
-
+  };
 
   return (
     <div className="min-h-screen py-4 px-4 sm:px-6 lg:px-8">
@@ -158,7 +151,8 @@ const Network = () => {
                 ))
               : // Projects Content
                 projects?.map((project, index) => (
-                  <ProjectCard key={index} 
+                  <ProjectCard
+                    key={index}
                     projectId={project._id}
                     userId={project?.userId?._id}
                     avatar={project?.userId?.profileImage}
@@ -171,7 +165,7 @@ const Network = () => {
                     skills={project?.TechStack}
                     likes={project?.likes}
                     comments={project?.comments}
-                    contributors={project?.contributors} 
+                    contributors={project?.contributors}
                     projectName={project?.title}
                   />
                 ))}
@@ -180,23 +174,6 @@ const Network = () => {
 
         {/* Separator Line */}
         <div className="hidden lg:block w-px bg-gray-200 h-full" />
-
-        {/* Right Column for Groups - Sticky Container */}
-        <div className="lg:w-1/4 w-full">
-          <div className="sticky top-4">
-            <div className="bg-white rounded-2xl shadow-lg p-6">
-              <h2 className="font-bold text-xl text-gray-900 mb-4">
-                Join Community Groups
-              </h2>
-              {/* Scrollable Container */}
-              <div className="max-h-[calc(100vh-12rem)] overflow-y-auto pr-2 space-y-4 custom-scrollbar">
-                {groups.map((group, index) => (
-                  <Group key={index} group={group} />
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   );

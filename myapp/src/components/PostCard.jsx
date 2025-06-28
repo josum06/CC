@@ -184,13 +184,6 @@ const PostCard = ({
                 >
                   <span>View Profile</span>
                 </button>
-                <button
-                  onClick={() => handleOptionClick("share")}
-                  className="flex items-center space-x-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 w-full text-left"
-                >
-                  {/* <Link size={16} /> */}
-                  <span>Copy Link</span>
-                </button>
               </div>
             </>
           )}

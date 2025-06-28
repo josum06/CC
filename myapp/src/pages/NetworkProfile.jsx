@@ -305,13 +305,25 @@ function NetworkProfile() {
                   <X size={20} className="text-gray-800" />
                 </button>
 
-                {/* Image Section */}
-                <div className="w-full md:w-7/12 bg-gray-100 flex items-center justify-center ">
-                  <img
-                    src={selectedPost.mediaUrl}
-                    alt="Post content"
-                    className="w-auto h-full object-contain"
-                  />
+                {/* Image and Video Section */}
+                <div className="w-full md:w-7/12 bg-gray-100 flex items-center justify-center">
+                  {selectedPost.mediaUrl &&
+                  selectedPost.mediaUrl.toLowerCase().endsWith(".mp4") ? (
+                    <video
+                      src={selectedPost.mediaUrl}
+                      controls
+                      className="w-auto h-full object-contain max-w-full max-h-full"
+                      preload="metadata"
+                    >
+                      Your browser does not support the video tag.
+                    </video>
+                  ) : (
+                    <img
+                      src={selectedPost.mediaUrl}
+                      alt="Post content"
+                      className="w-auto h-full object-contain"
+                    />
+                  )}
                 </div>
 
                 {/* Details Section */}
@@ -413,22 +425,35 @@ function NetworkProfile() {
                     className="aspect-square bg-gray-100 rounded-lg overflow-hidden relative group cursor-pointer"
                     onClick={() => handlePostClick(post)}
                   >
-                    <img
-                      src={post?.mediaUrl}
-                      alt="Post"
-                      className="w-full h-full object-cover"
-                    />
-                    {/* Hover Overlay */}
+                    {/* Check if it's a video file */}
+                    {post?.mediaUrl &&
+                    post.mediaUrl.toLowerCase().endsWith(".mp4") ? (
+                      <video
+                        src={post.mediaUrl}
+                        className="w-full h-full object-cover"
+                        muted
+                        preload="metadata" // This helps generate a thumbnail
+                      />
+                    ) : (
+                      <img
+                        src={post?.mediaUrl}
+                        alt="Post"
+                        className="w-full h-full object-cover"
+                      />
+                    )}
 
-                    <div className="absolute inset-0 not-open: bg-opacity-0 group-hover:bg-black/60 transition-all duration-300 flex items-center justify-center">
+                    {/* Hover Overlay */}
+                    <div className="absolute inset-0 bg-opacity-0 group-hover:bg-black/60 transition-all duration-300 flex items-center justify-center">
                       <div className="flex items-center space-x-6 opacity-0 group-hover:opacity-100 transition-all duration-300">
                         <div className="flex items-center text-white">
                           <button
-                            onClick={() => handleLike(post._id, clerkUser.id)}
+                            onClick={(e) => {
+                              e.stopPropagation(); // Prevent triggering the parent click
+                              handleLike(post._id, clerkUser.id);
+                            }}
                           >
                             <Heart size={24} className="fill-white" />
                           </button>
-
                           <span className="ml-2 font-semibold">
                             {post.likes}
                           </span>
@@ -441,9 +466,24 @@ function NetworkProfile() {
                         </div>
                       </div>
                     </div>
+
+                    {/* Video play indicator */}
+                    {post?.mediaUrl &&
+                      post.mediaUrl.toLowerCase().endsWith(".mp4") && (
+                        <div className="absolute top-2 right-2 bg-black bg-opacity-60 rounded-full p-1">
+                          <svg
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            fill="white"
+                          >
+                            <path d="M8 5v14l11-7z" />
+                          </svg>
+                        </div>
+                      )}
                   </div>
                 ))
-              : // Projects Grid - Replace with actual projects data
+              : // Projects Grid
 
               projects.length > 0
               ? projects.map((project, i) => (

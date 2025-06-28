@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { format } from "date-fns";
 import { ModalWindow } from "../components/ModalWindow";
+import { FacultyRoleModal } from "../components/FacultyRoleModal";
 
 const Account = () => {
   const navigate = useNavigate();
@@ -23,6 +24,7 @@ const Account = () => {
   const [modal, setShowModal] = useState(false);
   const [mainUser, setMainUser] = useState();
   const [requests, setRequests] = useState([]);
+  const [isFacultyModalOpen, setIsFacultyModalOpen] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -119,7 +121,8 @@ const Account = () => {
             <div className="flex items-center gap-2 mt-1">
               <span className="text-blue-400 text-sm font-medium">
                 {mainUser?.role
-                  ? mainUser.role.slice(0, 1).toUpperCase() + mainUser.role.slice(1)
+                  ? mainUser.role.slice(0, 1).toUpperCase() +
+                    mainUser.role.slice(1)
                   : "Role"}
               </span>
             </div>
@@ -147,15 +150,15 @@ const Account = () => {
               variant="warning"
             />
           )}
-          <MenuItem
-            icon={BookOpen}
-            label="Class Room"
-            onClick={() => navigate("/ClassRoom")}
-          />
+
           <MenuItem
             icon={Shield}
             label="Faculty Role"
-            onClick={() => navigate("/FacultyRole")}
+            onClick={() => setIsFacultyModalOpen(true)}
+          />
+          <FacultyRoleModal
+            isOpen={isFacultyModalOpen}
+            onClose={() => setIsFacultyModalOpen(false)}
           />
           <button
             onClick={handleClick}
@@ -194,7 +197,9 @@ const Account = () => {
                       alt="Profile"
                       className="w-10 h-10 rounded-full object-cover border border-gray-500/50"
                     />
-                    <span className="text-white font-medium">{request.fullName}</span>
+                    <span className="text-white font-medium">
+                      {request.fullName}
+                    </span>
                   </div>
                   <div className="flex items-center gap-2">
                     <button
@@ -237,4 +242,4 @@ const Account = () => {
   );
 };
 
-export default Account; 
+export default Account;

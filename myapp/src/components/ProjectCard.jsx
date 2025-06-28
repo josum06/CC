@@ -14,9 +14,11 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { useUser } from "@clerk/clerk-react";
 import CommentProject from "./CommentProject";
+import { useNavigate } from "react-router";
 
 const ProjectCard = ({
   avatar,
+  userId,
   username,
   time,
   projectName,
@@ -30,6 +32,7 @@ const ProjectCard = ({
   comments,
   projectId,
 }) => {
+  const navigate = useNavigate();
   const [showDropdown, setShowDropdown] = useState(false);
   const [user, setUser] = useState(null);
   const [likedByCurrentUser, setLikedByCurrentUser] = useState(false);
@@ -44,7 +47,6 @@ const ProjectCard = ({
     }
   }, [clerkUser]);
 
-  
   useEffect(() => {
     if (user) {
       fetchLikes();
@@ -74,10 +76,6 @@ const ProjectCard = ({
     } catch (error) {
       console.error("Error fetching user:", error);
     }
-  };
-  const handleCopyLink = () => {
-    navigator.clipboard.writeText(projectUrl);
-    setShowDropdown(false);
   };
 
   const handleLike = async () => {
@@ -127,6 +125,11 @@ const ProjectCard = ({
     }
   };
 
+  const handleClick = () => {
+    navigate("/NetworkProfile", {
+      state: { userData: { userId } },
+    });
+  };
   return (
     <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100 hover:shadow-md transition-all duration-300">
       {/* Header */}
@@ -162,26 +165,12 @@ const ProjectCard = ({
                   <button
                     onClick={() => {
                       // Handle view profile
+                      handleClick();
                       setShowDropdown(false);
                     }}
                     className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50"
                   >
                     View Profile
-                  </button>
-                  <button
-                    onClick={() => {
-                      // Handle send message
-                      setShowDropdown(false);
-                    }}
-                    className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50"
-                  >
-                    Send Message
-                  </button>
-                  <button
-                    onClick={handleCopyLink}
-                    className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50"
-                  >
-                    Copy Link
                   </button>
                 </div>
               </div>

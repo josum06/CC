@@ -93,14 +93,6 @@ const Footer = () => {
             <FaUsers className="text-sm sm:text-lg md:text-xl" />
             <span className="text-[8px] sm:text-xs md:text-sm">Network</span>
           </button>
-
-          <button
-            onClick={() => navigate("/Companies")}
-            className="flex flex-col items-center text-gray-100 cursor-pointer hover:text-blue-500"
-          >
-            <FaBuilding className="text-sm sm:text-lg md:text-xl" />
-            <span className="text-[8px] sm:text-xs md:text-sm">Companies</span>
-          </button>
         </div>
       </div>
 

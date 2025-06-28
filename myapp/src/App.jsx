@@ -9,7 +9,6 @@ import Post from "./pages/Post";
 import FacultyPost from "./pages/FacultyPost";
 import Events from "./pages/Events";
 import Network from "./pages/Network";
-import Companies from "./pages/Companies";
 import Chats from "./pages/Chats";
 import SignUpPage from "./pages/SignUp";
 import Login from "./pages/Login";
@@ -23,6 +22,7 @@ import NetworkProfile from "./pages/NetworkProfile";
 import { ToastContainer } from "react-toastify";
 import FacultyRole from "./pages/FacultyRole";
 import Account from "./pages/Account";
+import Search from "./pages/Search";
 
 const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 
@@ -48,23 +48,78 @@ function ProtectedRoute({ children }) {
 function App() {
   return (
     <ClerkProvider publishableKey={clerkPubKey}>
-
       <BrowserRouter>
-      <ToastContainer position="top-right" autoClose={3000} />
+        <ToastContainer position="top-right" autoClose={3000} />
         <Routes>
           {/* Public Routes */}
           <Route element={<NoNavFooterLayout />}>
             <Route path="/Signup" element={<SignUpPage />} />
             <Route path="/Login" element={<Login />} />
-            <Route path="/Post" element={<Post />} />
-            <Route path="/PostProject" element={<PostProject />} />
-            <Route path="/FacultyRole" element={<FacultyRole/>} />
-            <Route path="/CompleteYourProfile" element={<CompleteYourProfile />} />
-            <Route path="/YourProfile" element={<YourProfile />} />
-            <Route path="/NetworkProfile" element={<NetworkProfile />} />
-            <Route path="/YourAccount" element={<YourAccount />} />
+            <Route
+              path="/Post"
+              element={
+                <ProtectedRoute>
+                  <Post />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/PostProject"
+              element={
+                <ProtectedRoute>
+                  <PostProject />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/FacultyRole"
+              element={
+                <ProtectedRoute>
+                  <FacultyRole />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/CompleteYourProfile"
+              element={
+                <ProtectedRoute>
+                  <CompleteYourProfile />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/YourProfile"
+              element={
+                <ProtectedRoute>
+                  <YourProfile />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/NetworkProfile"
+              element={
+                <ProtectedRoute>
+                  <NetworkProfile />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/YourAccount"
+              element={
+                <ProtectedRoute>
+                  <YourAccount />
+                </ProtectedRoute>
+              }
+            />
             <Route path="/ClassRoom" element={<ClassRoom />} />
-            <Route path="/Chats" element={<Chats />} />
+            <Route
+              path="/Chats"
+              element={
+                <ProtectedRoute>
+                  <Chats />
+                </ProtectedRoute>
+              }
+            />
           </Route>
 
           {/* Protected Routes */}
@@ -74,22 +129,19 @@ function App() {
                 <AppLayout />
               </ProtectedRoute>
             }
-            >
-            <Route path="/" index element={<Home />} />
+          >
+            <Route path="/" element={<Navigate to="/Network" replace />} />
             <Route path="/Notice" element={<Notice />} />
             <Route path="/Events" element={<Events />} />
             <Route path="/Network" element={<Network />} />
-            <Route path="/Companies" element={<Companies />} />
             <Route path="/Account" element={<Account />} />
             <Route path="/FacultyPost" element={<FacultyPost />} />
-            
-          
+            <Route path="/Search" element={<Search />} />
           </Route>
 
           {/* Fallback Route */}
           <Route path="*" element={<Navigate to="/Login" />} />
         </Routes>
-
       </BrowserRouter>
     </ClerkProvider>
   );
