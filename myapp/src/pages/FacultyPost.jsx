@@ -75,11 +75,7 @@ const FacultyPost = () => {
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       {/* Modern Header */}
       <div className="fixed top-15 left-0 right-0 bg-white/80 backdrop-blur-sm z-50 border-b border-gray-200">
-        <div className="max-w-5xl mx-auto px-4 h-16 flex items-center justify-center">
-          
-          <h1 className="text-xl font-semibold text-gray-900">Faculty Post</h1>
-          
-        </div>
+       
       </div>
 
       {/* Main Content */}

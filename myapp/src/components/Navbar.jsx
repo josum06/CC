@@ -57,33 +57,36 @@ const Navbar = () => {
   return (
     <div className="sticky top-0 left-0 right-0 z-10">
       {/* Navbar */}
-      <nav className="w-full bg-transparent shadow-md z-50">
+      <nav className="w-full bg-[#02040a] shadow-md z-50 border-b border-gray-600">
         <div className="container mx-auto px-4 py-3 flex items-center justify-between">
           {/* Logo */}
-          <div className="text-2xl font-bold">🚀 Company</div>
+          <button onClick={() => navigate("/")}  ><div className="text-2xl font-bold text-gray-100 cursor-pointer">🚀Company</div></button>
 
           {/* Search Bar with Button Inside */}
+         
+
+          {/* Icons */}
+          <div className="flex items-center gap-1">
           <div className="hidden md:flex items-center w-full max-w-md relative">
             <input
               type="text"
               placeholder="Search..."
               onChange={handleChange}
-              className="w-full px-4 py-2 border rounded-md pr-10 focus:outline-none"
+              className="w-full px-3 py-1 border text-md me-2 focus:border-blue-500 border-gray-500 rounded-2xl pr-10 focus:outline-none placeholder:text-gray-400/50 text-gray-100 placeholder:text-sm"
             />
-            <button className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-blue-500">
-              <FaSearch />
-            </button>
+            
           </div>
-
-          {/* Icons */}
-          <div className="flex items-center gap-4">
-            <button onClick={() => navigate("/Chats")} className="">
-              <FaComments className="text-xl cursor-pointer" />
+            <button onClick={() => navigate("/Chats")} className="hover:bg-gray-500/50 p-2 rounded-full cursor-pointer">
+              <FaComments className="text-xl  text-gray-100" />
             </button>
+            <button onClick={toggleSidebar}className="hover:bg-gray-500/50 p-2 rounded-full cursor-pointer" >
             <FaUser
-              className="text-xl cursor-pointer"
-              onClick={toggleSidebar}
+              className="text-lg  text-gray-100"
+              
             />
+
+            </button>
+            
           </div>
         </div>
 
@@ -95,7 +98,7 @@ const Navbar = () => {
             onChange={handleChange}
             className="w-full px-4 py-2 border rounded-md pr-10 focus:outline-none"
           />
-          <button className="absolute right-6 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-blue-500">
+          <button className="absolute right-6 top-1/2 transform -translate-y-1/2 text-gray-100 hover:text-blue-500">
             <FaSearch />
           </button>
         </div>

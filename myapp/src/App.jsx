@@ -22,6 +22,7 @@ import YourProfile from "./pages/YourProfile";
 import NetworkProfile from "./pages/NetworkProfile";
 import { ToastContainer } from "react-toastify";
 import FacultyRole from "./pages/FacultyRole";
+import Account from "./pages/Account";
 
 const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 
@@ -79,8 +80,7 @@ function App() {
             <Route path="/Events" element={<Events />} />
             <Route path="/Network" element={<Network />} />
             <Route path="/Companies" element={<Companies />} />
-            
-            
+            <Route path="/Account" element={<Account />} />
             <Route path="/FacultyPost" element={<FacultyPost />} />
             
           
