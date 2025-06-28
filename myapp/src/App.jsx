@@ -65,6 +65,7 @@ function App() {
             <Route path="/YourAccount" element={<YourAccount />} />
             <Route path="/ClassRoom" element={<ClassRoom />} />
             <Route path="/Chats" element={<Chats />} />
+            
           </Route>
 
           {/* Protected Routes */}
