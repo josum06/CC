@@ -26,7 +26,7 @@ export const ModalWindow = ({ isOpen, onClose, children }) => {
     <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center">
       <div
         ref={modalRef}
-        className="bg-white rounded-2xl shadow-xl w-[90%] max-w-md p-6"
+        className="rounded-2xl shadow-xl w-[90%] max-w-md p-6"
       >
         {children}
       </div>

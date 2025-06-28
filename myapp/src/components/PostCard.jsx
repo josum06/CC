@@ -9,6 +9,8 @@ import {
   Share2,
   Bookmark,
   MoreHorizontal,
+  Clock,
+  User,
 } from "lucide-react";
 import { useUser } from "@clerk/clerk-react";
 import { useNavigate } from "react-router";
@@ -33,6 +35,7 @@ const PostCard = ({
   const [showOptions, setShowOptions] = useState(false);
   const [commentModal, setCommentModal] = useState(false);
   const [commentText, setCommentText] = useState("");
+
   useEffect(() => {
     if (user) {
       fetchUserProfile();
@@ -136,12 +139,12 @@ const PostCard = ({
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-sm max-w-md w-full mx-auto mb-6 border border-gray-100 hover:shadow-md transition-shadow duration-300">
+    <div className="bg-gradient-to-br from-[#232526] via-[#1a1b1c] to-[#000000] rounded-2xl border border-gray-500/30 shadow-2xl max-w-md w-full mx-auto mb-6 overflow-hidden hover:shadow-3xl transition-all duration-300">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-gray-50">
+      <div className="flex items-center justify-between px-6 py-4 border-b border-gray-500/30 bg-gradient-to-r from-gray-500/10 via-gray-600/5 to-gray-500/10">
         <div className="flex items-center space-x-3">
           <div className="relative">
-            <div className="w-9 h-9 rounded-full overflow-hidden ring-2 ring-gray-100 hover:ring-blue-100 transition-all">
+            <div className="w-12 h-12 rounded-full overflow-hidden ring-2 ring-blue-500/30 hover:ring-blue-500/50 transition-all duration-300 shadow-lg">
               <img
                 src={avatar}
                 alt={username}
@@ -150,22 +153,25 @@ const PostCard = ({
             </div>
           </div>
           <div>
-            <p className="font-semibold text-sm hover:underline cursor-pointer">
+            <p className="font-semibold text-gray-100 text-sm hover:text-blue-400 cursor-pointer transition-colors">
               {username}
             </p>
-            <p className="text-xs text-gray-500">{time}</p>
+            <div className="flex items-center space-x-1 text-xs text-gray-500">
+              <Clock size={12} />
+              <span>{time}</span>
+            </div>
           </div>
         </div>
 
         {/* Three Dots Menu */}
         <div className="relative">
           <button
-            className="p-1.5 hover:bg-gray-50 rounded-full transition-colors group"
+            className="p-2 hover:bg-gray-500/20 rounded-full transition-all duration-200 group"
             onClick={() => setShowOptions(!showOptions)}
           >
             <MoreHorizontal
               size={18}
-              className="text-gray-400 group-hover:text-gray-600"
+              className="text-gray-400 group-hover:text-gray-200"
             />
           </button>
 
@@ -177,11 +183,12 @@ const PostCard = ({
                 onClick={() => setShowOptions(false)}
               />
 
-              <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-100 py-1 z-20">
+              <div className="absolute right-0 mt-2 w-48 bg-gradient-to-br from-[#232526] via-[#1a1b1c] to-[#000000] rounded-xl shadow-2xl border border-gray-500/30 py-2 z-20">
                 <button
                   onClick={() => handleOptionClick("profile")}
-                  className="flex items-center space-x-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 w-full text-left"
+                  className="flex items-center space-x-3 px-4 py-3 text-sm text-gray-300 hover:text-gray-100 hover:bg-gray-500/20 w-full text-left transition-all duration-200"
                 >
+                  <User size={16} />
                   <span>View Profile</span>
                 </button>
               </div>
@@ -190,14 +197,13 @@ const PostCard = ({
         </div>
       </div>
 
-      {/* Image */}
+      {/* Image/Video Section */}
       <div className="relative group">
-        {/* Image or Video */}
         {imageUrl ? (
           imageUrl.endsWith(".mp4") ? (
             <video
               controls
-              className="w-full max-h-[32rem] object-contain bg-black/5"
+              className="w-full max-h-[32rem] object-contain bg-gradient-to-br from-gray-500/10 via-gray-600/5 to-gray-700/5"
             >
               <source src={imageUrl} type="video/mp4" />
               Your browser does not support the video tag.
@@ -207,7 +213,7 @@ const PostCard = ({
               <img
                 src={imageUrl}
                 alt="Post content"
-                className="w-full max-h-[32rem] object-contain bg-black/5"
+                className="w-full max-h-[32rem] object-contain bg-gradient-to-br from-gray-500/10 via-gray-600/5 to-gray-700/5"
                 loading="lazy"
               />
               <div
@@ -217,64 +223,64 @@ const PostCard = ({
             </>
           )
         ) : (
-          <div className="w-full h-64 flex items-center justify-center bg-gray-100">
-            <span className="text-gray-400">No media available</span>
+          <div className="w-full h-64 flex items-center justify-center bg-gradient-to-br from-gray-500/10 via-gray-600/5 to-gray-700/5">
+            <span className="text-gray-500">No media available</span>
           </div>
         )}
       </div>
 
       {/* Action Buttons */}
-      <div className="px-4 pt-3">
-        <div className="flex justify-between items-center mb-3">
+      <div className="px-6 pt-4">
+        <div className="flex justify-between items-center mb-4">
           <div className="flex items-center space-x-3">
             <button
               onClick={handleLike}
-              className="p-1.5 hover:bg-gray-50 rounded-full transition-all duration-200 transform hover:scale-110"
+              className="p-2 hover:bg-red-500/20 rounded-full transition-all duration-200 transform hover:scale-110 group"
             >
               <Heart
-                size={22}
+                size={24}
                 className={`${
                   likedByCurrentUser
                     ? "fill-red-500 stroke-red-500"
-                    : "stroke-gray-700 hover:stroke-red-500"
-                } transition-colors`}
+                    : "stroke-gray-400 group-hover:stroke-red-500"
+                } transition-all duration-200`}
               />
             </button>
             <button
               onClick={inputComment}
-              className="p-1.5 hover:bg-gray-50 rounded-full transition-all duration-200 transform hover:scale-110"
+              className="p-2 hover:bg-blue-500/20 rounded-full transition-all duration-200 transform hover:scale-110 group"
             >
               <MessageCircle
-                size={22}
-                className="stroke-gray-700 hover:stroke-blue-500"
+                size={24}
+                className="stroke-gray-400 group-hover:stroke-blue-500 transition-all duration-200"
               />
             </button>
-            <button className="p-1.5 hover:bg-gray-50 rounded-full transition-all duration-200 transform hover:scale-110">
+            <button className="p-2 hover:bg-green-500/20 rounded-full transition-all duration-200 transform hover:scale-110 group">
               <Share2
-                size={22}
-                className="stroke-gray-700 hover:stroke-green-500"
+                size={24}
+                className="stroke-gray-400 group-hover:stroke-green-500 transition-all duration-200"
               />
             </button>
           </div>
         </div>
 
         {/* Likes Count */}
-        <p className="font-semibold text-sm mb-1.5">{likes} likes</p>
+        <p className="font-semibold text-gray-200 text-sm mb-3">{likes} likes</p>
 
         {/* Caption */}
         {content && (
-          <div className="mb-2">
-            <span className="font-semibold text-sm mr-2 hover:underline cursor-pointer">
+          <div className="mb-3">
+            <span className="font-semibold text-gray-200 text-sm mr-2 hover:text-blue-400 cursor-pointer transition-colors">
               {username}
             </span>
-            <span className="text-sm text-gray-800">{content}</span>
+            <span className="text-sm text-gray-300">{content}</span>
           </div>
         )}
 
         {/* Comments Count */}
         <button
           onClick={inputComment}
-          className="text-gray-500 text-xs mb-2 hover:text-gray-700"
+          className="text-gray-500 text-xs mb-3 hover:text-gray-300 transition-colors"
         >
           View all {comments.length} comments
         </button>
@@ -282,22 +288,22 @@ const PostCard = ({
         {/* Comment Input */}
         <form
           onSubmit={handleSubmit}
-          className="flex items-center py-3 border-t border-gray-50"
+          className="flex items-center py-4 border-t border-gray-500/30"
         >
           <input
             type="text"
             value={commentText}
             onChange={(e) => setCommentText(e.target.value)}
             placeholder="Add a comment..."
-            className="flex-1 text-sm p-2 focus:outline-none placeholder-gray-400"
+            className="flex-1 text-sm p-3 rounded-xl border border-gray-500/50 bg-gradient-to-r from-gray-500/10 via-gray-600/5 to-gray-500/10 text-gray-200 placeholder-gray-500 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all duration-200"
           />
           <button
             type="submit"
             disabled={!commentText.trim()}
-            className={`px-3 py-1 text-sm font-semibold rounded-full transition-colors ${
+            className={`ml-3 px-4 py-2 text-sm font-semibold rounded-xl transition-all duration-200 ${
               commentText.trim()
-                ? "text-blue-500 hover:text-blue-600 hover:bg-blue-50"
-                : "text-gray-200 cursor-not-allowed"
+                ? "text-blue-400 hover:text-blue-300 hover:bg-blue-500/20"
+                : "text-gray-600 cursor-not-allowed"
             }`}
           >
             Post
@@ -307,7 +313,7 @@ const PostCard = ({
 
       {/* Comments Section */}
       {commentModal && (
-        <div className="border-t border-gray-50">
+        <div className="border-t border-gray-500/30 bg-gradient-to-r from-gray-500/5 via-gray-600/3 to-gray-500/5">
           <Comments postId={postId} />
         </div>
       )}

@@ -55,22 +55,8 @@ function App() {
           <Route element={<NoNavFooterLayout />}>
             <Route path="/Signup" element={<SignUpPage />} />
             <Route path="/Login" element={<Login />} />
-            <Route
-              path="/Post"
-              element={
-                <ProtectedRoute>
-                  <Post />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/PostProject"
-              element={
-                <ProtectedRoute>
-                  <PostProject />
-                </ProtectedRoute>
-              }
-            />
+           
+            
             <Route
               path="/FacultyRole"
               element={
@@ -87,30 +73,9 @@ function App() {
                 </ProtectedRoute>
               }
             />
-            <Route
-              path="/YourProfile"
-              element={
-                <ProtectedRoute>
-                  <YourProfile />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/NetworkProfile"
-              element={
-                <ProtectedRoute>
-                  <NetworkProfile />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/YourAccount"
-              element={
-                <ProtectedRoute>
-                  <YourAccount />
-                </ProtectedRoute>
-              }
-            />
+            
+           
+            
             <Route path="/ClassRoom" element={<ClassRoom />} />
             <Route
               path="/Chats"
@@ -137,7 +102,47 @@ function App() {
             <Route path="/Account" element={<Account />} />
             <Route path="/FacultyPost" element={<FacultyPost />} />
             <Route path="/Search" element={<Search />} />
+            <Route
+              path="/Post"
+              element={
+                <ProtectedRoute>
+                  <Post />
+                </ProtectedRoute>
+              }
+            />
+             <Route
+              path="/NetworkProfile"
+              element={
+                <ProtectedRoute>
+                  <NetworkProfile />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/YourProfile"
+              element={
+                <ProtectedRoute>
+                  <YourProfile />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/PostProject"
+              element={
+                <ProtectedRoute>
+                  <PostProject />
+                </ProtectedRoute>
+              }
+            />
           </Route>
+          <Route
+              path="/YourAccount"
+              element={
+                <ProtectedRoute>
+                  <YourAccount />
+                </ProtectedRoute>
+              }
+            />
 
           {/* Fallback Route */}
           <Route path="*" element={<Navigate to="/Login" />} />

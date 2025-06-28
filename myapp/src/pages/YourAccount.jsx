@@ -12,7 +12,7 @@ const YourAccount = () => {
       {/* Cross button at the top-left */}
       <button
         onClick={() => {
-          navigate("/Home")
+          navigate(-1)
           
         }}
         className="absolute top-4 left-4 text-3xl bg-gray-200 px-3 py-1 hover:cursor-pointer rounded-full  text-gray-600 hover:text-gray-800"

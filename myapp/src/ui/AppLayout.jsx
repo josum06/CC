@@ -23,7 +23,7 @@ const AppLayout = () => {
     <div className="flex h-screen bg-[#000000]">
       <Aside />
       <main className={`flex-1 overflow-y-scroll overflow-x-hidden ${isMobile ? 'pb-20' : ''}`}>
-        <div className="container mx-auto px-4 py-6">
+        <div className="container mx-auto ">
           <Outlet />
         </div>
         {/* Floating Message Button */}
