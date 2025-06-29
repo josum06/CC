@@ -310,17 +310,17 @@ const ProjectCard = ({
               <MessageCircle className="w-5 h-5 group-hover/comment:scale-110 transition-all duration-300" />
               <span>{comments?.length || 0}</span>
             </button>
-            <button className="flex items-center gap-2 text-sm font-medium text-gray-400 hover:text-green-400 transition-colors duration-300 group/share">
+            {/* <button className="flex items-center gap-2 text-sm font-medium text-gray-400 hover:text-green-400 transition-colors duration-300 group/share">
               <Share2 className="w-5 h-5 group-hover/share:scale-110 transition-all duration-300" />
               <span>Share</span>
-            </button>
+            </button> */}
           </div>
-          <button className="p-2 hover:bg-purple-500/20 rounded-full transition-all duration-300 transform hover:scale-110 group/bookmark">
+          {/* <button className="p-2 hover:bg-purple-500/20 rounded-full transition-all duration-300 transform hover:scale-110 group/bookmark">
             <Bookmark
               size={20}
               className="stroke-gray-400 group-hover/bookmark:stroke-purple-500 transition-all duration-300"
             />
-          </button>
+          </button> */}
         </div>
       </div>
 

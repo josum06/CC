@@ -1,16 +1,13 @@
 import axios from "axios";
 import { format, parseISO } from "date-fns";
 import { useEffect, useState } from "react";
-import { Heart, MoreHorizontal, MessageCircle, Send, User, Clock } from 'lucide-react';
+import { Heart, MessageCircle, User, Clock } from 'lucide-react';
 import { useUser } from "@clerk/clerk-react";
 
 function Comments({ postId }) {
   const { user } = useUser();
   const [comments, setComments] = useState([]);
   const [likedComments, setLikedComments] = useState(new Set());
-  const [replyModal, setReplyModal] = useState(false);
-  const [replyCommentId, setReplyCommentId] = useState(null);
-  const [replyText, setReplyText] = useState('');
 
   useEffect(() => {
     const fetchComments = async () => {
@@ -26,29 +23,6 @@ function Comments({ postId }) {
 
     fetchComments();
   }, [postId]);
-
-  const handleSubmit = async (e, commentId) => {
-    e.preventDefault();
-    try {
-      const res = await axios.post("http://localhost:3000/api/post/reply-comment", {
-        text: replyText,
-        clerkId: user.id,
-        commentId: commentId
-      });
-      console.log(res.data);
-
-      // Clear reply state
-      setReplyText('');
-      setReplyModal(false);
-      setReplyCommentId(null);
-
-      // Optional: re-fetch comments
-      const refreshed = await axios.get(`http://localhost:3000/api/post/get-comments/${postId}`);
-      setComments(refreshed.data.comments);
-    } catch (err) {
-      console.log(err);
-    }
-  };
 
   const handleLikeComment = (commentId) => {
     setLikedComments(prev => {
@@ -116,7 +90,7 @@ function Comments({ postId }) {
 
                 {/* Actions */}
                 <div className="flex items-center space-x-1 sm:space-x-2 opacity-0 group-hover:opacity-100 transition-all duration-300 ml-2 sm:ml-4">
-                  <button
+                  {/* <button
                     onClick={() => handleLikeComment(comment._id)}
                     className="p-1.5 sm:p-2 hover:bg-red-500/20 rounded-full transition-all duration-300 transform hover:scale-110 group/like"
                   >
@@ -128,25 +102,12 @@ function Comments({ postId }) {
                           : "stroke-gray-500 group-hover/like:stroke-red-500"
                       } transition-all duration-300`}
                     />
-                  </button>
-                  <button className="p-1.5 sm:p-2 hover:bg-gray-600/30 rounded-full transition-all duration-300 transform hover:scale-110 group/more">
-                    <MoreHorizontal size={14} className="sm:w-4 sm:h-4 text-gray-500 group-hover/more:text-gray-300" />
-                  </button>
+                  </button> */}
                 </div>
               </div>
 
               {/* Comment Actions */}
               <div className="flex items-center space-x-4 sm:space-x-6 mt-2 sm:mt-3">
-                <button
-                  onClick={() => {
-                    setReplyModal(true);
-                    setReplyCommentId(comment._id);
-                  }}
-                  className="flex items-center space-x-1.5 sm:space-x-2 text-xs font-medium text-gray-500 hover:text-blue-400 transition-colors duration-300 group/reply"
-                >
-                  <MessageCircle size={12} className="sm:w-[14px] sm:h-[14px] group-hover/reply:scale-110 transition-transform duration-300" />
-                  <span>Reply</span>
-                </button>
                 {likedComments.has(comment._id) && (
                   <span className="text-xs text-red-400 flex items-center space-x-1">
                     <Heart size={10} className="sm:w-3 sm:h-3 fill-red-500 stroke-red-500" />
@@ -154,33 +115,6 @@ function Comments({ postId }) {
                   </span>
                 )}
               </div>
-
-              {/* Reply Input */}
-              {replyModal && replyCommentId === comment._id && (
-                <form
-                  onSubmit={(e) => handleSubmit(e, comment._id)}
-                  className="flex items-center py-3 sm:py-4 mt-3 sm:mt-4 border-t border-gray-700/50"
-                >
-                  <input
-                    type="text"
-                    value={replyText}
-                    onChange={(e) => setReplyText(e.target.value)}
-                    placeholder="Add a reply..."
-                    className="flex-1 text-xs sm:text-sm p-2 sm:p-3 rounded-2xl border border-gray-600/50 bg-gradient-to-r from-gray-800/50 via-gray-700/30 to-gray-800/50 text-gray-200 placeholder-gray-500 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all duration-300 backdrop-blur-sm"
-                  />
-                  <button
-                    type="submit"
-                    disabled={!replyText.trim()}
-                    className={`ml-2 sm:ml-3 p-2 sm:p-3 rounded-2xl transition-all duration-300 ${
-                      replyText.trim()
-                        ? "bg-gradient-to-r from-blue-600/20 to-blue-700/20 text-blue-400 border border-blue-500/50 hover:from-blue-600/30 hover:to-blue-700/30 hover:border-blue-400/50 hover:scale-105"
-                        : "bg-gray-700/30 text-gray-600 cursor-not-allowed"
-                    }`}
-                  >
-                    <Send size={16} className="sm:w-[18px] sm:h-[18px]" />
-                  </button>
-                </form>
-              )}
             </div>
           </div>
         </div>

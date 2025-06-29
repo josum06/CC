@@ -57,26 +57,11 @@ function App() {
             <Route path="/Login" element={<Login />} />
            
             
-            <Route
-              path="/FacultyRole"
-              element={
-                <ProtectedRoute>
-                  <FacultyRole />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/CompleteYourProfile"
-              element={
-                <ProtectedRoute>
-                  <CompleteYourProfile />
-                </ProtectedRoute>
-              }
-            />
+           
             
            
             
-            <Route path="/ClassRoom" element={<ClassRoom />} />
+           
             <Route
               path="/Chats"
               element={
@@ -107,6 +92,22 @@ function App() {
               element={
                 <ProtectedRoute>
                   <Post />
+                </ProtectedRoute>
+              }
+            />
+             <Route
+              path="/FacultyRole"
+              element={
+                <ProtectedRoute>
+                  <FacultyRole />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/CompleteYourProfile"
+              element={
+                <ProtectedRoute>
+                  <CompleteYourProfile />
                 </ProtectedRoute>
               }
             />
@@ -143,6 +144,7 @@ function App() {
                 </ProtectedRoute>
               }
             />
+             <Route path="/ClassRoom" element={<ClassRoom />} />
 
           {/* Fallback Route */}
           <Route path="*" element={<Navigate to="/Login" />} />

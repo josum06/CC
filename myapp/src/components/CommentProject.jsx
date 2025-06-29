@@ -90,7 +90,7 @@ function CommentProject({ projectId }) {
                 
                 {/* Actions */}
                 <div className="flex items-center space-x-2 opacity-0 group-hover:opacity-100 transition-all duration-300 ml-4">
-                  <button 
+                  {/* <button 
                     onClick={() => handleLikeComment(comment._id)}
                     className="p-2 hover:bg-red-500/20 rounded-full transition-all duration-300 transform hover:scale-110 group/like"
                   >
@@ -102,26 +102,15 @@ function CommentProject({ projectId }) {
                           : "stroke-gray-500 group-hover/like:stroke-red-500"
                       } transition-all duration-300`}
                     />
-                  </button>
-                  <button className="p-2 hover:bg-gray-600/30 rounded-full transition-all duration-300 transform hover:scale-110 group/more">
+                  </button> */}
+                  {/* <button className="p-2 hover:bg-gray-600/30 rounded-full transition-all duration-300 transform hover:scale-110 group/more">
                     <MoreHorizontal size={16} className="text-gray-500 group-hover/more:text-gray-300" />
-                  </button>
+                  </button> */}
                 </div>
               </div>
               
               {/* Comment Actions */}
-              <div className="flex items-center space-x-6 mt-3">
-                <button className="flex items-center space-x-2 text-xs font-medium text-gray-500 hover:text-purple-400 transition-colors duration-300 group/reply">
-                  <MessageCircle size={14} className="group-hover/reply:scale-110 transition-transform duration-300" />
-                  <span>Reply</span>
-                </button>
-                {likedComments.has(comment._id) && (
-                  <span className="text-xs text-red-400 flex items-center space-x-1">
-                    <Heart size={12} className="fill-red-500 stroke-red-500" />
-                    <span>Liked</span>
-                  </span>
-                )}
-              </div>
+             
             </div>
           </div>
         </div>

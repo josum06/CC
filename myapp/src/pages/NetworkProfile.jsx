@@ -14,6 +14,7 @@ import {
   Clock,
   Github,
   ExternalLink,
+  ArrowLeft,
 } from "lucide-react";
 import Comments from "../components/Comments";
 import axios from "axios";
@@ -28,6 +29,7 @@ function NetworkProfile() {
   const [activeTab, setActiveTab] = useState("posts"); // 'posts' or 'projects'
   const [currUserId, setCurrUserId] = useState(null);
   const [selectedPost, setSelectedPost] = useState(null);
+  const [selectedProject, setSelectedProject] = useState(null);
   const [commentModalOpen, setCommentModalOpen] = useState(false);
   const [commentText, setCommentText] = useState("");
   const [likedByCurrentUser, setLikedByCurrentUser] = useState(false);
@@ -171,6 +173,14 @@ function NetworkProfile() {
 
   return (
     <div className="min-h-screen bg-[#000000] text-gray-100 relative">
+      {/* Back to Previous Page Button */}
+      <button
+        onClick={() => navigate(-1)}
+        className="flex items-center gap-2 px-4 py-2 mt-4 ml-4 bg-gradient-to-r from-gray-700/40 to-gray-800/40 hover:from-gray-700/60 hover:to-gray-800/60 text-gray-300 rounded-xl border border-gray-600/30 hover:border-gray-500/50 shadow transition-all duration-300 z-20"
+      >
+        <ArrowLeft size={18} />
+        <span className="font-medium">Back</span>
+      </button>
       {/* Background decorative elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl"></div>
@@ -366,7 +376,8 @@ function NetworkProfile() {
                     ? projects.map((project, i) => (
                         <div
                           key={i}
-                          className="bg-gradient-to-br from-[#232526] via-[#1a1b1c] to-[#000000] p-6 rounded-2xl shadow-xl border border-gray-500/30 hover:border-gray-400/50 transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl"
+                          className="bg-gradient-to-br from-[#232526] via-[#1a1b1c] to-[#000000] p-6 rounded-2xl shadow-xl border border-gray-500/30 hover:border-gray-400/50 transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl cursor-pointer"
+                          onClick={() => setSelectedProject(project)}
                         >
                           <h3 className="font-semibold text-gray-100 text-lg mb-3">{project.title}</h3>
                           <p className="text-gray-400 text-sm mb-4 leading-relaxed">
@@ -424,49 +435,65 @@ function NetworkProfile() {
 
       {/* Post Modal */}
       {selectedPost && (
-        <div className="fixed inset-0 z-50 overflow-y-auto bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="relative bg-gradient-to-br from-[#232526] via-[#1a1b1c] to-[#000000] border border-gray-500/30 rounded-2xl max-w-6xl w-full max-h-[90vh] min-h-[90vh] overflow-hidden flex flex-col md:flex-row shadow-2xl">
-            {/* Close button */}
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-black/80 backdrop-blur-sm flex items-center justify-center p-1 sm:p-2 md:p-4">
+          <div className="relative bg-gradient-to-br from-[#232526] via-[#1a1b1c] to-[#000000] border border-gray-500/30 rounded-lg sm:rounded-xl lg:rounded-2xl w-full h-full sm:h-auto sm:max-w-4xl lg:max-w-6xl sm:max-h-[95vh] lg:max-h-[90vh] overflow-hidden flex flex-col lg:flex-row shadow-2xl">
+            {/* Close button (left) */}
             <button
               onClick={() => setSelectedPost(null)}
-              className="absolute top-4 right-4 p-2 bg-gray-800/50 hover:bg-gray-700/50 rounded-full cursor-pointer transition-all duration-300 border border-gray-600/30 hover:border-gray-500/50 z-50"
+              className="absolute top-1 left-1 sm:top-2 sm:left-2 md:top-4 md:left-4 p-1.5 sm:p-2 bg-gray-800/50 hover:bg-gray-700/50 rounded-full cursor-pointer transition-all duration-300 border border-gray-600/30 hover:border-gray-500/50 z-50"
+              aria-label="Close post modal"
             >
-              <X size={20} className="text-gray-300" />
+              <X size={16} className="text-gray-300 sm:w-4 sm:h-4 md:w-5 md:h-5" />
             </button>
 
-            {/* Image and Video Section */}
-            <div className="w-full md:w-7/12 bg-gradient-to-br from-gray-800/30 to-gray-900/30 flex items-center justify-center">
-              {selectedPost.mediaUrl &&
-              selectedPost.mediaUrl.toLowerCase().endsWith(".mp4") ? (
-                <video
-                  src={selectedPost.mediaUrl}
-                  controls
-                  className="w-auto h-full object-contain max-w-full max-h-full"
-                  preload="metadata"
-                >
-                  Your browser does not support the video tag.
-                </video>
-              ) : (
-                <img
-                  src={selectedPost.mediaUrl}
-                  alt="Post content"
-                  className="w-auto h-full object-contain"
-                />
-              )}
+            {/* Media Section (photo, video, etc.) */}
+            <div className="w-full lg:w-7/12 flex-shrink-0 bg-gradient-to-br from-gray-800/30 to-gray-900/30 flex items-center justify-center overflow-hidden">
+              <div className="w-full flex items-center justify-center">
+                {selectedPost.mediaUrl ? (
+                  selectedPost.mediaUrl.toLowerCase().endsWith(".mp4") ? (
+                    <video
+                      src={selectedPost.mediaUrl}
+                      controls
+                      className="object-contain aspect-[4/3] mx-auto my-4
+                        w-full
+                        max-w-[95vw] max-h-[45vh] min-h-[180px]
+                        sm:max-h-[50vh]
+                        md:max-h-[55vh] md:min-h-[220px]
+                        lg:max-w-[40vw] lg:max-h-[60vh] lg:min-h-[250px] lg:my-0"
+                      preload="metadata"
+                    >
+                      Your browser does not support the video tag.
+                    </video>
+                  ) : (
+                    <img
+                      src={selectedPost.mediaUrl}
+                      alt="Post content"
+                      className="object-contain aspect-[4/3] mx-auto my-4
+                        w-full
+                        max-w-[95vw] max-h-[45vh] min-h-[180px]
+                        sm:max-h-[50vh]
+                        md:max-h-[55vh] md:min-h-[220px]
+                        lg:max-w-[40vw] lg:max-h-[60vh] lg:min-h-[250px] lg:my-0"
+                    />
+                  )
+                ) : (
+                  <div className="flex items-center justify-center w-full h-40 text-gray-400">No media available</div>
+                )}
+              </div>
             </div>
 
             {/* Details Section */}
-            <div className="w-full md:w-5/12 flex border-l border-gray-500/30 flex-col min-h-full bg-gradient-to-br from-[#232526] via-[#1a1b1c] to-[#000000]">
+            <div className="w-full lg:w-5/12 flex lg:border-l border-gray-500/30 flex-col min-h-0 lg:min-h-full bg-gradient-to-br from-[#232526] via-[#1a1b1c] to-[#000000] overflow-y-auto">
               {/* Post Header */}
-              <div className="p-6 border-b border-gray-500/30 bg-gradient-to-r from-gray-700/20 via-gray-600/10 to-gray-700/20">
-                <div className="flex items-center space-x-3">
+              <div className="p-2 sm:p-3 md:p-4 lg:p-6 border-b border-gray-500/30 bg-gradient-to-r from-gray-700/20 via-gray-600/10 to-gray-700/20 flex-shrink-0">
+                <div className="flex items-center space-x-2 sm:space-x-3">
                   <img
                     src={user.profileImage}
                     alt={selectedPost.username}
-                    className="w-12 h-12 rounded-full object-cover ring-2 ring-gray-600/50"
+                    className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 lg:w-12 lg:h-12 rounded-full object-cover ring-2 ring-gray-600/50"
                   />
-                  <div>
-                    <p className="font-semibold text-gray-100">{selectedPost.caption}</p>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold text-gray-100 text-xs sm:text-sm md:text-base truncate">{selectedPost.caption}</p>
                     <p className="text-xs text-gray-400">
                       {selectedPost.time}
                     </p>
@@ -474,22 +501,22 @@ function NetworkProfile() {
                 </div>
               </div>
 
-              {/* Comments Section */}
-              <div className="flex-1 overflow-y-auto">
+              {/* Comments Section - Hidden on mobile and tablet unless comment button is clicked */}
+              <div className={`flex-1 overflow-y-auto min-h-0 ${commentModalOpen ? 'block' : 'hidden lg:block'}`}>
                 <Comments postId={selectedPost._id} />
               </div>
 
               {/* Action Buttons */}
-              <div className="p-6 border-t border-gray-500/30 bg-gradient-to-r from-gray-700/20 via-gray-600/10 to-gray-700/20">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center space-x-4">
+              <div className="p-2 sm:p-3 md:p-4 lg:p-6 border-t border-gray-500/30 bg-gradient-to-r from-gray-700/20 via-gray-600/10 to-gray-700/20 flex-shrink-0">
+                <div className="flex items-center justify-between mb-2 sm:mb-3 md:mb-4">
+                  <div className="flex items-center space-x-1 sm:space-x-2 md:space-x-4">
                     <button
                       onClick={handleLike}
-                      className="p-2 hover:bg-gray-700/50 rounded-full transition-all duration-300"
+                      className="p-1 sm:p-1.5 md:p-2 hover:bg-gray-700/50 rounded-full transition-all duration-300"
                     >
                       <Heart
-                        size={24}
-                        className={`${
+                        size={18}
+                        className={`sm:w-5 sm:h-5 md:w-6 md:h-6 ${
                           likedByCurrentUser
                             ? "fill-red-500 stroke-red-500"
                             : "stroke-gray-400 hover:stroke-red-500"
@@ -499,35 +526,35 @@ function NetworkProfile() {
 
                     <button
                       onClick={() => setCommentModalOpen(!commentModalOpen)}
-                      className="p-2 hover:bg-gray-700/50 rounded-full transition-all duration-300"
+                      className="p-1 sm:p-1.5 md:p-2 hover:bg-gray-700/50 rounded-full transition-all duration-300"
                     >
-                      <MessageCircle size={24} className="text-gray-400 hover:text-gray-300" />
+                      <MessageCircle size={18} className="text-gray-400 hover:text-gray-300 sm:w-5 sm:h-5 md:w-6 md:h-6" />
                     </button>
 
-                    <button className="p-2 hover:bg-gray-700/50 rounded-full transition-all duration-300">
-                      <Share2 size={24} className="text-gray-400 hover:text-gray-300" />
+                    <button className="p-1 sm:p-1.5 md:p-2 hover:bg-gray-700/50 rounded-full transition-all duration-300">
+                      <Share2 size={18} className="text-gray-400 hover:text-gray-300 sm:w-5 sm:h-5 md:w-6 md:h-6" />
                     </button>
                   </div>
                 </div>
-                <p className="font-semibold text-sm mb-3 text-gray-100">
+                <p className="font-semibold text-xs sm:text-sm mb-2 sm:mb-3 text-gray-100">
                   {selectedPost.likes} likes
                 </p>
                 {commentModalOpen && (
                   <form
                     onSubmit={handleSubmit}
-                    className="flex items-center py-3 border-t border-gray-600/30"
+                    className="flex items-center py-2 sm:py-3 border-t border-gray-600/30"
                   >
                     <input
                       type="text"
                       value={commentText}
                       onChange={(e) => setCommentText(e.target.value)}
                       placeholder="Add a comment..."
-                      className="flex-1 text-sm p-3 rounded-xl bg-gradient-to-r from-gray-700/30 to-gray-800/30 border border-gray-600/30 focus:border-blue-500/50 focus:outline-none text-gray-100 placeholder-gray-500"
+                      className="flex-1 text-xs sm:text-sm p-1.5 sm:p-2 md:p-3 rounded-lg sm:rounded-xl bg-gradient-to-r from-gray-700/30 to-gray-800/30 border border-gray-600/30 focus:border-blue-500/50 focus:outline-none text-gray-100 placeholder-gray-500"
                     />
                     <button
                       type="submit"
                       disabled={!commentText.trim()}
-                      className={`ml-3 px-4 py-2 text-sm font-semibold rounded-xl transition-all duration-300 ${
+                      className={`ml-1 sm:ml-2 md:ml-3 px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-semibold rounded-lg sm:rounded-xl transition-all duration-300 ${
                         commentText.trim()
                           ? "bg-gradient-to-r from-blue-600/20 to-blue-700/20 text-blue-400 border border-blue-500/50 hover:from-blue-600/30 hover:to-blue-700/30"
                           : "text-gray-500 cursor-not-allowed"
@@ -537,7 +564,86 @@ function NetworkProfile() {
                     </button>
                   </form>
                 )}
-                <p className="text-sm text-gray-500 mt-3">{selectedPost.time}</p>
+                <p className="text-xs sm:text-sm text-gray-500 mt-1 sm:mt-2 md:mt-3">{selectedPost.time}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Project Modal */}
+      {selectedProject && (
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-black/80 backdrop-blur-sm flex items-center justify-center p-1 sm:p-2 md:p-4">
+          <div className="relative bg-gradient-to-br from-[#232526] via-[#1a1b1c] to-[#000000] border border-gray-500/30 rounded-lg sm:rounded-xl lg:rounded-2xl w-full h-full sm:h-auto sm:max-w-4xl lg:max-w-6xl sm:max-h-[95vh] lg:max-h-[90vh] overflow-hidden flex flex-col lg:flex-row shadow-2xl">
+            {/* Close button (left) */}
+            <button
+              onClick={() => setSelectedProject(null)}
+              className="absolute top-1 left-1 sm:top-2 sm:left-2 md:top-4 md:left-4 p-1.5 sm:p-2 bg-gray-800/50 hover:bg-gray-700/50 rounded-full cursor-pointer transition-all duration-300 border border-gray-600/30 hover:border-gray-500/50 z-50"
+              aria-label="Close project modal"
+            >
+              <X size={16} className="text-gray-300 sm:w-4 sm:h-4 md:w-5 md:h-5" />
+            </button>
+
+            {/* Project Image Section */}
+            <div className="w-full lg:w-7/12 flex-shrink-0 bg-gradient-to-br from-gray-800/30 to-gray-900/30 flex items-center justify-center overflow-hidden">
+              <div className="w-full flex items-center justify-center">
+                <img
+                  src={selectedProject.mediaUrl}
+                  alt='Project content'
+                  className="object-contain aspect-[4/3] mx-auto my-4
+                    w-full
+                    max-w-[95vw] max-h-[45vh] min-h-[180px]
+                    sm:max-h-[50vh]
+                    md:max-h-[55vh] md:min-h-[220px]
+                    lg:max-w-[40vw] lg:max-h-[60vh] lg:min-h-[250px] lg:my-0"
+                />
+              </div>
+            </div>
+
+            {/* Details Section */}
+            <div className="w-full lg:w-5/12 flex-1 flex lg:border-l border-gray-500/30 flex-col min-h-0 lg:min-h-full bg-gradient-to-br from-[#232526] via-[#1a1b1c] to-[#000000] overflow-y-auto px-2 sm:px-4 md:px-6">
+              {/* Project Header */}
+              <div className="p-2 sm:p-3 md:p-4 lg:p-6 border-b border-gray-500/30 bg-gradient-to-r from-gray-700/20 via-gray-600/10 to-gray-700/20 flex-shrink-0">
+                <h2 className="font-semibold text-gray-100 text-lg sm:text-xl md:text-2xl truncate">{selectedProject.title}</h2>
+                <p className="text-xs text-gray-400 mt-1">{selectedProject.description}</p>
+              </div>
+
+              {/* Tech Stack */}
+              <div className="flex flex-wrap gap-2 p-2 sm:p-3 md:p-4 lg:p-6">
+                {selectedProject?.TechStack?.map((tech, index) => (
+                  <span
+                    key={index}
+                    className="px-3 py-1 bg-gradient-to-r from-blue-600/20 to-blue-700/20 text-blue-400 rounded-lg text-xs border border-blue-500/30"
+                  >
+                    {tech}
+                  </span>
+                ))}
+              </div>
+
+              {/* Links */}
+              <div className="space-y-2 p-2 sm:p-3 md:p-4 lg:p-6">
+                {selectedProject?.githubUrl && (
+                  <a
+                    href={selectedProject.githubUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 text-blue-400 hover:text-blue-300 transition-colors text-sm"
+                  >
+                    <Github size={16} />
+                    <span>View on GitHub</span>
+                  </a>
+                )}
+                {selectedProject?.projectUrl && (
+                  <a
+                    href={selectedProject.projectUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 text-blue-400 hover:text-blue-300 transition-colors text-sm"
+                  >
+                    <ExternalLink size={16} />
+                    <span>Live Demo</span>
+                  </a>
+                )}
               </div>
             </div>
           </div>

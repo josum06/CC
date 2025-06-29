@@ -274,19 +274,19 @@ const PostCard = ({
                 className="sm:w-6 sm:h-6 stroke-gray-400 group-hover/comment:stroke-blue-500 transition-all duration-300"
               />
             </button>
-            <button className="p-2 sm:p-3 hover:bg-green-500/20 rounded-full transition-all duration-300 transform hover:scale-110 group/share">
+            {/* <button className="p-2 sm:p-3 hover:bg-green-500/20 rounded-full transition-all duration-300 transform hover:scale-110 group/share">
               <Share2
                 size={20}
                 className="sm:w-6 sm:h-6 stroke-gray-400 group-hover/share:stroke-green-500 transition-all duration-300"
               />
-            </button>
+            </button> */}
           </div>
-          <button className="p-2 sm:p-3 hover:bg-purple-500/20 rounded-full transition-all duration-300 transform hover:scale-110 group/bookmark">
+          {/* <button className="p-2 sm:p-3 hover:bg-purple-500/20 rounded-full transition-all duration-300 transform hover:scale-110 group/bookmark">
             <Bookmark
               size={20}
               className="sm:w-6 sm:h-6 stroke-gray-400 group-hover/bookmark:stroke-purple-500 transition-all duration-300"
             />
-          </button>
+          </button> */}
         </div>
 
         {/* Likes Count */}

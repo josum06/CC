@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useUser } from "@clerk/clerk-react";
 import { toast, ToastContainer } from "react-toastify";
 import axios from "axios";
-import { X, UploadCloud, ArrowLeft, Camera, Github, Linkedin, BookOpen, Building, GraduationCap } from 'lucide-react';
+import { X, UploadCloud, ArrowLeft, Camera, Github, Linkedin, BookOpen, Building, GraduationCap, User, Mail, CheckCircle, AlertCircle } from 'lucide-react';
 import { useNavigate } from "react-router-dom";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -21,7 +21,7 @@ const CompleteYourProfile = () => {
   const [aboutMe, setAboutMe] = useState("");
   const [idCardPhoto, setIdCardPhoto] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [status ,setStatus] = useState(false);
+  const [status, setStatus] = useState(false);
 
   const allowedBranchCodes = {
     "027": "Computer Science Engineering",
@@ -165,101 +165,113 @@ const CompleteYourProfile = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-[#000000] text-gray-100 relative overflow-hidden">
+      {/* Background decorative elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -top-20 -right-20 sm:-top-40 sm:-right-40 w-40 h-40 sm:w-80 sm:h-80 bg-blue-500/10 rounded-full blur-3xl"></div>
+        <div className="absolute -bottom-20 -left-20 sm:-bottom-40 sm:-left-40 w-40 h-40 sm:w-80 sm:h-80 bg-purple-500/10 rounded-full blur-3xl"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-48 h-48 sm:w-96 sm:h-96 bg-gradient-to-r from-blue-500/5 to-purple-500/5 rounded-full blur-3xl"></div>
+      </div>
+
       {/* Header */}
-      <div className="fixed top-0 left-0 right-0 bg-white z-50 border-b border-gray-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex  items-center justify-between">
-          <button
-            onClick={() => navigate("/Home")}
-            className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 cursor-pointer transition-colors"
-          >
-            <ArrowLeft size={20} />
-            <span className="hidden sm:inline">Back to Home</span>
-          </button>
-          <div className="w-20" />
+      <div className="relative z-10 border-b border-gray-500/50 px-3 py-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6">
+            <div className="relative group">
+              <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-xl sm:rounded-2xl overflow-hidden bg-gradient-to-br from-gray-800/50 to-gray-900/50 ring-2 sm:ring-4 ring-blue-500/30 shadow-xl sm:shadow-2xl group-hover:shadow-blue-500/20 transition-all duration-300">
+                <img
+                  src={user?.imageUrl}
+                  alt="profile"
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300" />
+                <button className="absolute bottom-1 right-1 sm:bottom-2 sm:right-2 p-1.5 sm:p-2 bg-gray-800/90 backdrop-blur-sm rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-300">
+                  <Camera size={12} className="sm:w-4 sm:h-4 text-gray-300" />
+                </button>
+              </div>
+            </div>
+            
+            <div className="flex-1 min-w-0">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-2 leading-tight">
+                Complete Your Profile
+              </h1>
+              <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-400 max-w-2xl leading-relaxed">
+                Take a moment to set up your professional profile. This information helps us personalize your experience and connect you with opportunities.
+              </p>
+            </div>
+          </div>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto pt-24 pb-12">
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100">
-          {/* Profile Header */}
-          <div className="px-4 sm:px-8 pt-6 sm:pt-8 pb-4">
-            <div className="flex flex-col md:flex-row items-start md:items-center gap-4 sm:gap-6">
-              <div className="relative group">
-                <div className="w-24 h-24 md:w-32 md:h-32 rounded-2xl overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100 ring-4 ring-white shadow-md group-hover:shadow-lg transition-all duration-300">
-                  <img
-                    src={user?.imageUrl}
-                    alt="profile"
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300" />
-                  <button className="absolute bottom-2 right-2 p-2 bg-white/90 backdrop-blur-sm rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-300">
-                    <Camera size={16} className="text-gray-700" />
-                  </button>
-                </div>
-              </div>
-              
-              <div className="flex-1">
-                <h1 className="text-3xl font-bold text-gray-900 mb-1">
-                  Complete Your Profile
-                </h1>
-                <p className="text-gray-500 max-w-2xl">
-                  Take a moment to set up your professional profile. This information helps us personalize your experience and connect you with opportunities.
-                </p>
-              </div>
-            </div>
-          </div>
-
+      <div className="max-w-7xl mx-auto px-3 py-6 sm:px-6 sm:py-8 lg:px-8 relative z-10">
+        <div className="bg-gradient-to-br from-[#232526] via-[#1a1b1c] to-[#000000] rounded-2xl sm:rounded-3xl border border-gray-500/30 shadow-2xl overflow-hidden">
           {/* Progress Bar */}
-          <div className="px-4 sm:px-8 py-4 border-b border-gray-100">
-            <div className="flex items-center gap-4">
-              <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
+          <div className="px-4 sm:px-6 lg:px-8 py-4 sm:py-6 border-b border-gray-500/30 bg-gradient-to-r from-gray-700/20 via-gray-600/10 to-gray-700/20">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
+              <div className="flex-1 h-2 sm:h-3 bg-gray-700/50 rounded-full overflow-hidden backdrop-blur-sm">
                 <div 
-                  className="h-full bg-gradient-to-r from-blue-500 to-indigo-500 transition-all duration-500"
-                  style={{ 
-                    width: `${calculateProgress()}%` // Implement this function to calculate completion
-                  }}
+                  className="h-full bg-gradient-to-r from-blue-500 to-purple-500 transition-all duration-700 ease-out shadow-lg"
+                  style={{ width: `${calculateProgress()}%` }}
                 />
               </div>
-              <span className="text-sm font-medium text-gray-500">
-                {calculateProgress()}% Complete
-              </span>
+              <div className="flex items-center gap-2">
+                <span className="text-xs sm:text-sm font-medium text-gray-300">
+                  {calculateProgress()}% Complete
+                </span>
+                {calculateProgress() === 100 && (
+                  <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-400" />
+                )}
+              </div>
             </div>
           </div>
 
           <form onSubmit={handleSubmit}>
-            <div className="p-4 sm:p-8">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-12">
+            <div className="p-4 sm:p-6 lg:p-8">
+              <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 sm:gap-8 xl:gap-12">
                 {/* Left Column */}
-                <div className="space-y-8">
-                  <div className="space-y-6">
-                    <div className="flex items-center justify-between">
-                      <h2 className="text-xl font-semibold text-gray-900">Personal Information</h2>
-                      <span className="px-3 py-1 bg-blue-50 text-blue-600 text-sm font-medium rounded-full">
+                <div className="space-y-6 sm:space-y-8">
+                  {/* Personal Information */}
+                  <div className="space-y-4 sm:space-y-6">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+                      <h2 className="text-lg sm:text-xl lg:text-2xl font-semibold text-white flex items-center gap-2 sm:gap-3">
+                        <User className="w-5 h-5 sm:w-6 sm:h-6 text-blue-400" />
+                        <span className="text-base sm:text-lg lg:text-xl">Personal Information</span>
+                      </h2>
+                      <span className="px-2 sm:px-3 py-1 bg-gradient-to-r from-blue-600/20 to-blue-700/20 text-blue-300 text-xs sm:text-sm font-medium rounded-full border border-blue-500/30 self-start sm:self-auto">
                         Required
                       </span>
                     </div>
 
                     {/* Name and Email Card */}
-                    <div className="bg-gradient-to-br from-gray-50 to-white rounded-2xl border border-gray-100 p-6">
+                    <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 rounded-xl sm:rounded-2xl border border-gray-700/50 p-4 sm:p-6 backdrop-blur-sm">
                       <div className="space-y-4">
-                        <div>
-                          <label className="text-sm font-medium text-gray-500">Full Name</label>
-                          <p className="text-lg font-medium text-gray-900 mt-1">{user?.fullName}</p>
+                        <div className="flex items-start sm:items-center gap-3">
+                          <div className="p-1.5 sm:p-2 bg-blue-500/20 rounded-lg flex-shrink-0">
+                            <User className="w-4 h-4 sm:w-5 sm:h-5 text-blue-400" />
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <label className="text-xs sm:text-sm font-medium text-gray-400">Full Name</label>
+                            <p className="text-sm sm:text-base lg:text-lg font-medium text-white mt-1 break-words">{user?.fullName}</p>
+                          </div>
                         </div>
-                        <div>
-                          <label className="text-sm font-medium text-gray-500">Email Address</label>
-                          <p className="text-lg font-medium text-gray-900 mt-1">
-                            {user?.primaryEmailAddress?.emailAddress}
-                          </p>
+                        <div className="flex items-start sm:items-center gap-3">
+                          <div className="p-1.5 sm:p-2 bg-green-500/20 rounded-lg flex-shrink-0">
+                            <Mail className="w-4 h-4 sm:w-5 sm:h-5 text-green-400" />
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <label className="text-xs sm:text-sm font-medium text-gray-400">Email Address</label>
+                            <p className="text-sm sm:text-base lg:text-lg font-medium text-white mt-1 break-all">
+                              {user?.primaryEmailAddress?.emailAddress}
+                            </p>
+                          </div>
                         </div>
                       </div>
                     </div>
 
-                    {/* Enrollment Section with enhanced styling */}
-                    <div className="space-y-4">
+                    {/* Enrollment Section */}
+                    <div className="space-y-3 sm:space-y-4">
                       <div className="relative">
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-xs sm:text-sm font-medium text-gray-300 mb-2">
                           Enrollment Number
                         </label>
                         <div className="relative group">
@@ -273,47 +285,47 @@ const CompleteYourProfile = () => {
                                 handleEnrollmentChange(e);
                               }
                             }}
-                            className={`w-full p-4 border rounded-xl bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 ${
-                              status ? "bg-gray-50" : "hover:border-gray-300"
+                            className={`w-full p-3 sm:p-4 text-sm sm:text-base border rounded-lg sm:rounded-xl bg-gray-800/50 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 text-white placeholder-gray-400 ${
+                              status ? "bg-gray-700/50 cursor-not-allowed" : "hover:border-gray-600"
                             }`}
                             placeholder="Enter your 11-digit enrollment number"
                           />
                           {enrollmentNumber && (
                             <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                              <div className="w-2 h-2 rounded-full bg-green-500" />
+                              <div className="w-2 h-2 sm:w-3 sm:h-3 rounded-full bg-green-500 shadow-lg shadow-green-500/50" />
                             </div>
                           )}
                         </div>
                       </div>
 
                       {enrollmentNumber && (
-                        <div className="grid grid-cols-2 gap-4">
-                          <div className="bg-gradient-to-br from-gray-50 to-white p-4 rounded-xl border border-gray-100 hover:border-gray-200 transition-colors duration-300">
-                            <div className="flex items-center space-x-2 text-gray-600 mb-2">
-                              <BookOpen size={16} />
-                              <span className="text-sm font-medium">Roll Number</span>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                          <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 p-3 sm:p-4 rounded-lg sm:rounded-xl border border-gray-700/50 hover:border-gray-600/50 transition-colors duration-300">
+                            <div className="flex items-center space-x-2 text-gray-400 mb-2">
+                              <BookOpen size={14} className="sm:w-4 sm:h-4" />
+                              <span className="text-xs sm:text-sm font-medium">Roll Number</span>
                             </div>
-                            <p className="text-lg font-semibold text-gray-900">
+                            <p className="text-sm sm:text-base lg:text-lg font-semibold text-white">
                               {enrollmentNumber.substring(0, 3)}
                             </p>
                           </div>
 
-                          <div className="bg-gradient-to-br from-gray-50 to-white p-4 rounded-xl border border-gray-100 hover:border-gray-200 transition-colors duration-300">
-                            <div className="flex items-center space-x-2 text-gray-600 mb-2">
-                              <Building size={16} />
-                              <span className="text-sm font-medium">Batch Year</span>
+                          <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 p-3 sm:p-4 rounded-lg sm:rounded-xl border border-gray-700/50 hover:border-gray-600/50 transition-colors duration-300">
+                            <div className="flex items-center space-x-2 text-gray-400 mb-2">
+                              <Building size={14} className="sm:w-4 sm:h-4" />
+                              <span className="text-xs sm:text-sm font-medium">Batch Year</span>
                             </div>
-                            <p className="text-lg font-semibold text-gray-900">
+                            <p className="text-sm sm:text-base lg:text-lg font-semibold text-white">
                               {"20" + enrollmentNumber.substring(9, 11)}
                             </p>
                           </div>
 
-                          <div className="col-span-2 bg-gradient-to-br from-gray-50 to-white p-4 rounded-xl border border-gray-100 hover:border-gray-200 transition-colors duration-300">
-                            <div className="flex items-center space-x-2 text-gray-600 mb-2">
-                              <GraduationCap size={16} />
-                              <span className="text-sm font-medium">Branch</span>
+                          <div className="col-span-1 sm:col-span-2 bg-gradient-to-br from-gray-800/50 to-gray-900/50 p-3 sm:p-4 rounded-lg sm:rounded-xl border border-gray-700/50 hover:border-gray-600/50 transition-colors duration-300">
+                            <div className="flex items-center space-x-2 text-gray-400 mb-2">
+                              <GraduationCap size={14} className="sm:w-4 sm:h-4" />
+                              <span className="text-xs sm:text-sm font-medium">Branch</span>
                             </div>
-                            <p className="text-lg font-semibold text-gray-900">
+                            <p className="text-sm sm:text-base lg:text-lg font-semibold text-white">
                               {allowedBranchCodes[enrollmentNumber.substring(6,9)] || ""}
                             </p>
                           </div>
@@ -322,21 +334,26 @@ const CompleteYourProfile = () => {
                     </div>
                   </div>
 
-                  {/* Social Links with enhanced styling */}
-                  <div className="space-y-6">
-                    <h3 className="text-xl font-semibold text-gray-900">Social Presence</h3>
-                    <div className="space-y-4">
+                  {/* Social Links */}
+                  <div className="space-y-4 sm:space-y-6">
+                    <h3 className="text-lg sm:text-xl lg:text-2xl font-semibold text-white flex items-center gap-2 sm:gap-3">
+                      <div className="p-1.5 sm:p-2 bg-purple-500/20 rounded-lg">
+                        <Linkedin className="w-4 h-4 sm:w-5 sm:h-5 text-purple-400" />
+                      </div>
+                      <span className="text-base sm:text-lg lg:text-xl">Social Presence</span>
+                    </h3>
+                    <div className="space-y-3 sm:space-y-4">
                       <div className="group">
                         <div className="relative">
-                          <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                            <Github className="text-gray-400 group-hover:text-gray-600 transition-colors" size={20} />
+                          <div className="absolute inset-y-0 left-0 pl-3 sm:pl-4 flex items-center pointer-events-none">
+                            <Github className="text-gray-400 group-hover:text-gray-300 transition-colors w-4 h-4 sm:w-5 sm:h-5" />
                           </div>
                           <input
                             type="url"
                             disabled={status}
                             value={githubUrl}
                             onChange={(e) => setGithubUrl(e.target.value)}
-                            className="w-full pl-12 pr-4 py-4 border rounded-xl bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 hover:border-gray-300"
+                            className="w-full pl-10 sm:pl-12 pr-3 sm:pr-4 py-3 sm:py-4 text-sm sm:text-base border rounded-lg sm:rounded-xl bg-gray-800/50 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 hover:border-gray-600 text-white placeholder-gray-400"
                             placeholder="Your GitHub profile URL"
                           />
                         </div>
@@ -344,15 +361,15 @@ const CompleteYourProfile = () => {
 
                       <div className="group">
                         <div className="relative">
-                          <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                            <Linkedin className="text-gray-400 group-hover:text-gray-600 transition-colors" size={20} />
+                          <div className="absolute inset-y-0 left-0 pl-3 sm:pl-4 flex items-center pointer-events-none">
+                            <Linkedin className="text-gray-400 group-hover:text-gray-300 transition-colors w-4 h-4 sm:w-5 sm:h-5" />
                           </div>
                           <input
                             type="url"
                             disabled={status}
                             value={linkedinUrl}
                             onChange={(e) => setLinkedinUrl(e.target.value)}
-                            className="w-full pl-12 pr-4 py-4 border rounded-xl bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 hover:border-gray-300"
+                            className="w-full pl-10 sm:pl-12 pr-3 sm:pr-4 py-3 sm:py-4 text-sm sm:text-base border rounded-lg sm:rounded-xl bg-gray-800/50 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 hover:border-gray-600 text-white placeholder-gray-400"
                             placeholder="Your LinkedIn profile URL"
                           />
                         </div>
@@ -362,30 +379,35 @@ const CompleteYourProfile = () => {
                 </div>
 
                 {/* Right Column */}
-                <div className="space-y-8">
-                  {/* Skills Section with enhanced styling */}
-                  <div className="space-y-6">
-                    <div className="flex items-center justify-between">
-                      <h3 className="text-xl font-semibold text-gray-900">Skills & Expertise</h3>
-                      <span className="px-3 py-1 bg-blue-50 text-blue-600 text-sm font-medium rounded-full">
+                <div className="space-y-6 sm:space-y-8">
+                  {/* Skills Section */}
+                  <div className="space-y-4 sm:space-y-6">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+                      <h3 className="text-lg sm:text-xl lg:text-2xl font-semibold text-white flex items-center gap-2 sm:gap-3">
+                        <div className="p-1.5 sm:p-2 bg-orange-500/20 rounded-lg">
+                          <BookOpen className="w-4 h-4 sm:w-5 sm:h-5 text-orange-400" />
+                        </div>
+                        <span className="text-base sm:text-lg lg:text-xl">Skills & Expertise</span>
+                      </h3>
+                      <span className="px-2 sm:px-3 py-1 bg-gradient-to-r from-orange-600/20 to-orange-700/20 text-orange-300 text-xs sm:text-sm font-medium rounded-full border border-orange-500/30 self-start sm:self-auto">
                         {skills.length} Added
                       </span>
                     </div>
                     
-                    <div className="bg-gradient-to-br from-gray-50 to-white rounded-xl border border-gray-100 p-6">
+                    <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 rounded-lg sm:rounded-xl border border-gray-700/50 p-4 sm:p-6 backdrop-blur-sm">
                       <div className="flex flex-wrap gap-2 mb-4">
                         {skills.map((skill, index) => (
                           <span 
                             key={index} 
-                            className="group flex items-center bg-white px-3 py-1.5 rounded-lg border border-gray-200 hover:border-gray-300 transition-all duration-300"
+                            className="group flex items-center bg-gray-700/50 px-2 sm:px-3 py-1 sm:py-1.5 rounded-md sm:rounded-lg border border-gray-600/50 hover:border-gray-500/50 transition-all duration-300"
                           >
-                            <span className="text-sm font-medium text-gray-700">{skill}</span>
+                            <span className="text-xs sm:text-sm font-medium text-gray-200">{skill}</span>
                             <button 
                               type="button"
                               onClick={() => setSkills(skills.filter((s) => s !== skill))}
-                              className="ml-2 text-gray-400 hover:text-red-500 transition-colors"
+                              className="ml-1.5 sm:ml-2 text-gray-400 hover:text-red-400 transition-colors"
                             >
-                              <X size={14} />
+                              <X size={12} className="sm:w-3.5 sm:h-3.5" />
                             </button>
                           </span>
                         ))}
@@ -396,7 +418,7 @@ const CompleteYourProfile = () => {
                           type="text"
                           value={skillsInput}
                           onChange={(e) => setSkillsInput(e.target.value)}
-                          className="flex-1 p-3 border rounded-l-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300"
+                          className="flex-1 p-2.5 sm:p-3 text-sm sm:text-base border rounded-l-lg sm:rounded-l-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 bg-gray-800/50 text-white placeholder-gray-400"
                           placeholder="Type a skill and press Add"
                         />
                         <button
@@ -407,7 +429,7 @@ const CompleteYourProfile = () => {
                               setSkillsInput("");
                             }
                           }}
-                          className="px-6 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-r-xl hover:from-blue-600 hover:to-blue-700 transition-all duration-300 font-medium"
+                          className="px-4 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-r-lg sm:rounded-r-xl hover:from-blue-600 hover:to-blue-700 transition-all duration-300 font-medium"
                         >
                           Add
                         </button>
@@ -415,28 +437,38 @@ const CompleteYourProfile = () => {
                     </div>
                   </div>
 
-                  {/* About Me Section with enhanced styling */}
-                  <div className="space-y-6">
-                    <h3 className="text-xl font-semibold text-gray-900">About Me</h3>
+                  {/* About Me Section */}
+                  <div className="space-y-4 sm:space-y-6">
+                    <h3 className="text-lg sm:text-xl lg:text-2xl font-semibold text-white flex items-center gap-2 sm:gap-3">
+                      <div className="p-1.5 sm:p-2 bg-green-500/20 rounded-lg">
+                        <User className="w-4 h-4 sm:w-5 sm:h-5 text-green-400" />
+                      </div>
+                      <span className="text-base sm:text-lg lg:text-xl">About Me</span>
+                    </h3>
                     <div className="relative">
                       <textarea
                         value={aboutMe}
                         disabled={status}
                         onChange={(e) => setAboutMe(e.target.value)}
-                        className="w-full p-4 border rounded-xl bg-gradient-to-br from-gray-50 to-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 h-40 resize-none"
+                        className="w-full p-3 sm:p-4 text-sm sm:text-base border rounded-lg sm:rounded-xl bg-gradient-to-br from-gray-800/50 to-gray-900/50 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 h-32 sm:h-40 resize-none text-white placeholder-gray-400"
                         placeholder="Share your story, interests, and what drives you..."
                       />
-                      <div className="absolute bottom-4 right-4 text-sm text-gray-400">
+                      <div className="absolute bottom-3 sm:bottom-4 right-3 sm:right-4 text-xs sm:text-sm text-gray-400">
                         {aboutMe.length}/500
                       </div>
                     </div>
                   </div>
 
-                  {/* ID Card Upload with enhanced styling */}
-                  <div className="space-y-6">
-                    <h3 className="text-xl font-semibold text-gray-900">College ID Card</h3>
+                  {/* ID Card Upload */}
+                  <div className="space-y-4 sm:space-y-6">
+                    <h3 className="text-lg sm:text-xl lg:text-2xl font-semibold text-white flex items-center gap-2 sm:gap-3">
+                      <div className="p-1.5 sm:p-2 bg-red-500/20 rounded-lg">
+                        <AlertCircle className="w-4 h-4 sm:w-5 sm:h-5 text-red-400" />
+                      </div>
+                      <span className="text-base sm:text-lg lg:text-xl">College ID Card</span>
+                    </h3>
                     <div className="relative group">
-                      <div className="relative w-full aspect-[16/10] rounded-xl bg-gradient-to-br from-gray-50 to-white border-2 border-dashed border-gray-200 hover:border-blue-500 transition-all duration-300 overflow-hidden">
+                      <div className="relative w-full aspect-[16/10] rounded-lg sm:rounded-xl bg-gradient-to-br from-gray-800/50 to-gray-900/50 border-2 border-dashed border-gray-600/50 hover:border-blue-500/50 transition-all duration-300 overflow-hidden backdrop-blur-sm">
                         <input
                           type="file"
                           accept="image/*"
@@ -453,16 +485,16 @@ const CompleteYourProfile = () => {
                             />
                             <button
                               onClick={removeImage}
-                              className="absolute top-2 right-2 p-2 bg-white/90 backdrop-blur-sm rounded-full shadow-lg hover:bg-red-500 hover:text-white transition-all duration-300"
+                              className="absolute top-2 right-2 p-1.5 sm:p-2 bg-gray-800/90 backdrop-blur-sm rounded-full shadow-lg hover:bg-red-500 hover:text-white transition-all duration-300"
                             >
-                              <X size={18} />
+                              <X size={14} className="sm:w-4.5 sm:h-4.5" />
                             </button>
                           </div>
                         ) : (
-                          <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-400 hover:text-blue-500 transition-colors duration-300">
-                            <UploadCloud size={40} />
-                            <p className="mt-2 text-sm font-medium">Click or drag to upload your ID card</p>
-                            <p className="text-xs text-gray-400 mt-1">Supported formats: JPG, PNG</p>
+                          <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-400 hover:text-blue-400 transition-colors duration-300 p-4">
+                            <UploadCloud size={32} className="sm:w-10 sm:h-10" />
+                            <p className="mt-2 text-xs sm:text-sm font-medium text-center">Click or drag to upload your ID card</p>
+                            <p className="text-xs text-gray-500 mt-1 text-center">Supported formats: JPG, PNG</p>
                           </div>
                         )}
                       </div>
@@ -473,17 +505,17 @@ const CompleteYourProfile = () => {
             </div>
 
             {/* Submit Button */}
-            <div className="mt-8 sm:mt-12 pb-4 sm:pb-6 px-4 sm:px-6 border-t border-gray-100 pt-6">
+            <div className="mt-6 sm:mt-8 lg:mt-12 pb-4 sm:pb-6 px-4 sm:px-6 lg:px-8 border-t border-gray-500/30 pt-4 sm:pt-6 bg-gradient-to-r from-gray-700/20 via-gray-600/10 to-gray-700/20">
               <div className="flex justify-end">
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="w-full sm:w-auto group relative px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl hover:from-blue-600 hover:to-blue-700 transition-all duration-300 font-medium shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full sm:w-auto group relative px-6 sm:px-8 py-3 sm:py-4 text-sm sm:text-base bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg sm:rounded-xl hover:from-blue-600 hover:to-purple-700 transition-all duration-300 font-medium shadow-xl sm:shadow-2xl hover:shadow-blue-500/25 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <span className="flex items-center justify-center space-x-2">
                     {isLoading ? (
                       <>
-                        <span className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
+                        <span className="animate-spin rounded-full h-3 w-3 sm:h-4 sm:w-4 border-2 border-white border-t-transparent" />
                         <span>Saving Changes...</span>
                       </>
                     ) : (
@@ -502,7 +534,7 @@ const CompleteYourProfile = () => {
 
       <ToastContainer 
         position="bottom-right"
-        theme="colored"
+        theme="dark"
         className="toast-container"
       />
     </div>
