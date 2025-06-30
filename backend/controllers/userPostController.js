@@ -109,8 +109,6 @@ exports.likePost = async (req, res) => {
   try {
     const { postId } = req.params;
     const { userId } = req.body; // Get user ID from request
-    console.log("User ID:", userId);
-    console.log("Post ID:", postId);
 
     if (!postId || !userId) {
       return res.status(400).json({ message: "Missing postId or userId" });
@@ -205,4 +203,4 @@ exports.replyComment = async (req, res) => {
     console.error("Error replying to comment:", error);
     res.status(500).json({ error: "Internal server error" });
   }
-}
+};
