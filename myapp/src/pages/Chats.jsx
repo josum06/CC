@@ -233,7 +233,6 @@ const ChatApp = () => {
       >
         {recipient ? (
           <>
-            {/* Mobile back button */}
             {isMobile && (
               <div className="md:hidden bg-gradient-to-br from-gray-900/95 via-gray-800/90 to-gray-900/95 backdrop-blur-xl border-b border-gray-700/50 p-3 shadow-lg">
                 <div className="flex items-center">
@@ -262,19 +261,7 @@ const ChatApp = () => {
                 </div>
               </div>
             )}
-            {/* User Info Bar */}
-            <div className="flex items-center gap-3 p-4 border-b border-gray-700/50 bg-black/70">
-              <img
-                src={clerkUser?.imageUrl || "default-user.jpg"}
-                alt="Your profile"
-                className="w-10 h-10 rounded-full object-cover border-2 border-blue-500/30"
-              />
-              <div>
-                <div className="text-white font-semibold">{clerkUser?.fullName || "You"}</div>
-                <div className="text-xs text-gray-400">You</div>
-              </div>
-            </div>
-            <ChatWindow user={user} recipient={recipient} clerkUser={clerkUser} />
+            <ChatWindow user={user} recipient={recipient} clerkUser={clerkUser} isMobile={isMobile} />
           </>
         ) : (
           <div className="flex-1 flex flex-col items-center justify-center text-gray-400 bg-transparent relative">
