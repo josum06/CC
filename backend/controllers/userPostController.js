@@ -65,7 +65,6 @@ exports.getPosts = async (req, res) => {
 exports.createComment = async (req, res) => {
   try {
     const { text, postId, userId } = req.body;
-    console.log(text, postId, userId);
     // Check if post exists
     const post = await Post.findById(postId);
     if (!post) {
@@ -109,8 +108,7 @@ exports.likePost = async (req, res) => {
   try {
     const { postId } = req.params;
     const { userId } = req.body; // Get user ID from request
-    console.log("User ID:", userId);
-    console.log("Post ID:", postId);
+
 
     if (!postId || !userId) {
       return res.status(400).json({ message: "Missing postId or userId" });
@@ -177,8 +175,6 @@ exports.replyComment = async (req, res) => {
     }
 
     const userId = user._id;
-
-    console.log("Comment ID:", userId);
     const comment = await Comment.findById(commentId);
     if (!comment) {
       return res.status(404).json({ message: "Comment not found" });

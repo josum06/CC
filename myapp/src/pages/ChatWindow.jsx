@@ -168,7 +168,7 @@ const ChatWindow = ({ user, recipient }) => {
       sender: { _id: user._id, fullName: user.fullName },
       content: message,
       roomId,
-      timestamp: new Date(),
+      timestamp: new Date()
     };
 
     socket.emit("send_message", msg);
@@ -211,31 +211,9 @@ const ChatWindow = ({ user, recipient }) => {
               <h2 className="font-semibold text-white text-base md:text-lg truncate">
                 {recipient.fullName}
               </h2>
-              <p className="text-xs md:text-sm text-green-400 flex items-center">
-                {isTyping ? (
-                  <span className="text-green-400 flex items-center">
-                    <span className="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></span>
-                    typing...
-                  </span>
-                ) : (
-                  <>
-                    <span className="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></span>
-                    online
-                  </>
-                )}
-              </p>
             </div>
           </div>
           <div className="flex items-center gap-1 md:gap-2">
-            {/* <button className="p-2 hover:bg-white/10 rounded-xl transition-all duration-300 group hover:scale-105">
-              <Phone className="w-4 h-4 md:w-5 md:h-5 text-gray-400 group-hover:text-white transition-colors" />
-            </button>
-            <button className="p-2 hover:bg-white/10 rounded-xl transition-all duration-300 group hover:scale-105">
-              <Video className="w-4 h-4 md:w-5 md:h-5 text-gray-400 group-hover:text-white transition-colors" />
-            </button> */}
-            {/* <button className="p-2 hover:bg-white/10 rounded-xl transition-all duration-300 group hover:scale-105">
-              <Info className="w-4 h-4 md:w-5 md:h-5 text-gray-400 group-hover:text-white transition-colors" />
-            </button> */}
             <button className="p-2 hover:bg-white/10 rounded-xl transition-all duration-300 group hover:scale-105">
               <MoreVertical className="w-4 h-4 md:w-5 md:h-5 text-gray-400 group-hover:text-white transition-colors" />
             </button>
@@ -280,37 +258,11 @@ const ChatWindow = ({ user, recipient }) => {
                       setShowReactions(messageId);
                     }}
                   >
-                    {msg.file && (
-                      <div className="mb-3 p-3 bg-black/20 rounded-xl flex items-center gap-3">
-                        {msg.file.type && msg.file.type.startsWith("audio/") ? (
-                          <div className="flex items-center gap-3 w-full">
-                            <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center shadow-lg">
-                              <FaMicrophone className="w-4 h-4 text-white" />
-                            </div>
-                            <div className="flex-1">
-                              <p className="text-sm font-medium">Voice Message</p>
-                              <div className="w-full bg-gray-600/50 rounded-full h-1.5 mt-1">
-                                <div
-                                  className="bg-gradient-to-r from-blue-500 to-purple-500 h-1.5 rounded-full transition-all duration-300"
-                                  style={{ width: "70%" }}
-                                ></div>
-                              </div>
-                            </div>
-                          </div>
-                        ) : (
-                          <>
-                            <BsFileEarmark className="w-5 h-5 text-gray-400" />
-                            <span className="text-sm truncate">
-                              {msg.file.name}
-                            </span>
-                          </>
-                        )}
-                      </div>
-                    )}
+                   
                     <p className="text-sm md:text-base leading-relaxed">{msg.content}</p>
                     <div className="flex items-center justify-end mt-2 gap-2">
                       <p className="text-xs text-gray-400">
-                        {dayjs(msg.timestamp).format("hh:mm A")}
+                      {msg.createdAt ? dayjs( msg.createdAt).format("hh:mm A") : dayjs( msg.timestamp).format("hh:mm A")}
                       </p>
                     </div>
 
@@ -484,10 +436,6 @@ const ChatWindow = ({ user, recipient }) => {
             )}
           </div>
 
-          <button className="text-gray-400 hover:text-blue-400 transition-all duration-300 p-1 md:p-2 hover:bg-white/10 rounded-xl hover:scale-105">
-            <Paperclip className="w-5 h-5" />
-          </button>
-
           <input
             className="flex-1 bg-transparent border-none focus:outline-none text-white placeholder-gray-400 text-sm md:text-base"
             placeholder="Type a message..."
@@ -503,7 +451,7 @@ const ChatWindow = ({ user, recipient }) => {
             }}
           />
 
-          {message.trim() ? (
+          {message.trim() && (
             <motion.button
               onClick={sendMessage}
               className="bg-gradient-to-r from-blue-500 to-purple-500 text-white p-2 md:p-3 rounded-full hover:from-blue-600 hover:to-purple-600 transition-all duration-300 shadow-lg"
@@ -512,11 +460,8 @@ const ChatWindow = ({ user, recipient }) => {
             >
               <Send className="w-4 h-4 md:w-5 md:h-5" />
             </motion.button>
-          ) : (
-            <button className="text-gray-400 hover:text-blue-400 transition-all duration-300 p-1 md:p-2 hover:bg-white/10 rounded-xl hover:scale-105">
-              <Mic className="w-5 h-5" />
-            </button>
-          )}
+          )
+          }
         </div>
       </div>
 

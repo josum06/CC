@@ -6,8 +6,7 @@ exports.getChats = async (req, res) => {
   try {
     const recipientId = req.params.id;
     const senderId = req.query.senderId;
-    console.log("Sender ID:", senderId);
-    console.log("Recipient ID:", recipientId);
+   
     const messages = await Message.find({
       $or: [
         { sender: senderId, recipient: recipientId },

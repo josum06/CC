@@ -65,7 +65,6 @@ exports.createProject = async (req, res) => {
     await project.save();
 
     res.status(201).json(project);
-    console.log(`Project created successfully: ${project}`);
   } catch (error) {
     console.error("Error creating project:", error);
     res.status(500).json({ error: "Internal server error" });
@@ -105,7 +104,6 @@ exports.getProject = async (req, res) => {
 exports.createCommentProject = async (req, res) => {
   try {
     const { text, projectId, userId } = req.body;
-    console.log(text, projectId, userId);
 
     // Check if project exists
     const project = await Project.findById(projectId);

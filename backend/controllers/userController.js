@@ -1,6 +1,7 @@
 const User = require("../models/User");
 const imagekit = require("../imageKit");
 const Post = require("../models/Post");
+
 // Function to handle profile upload
 const uploadProfile = async (req, res) => {
   try {
@@ -52,14 +53,18 @@ const uploadProfile = async (req, res) => {
       { new: true } // Return updated document
     );
 
+    
+
+
     if (!updatedUser) {
       return res.status(404).json({ error: "User not found" });
     }
-
+     
     if (updatedUser.enrollmentNumber && updatedUser.collegeIDCard) {
       updatedUser.profileComplete = true;
       await updatedUser.save();
     }
+    
 
     res
       .status(200)
@@ -91,7 +96,7 @@ const getUserProfile = async (req, res) => {
 const getUserProfileById = async (req, res) => {
   try {
     const { userId } = req.params;
-    console.log(userId);
+
     const user = await User.findOne({ _id: userId });
 
     if (!user) {
@@ -105,6 +110,7 @@ const getUserProfileById = async (req, res) => {
   }
 };
 
+
 const getPostsById = async (req, res) => {
   try {
     const userId = req.params.userId;
@@ -116,6 +122,8 @@ const getPostsById = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
+
 const getAllUsers = async (req, res) => {
   try {
     const users = await User.find(); // Exclude password field
@@ -182,7 +190,8 @@ const updateConnectionsPending = async (req, res) => {
     if (!sender || !receiver) {
       return res.status(404).json({ message: "User not found" });
     }
-
+    
+    
     res.status(200).json({
       message: "Connection request sent successfully",
     });
@@ -202,7 +211,7 @@ const getPendingConnections = async (req, res) => {
       select: "fullName profileImage", // Select only these fields
     });
 
-    console.log(user);
+
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }

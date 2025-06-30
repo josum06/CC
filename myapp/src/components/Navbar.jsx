@@ -40,7 +40,7 @@ const Navbar = () => {
       },
     });
     setSearchUsers(res.data);
-    console.log(res.data);
+
     setIsSearchActive(true);
   };
   const toggleSidebar = () => {

@@ -36,7 +36,7 @@ exports.getPosts = async (req, res) => {
     const page = parseInt(req.query.page) || 1; // Default to page 1
     const limit = 10; // Fetch 10 notices per request
     const skip = (page - 1) * limit;
-    console.log("Page:", page);
+
 
     // Fetch notices with pagination (latest first)
     const post = await AdminPost.find({ category: category })
