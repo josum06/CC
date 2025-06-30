@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 const UserProfile = () => {
   const { user } = useUser();
   const [user2, setUser2] = useState();
-  const [screenSize, setScreenSize] = useState('desktop');
+  const [screenSize, setScreenSize] = useState("desktop");
 
   const [editMode, setEditMode] = useState(false);
   const [tempUser, setTempUser] = useState({ ...user2 });
@@ -35,24 +35,24 @@ const UserProfile = () => {
     const checkScreenSize = () => {
       const width = window.innerWidth;
       if (width < 768) {
-        setScreenSize('mobile');
+        setScreenSize("mobile");
       } else if (width >= 768 && width < 1024) {
-        setScreenSize('tablet');
+        setScreenSize("tablet");
       } else {
-        setScreenSize('desktop');
+        setScreenSize("desktop");
       }
     };
 
     checkScreenSize();
-    window.addEventListener('resize', checkScreenSize);
+    window.addEventListener("resize", checkScreenSize);
 
-    return () => window.removeEventListener('resize', checkScreenSize);
+    return () => window.removeEventListener("resize", checkScreenSize);
   }, []);
 
   const fetchUserProfile = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:3000/api/user/profile/${user.id}`
+        `${import.meta.env.VITE_BACKEND_URL}/api/user/profile/${user.id}`
       );
       const data = response.data;
       setUser2(data);
@@ -84,18 +84,15 @@ const UserProfile = () => {
       if (tempUser.aboutMe) formData.append("aboutMe", tempUser.aboutMe);
       if (tempUser.skills)
         formData.append("skills", JSON.stringify(tempUser.skills));
-      console.log("Sending FormData:", Object.fromEntries(formData));
 
       // Make API call
       await axios.patch(
-        "http://localhost:3000/api/user/upload-profile",
+        "${import.meta.env.VITE_BACKEND_URL}/api/user/upload-profile",
         formData,
         {
           headers: { "Content-Type": "multipart/form-data" },
         }
       );
-
-      console.log("Profile updated successfully!");
       toast.success("Profile updated successfully!");
     } catch (error) {
       console.error(
@@ -118,7 +115,6 @@ const UserProfile = () => {
         skills: [...tempUser.skills, newSkill],
       });
       setNewSkill("");
-      console.log(tempUser);
     }
   };
 
@@ -152,21 +148,25 @@ const UserProfile = () => {
 
   // Calculate responsive padding based on screen size
   const getResponsivePadding = () => {
-    if (screenSize === 'mobile') return 'px-4 pb-20';
-    if (screenSize === 'tablet') return 'p-8';
-    return 'p-8';
+    if (screenSize === "mobile") return "px-4 pb-20";
+    if (screenSize === "tablet") return "p-8";
+    return "p-8";
   };
 
   return (
     <div className="min-h-screen bg-[#000000] text-white overflow-x-hidden">
       {/* Responsive Header */}
-      <div className={`fixed top-0 right-0 bg-[#000000]/95 backdrop-blur-md z-40 border-b border-gray-500/30 transition-all duration-300 ${screenSize === 'mobile' ? 'left-0' : screenSize === 'tablet' ? 'left-16' : 'left-64'}`}>
+      <div
+        className={`fixed top-0 right-0 bg-[#000000]/95 backdrop-blur-md z-40 border-b border-gray-500/30 transition-all duration-300 ${
+          screenSize === "mobile"
+            ? "left-0"
+            : screenSize === "tablet"
+            ? "left-16"
+            : "left-64"
+        }`}
+      >
         <div className="flex items-center justify-between h-16 px-6">
-          <h1 className="text-xl font-bold text-white">
-            My Profile
-          </h1>
-         
-           
+          <h1 className="text-xl font-bold text-white">My Profile</h1>
         </div>
       </div>
 
@@ -309,8 +309,18 @@ const UserProfile = () => {
             {/* ID Card Section */}
             <div className="bg-[#232526] rounded-2xl p-6 shadow-xl border border-gray-500/20">
               <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
-                <svg className="w-5 h-5 mr-2 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V4a2 2 0 114 0v2m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2" />
+                <svg
+                  className="w-5 h-5 mr-2 text-blue-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V4a2 2 0 114 0v2m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2"
+                  />
                 </svg>
                 University ID Card
               </h3>
@@ -357,8 +367,18 @@ const UserProfile = () => {
             {/* Social Links Section */}
             <div className="bg-[#232526] rounded-2xl p-6 shadow-xl border border-gray-500/20">
               <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
-                <svg className="w-5 h-5 mr-2 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                <svg
+                  className="w-5 h-5 mr-2 text-blue-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+                  />
                 </svg>
                 Social Profiles
               </h3>
@@ -411,7 +431,9 @@ const UserProfile = () => {
                           clipRule="evenodd"
                         />
                       </svg>
-                      <span className="truncate">{user2?.githubUrl || "Not added yet"}</span>
+                      <span className="truncate">
+                        {user2?.githubUrl || "Not added yet"}
+                      </span>
                     </a>
                   )}
                 </div>
@@ -456,7 +478,9 @@ const UserProfile = () => {
                       >
                         <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
                       </svg>
-                      <span className="truncate">{user2?.linkedinUrl || "Not added yet"}</span>
+                      <span className="truncate">
+                        {user2?.linkedinUrl || "Not added yet"}
+                      </span>
                     </a>
                   )}
                 </div>
@@ -469,8 +493,18 @@ const UserProfile = () => {
             {/* Personal Information */}
             <div className="bg-[#232526] rounded-2xl p-6 shadow-xl border border-gray-500/20">
               <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
-                <svg className="w-5 h-5 mr-2 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                <svg
+                  className="w-5 h-5 mr-2 text-blue-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                  />
                 </svg>
                 Personal Information
               </h3>
@@ -480,7 +514,9 @@ const UserProfile = () => {
                     Email Address
                   </label>
                   <div className="p-3 bg-[#1a1a1a] rounded-lg border border-gray-500/30">
-                    <p className="text-white">{user?.primaryEmailAddress?.emailAddress}</p>
+                    <p className="text-white">
+                      {user?.primaryEmailAddress?.emailAddress}
+                    </p>
                   </div>
                 </div>
                 <div>
@@ -509,8 +545,18 @@ const UserProfile = () => {
             <div className="bg-[#232526] rounded-2xl p-6 shadow-xl border border-gray-500/20">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-lg font-semibold text-white flex items-center">
-                  <svg className="w-5 h-5 mr-2 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                  <svg
+                    className="w-5 h-5 mr-2 text-blue-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
+                    />
                   </svg>
                   Technical Skills
                 </h3>
@@ -588,8 +634,18 @@ const UserProfile = () => {
             {/* About Me Section */}
             <div className="bg-[#232526] rounded-2xl p-6 shadow-xl border border-gray-500/20">
               <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
-                <svg className="w-5 h-5 mr-2 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                <svg
+                  className="w-5 h-5 mr-2 text-blue-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                  />
                 </svg>
                 About Me
               </h3>

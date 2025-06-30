@@ -2,7 +2,15 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import ChatWindow from "./ChatWindow";
 import { useUser } from "@clerk/clerk-react";
-import { Search, MessageCircle, Users, ArrowLeft, MoreVertical, Plus, Bell } from "lucide-react";
+import {
+  Search,
+  MessageCircle,
+  Users,
+  ArrowLeft,
+  MoreVertical,
+  Plus,
+  Bell,
+} from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import ConnectionRequestsModal from "../components/ConnectionRequestsModal";
@@ -36,7 +44,7 @@ const ChatApp = () => {
     try {
       setIsLoading(true);
       const res = await axios.get(
-        `http://localhost:3000/api/user/profile/${clerkUser.id}`
+        `${import.meta.env.VITE_BACKEND_URL}/api/user/profile/${clerkUser.id}`
       );
       setUser(res.data);
       await fetchAllUsers(res.data._id);
@@ -51,9 +59,10 @@ const ChatApp = () => {
   const fetchAllUsers = async (currentUserId) => {
     try {
       const res = await axios.get(
-        `http://localhost:3000/api/user/getAllConnections/${currentUserId}`
+        `${
+          import.meta.env.VITE_BACKEND_URL
+        }/api/user/getAllConnections/${currentUserId}`
       );
-      console.log(res.data);
       setUsers(res.data);
     } catch (error) {
       console.error("Error fetching users:", error);
@@ -62,7 +71,11 @@ const ChatApp = () => {
 
   const fetchPendingRequestsCount = async (userId) => {
     try {
-      const res = await axios.get(`http://localhost:3000/api/user/pendingRequests/${userId}`);
+      const res = await axios.get(
+        `${
+          import.meta.env.VITE_BACKEND_URL
+        }/api/user/getPendingConnections/${userId}`
+      );
       // If the API returns an array of requests:
       setPendingCount(res.data.length);
       // If the API returns a count directly:
@@ -83,9 +96,10 @@ const ChatApp = () => {
     setShowChat(false);
   };
 
-  const filteredUsers = users.filter(u =>
-    u.fullName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    u.designation?.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredUsers = users.filter(
+    (u) =>
+      u.fullName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      u.designation?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
@@ -93,8 +107,14 @@ const ChatApp = () => {
       {/* Background decorative elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-purple-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-r from-blue-500/5 to-purple-500/5 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '4s' }}></div>
+        <div
+          className="absolute -bottom-40 -left-40 w-80 h-80 bg-purple-500/10 rounded-full blur-3xl animate-pulse"
+          style={{ animationDelay: "2s" }}
+        ></div>
+        <div
+          className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-r from-blue-500/5 to-purple-500/5 rounded-full blur-3xl animate-pulse"
+          style={{ animationDelay: "4s" }}
+        ></div>
       </div>
 
       {/* Sidebar - Hidden on mobile when chat is open */}
@@ -106,7 +126,7 @@ const ChatApp = () => {
         {/* Header */}
         <div className=" bg-[#000000] backdrop-blur-xl border-b border-gray-700/50 p-4 md:p-4 shadow-lg">
           <div className="flex items-center gap-3">
-            <button 
+            <button
               onClick={() => navigate(-1)}
               className="p-2 hover:bg-white/10 rounded-xl cursor-pointer transition-all duration-300 group hover:scale-105"
             >
@@ -172,10 +192,9 @@ const ChatApp = () => {
                 {searchQuery ? "No matches found" : "No connections yet"}
               </h3>
               <p className="text-gray-400 text-sm max-w-xs">
-                {searchQuery 
-                  ? "Try adjusting your search terms" 
-                  : "Start connecting with your campus community"
-                }
+                {searchQuery
+                  ? "Try adjusting your search terms"
+                  : "Start connecting with your campus community"}
               </p>
             </div>
           ) : (
@@ -188,7 +207,9 @@ const ChatApp = () => {
                   transition={{ duration: 0.3, delay: index * 0.05 }}
                   onClick={() => handleUserSelect(u)}
                   className={`group flex items-center p-3 md:p-4 cursor-pointer rounded-2xl transition-all duration-300 hover:bg-gray-800/50 hover:scale-[1.02] hover:shadow-lg ${
-                    recipient?._id === u._id ? "bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-500/30 shadow-lg" : ""
+                    recipient?._id === u._id
+                      ? "bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-500/30 shadow-lg"
+                      : ""
                   }`}
                 >
                   <div className="relative flex-shrink-0">
@@ -236,8 +257,8 @@ const ChatApp = () => {
             {isMobile && (
               <div className="md:hidden bg-gradient-to-br from-gray-900/95 via-gray-800/90 to-gray-900/95 backdrop-blur-xl border-b border-gray-700/50 p-3 shadow-lg">
                 <div className="flex items-center">
-                  <button 
-                    onClick={handleBackToContacts} 
+                  <button
+                    onClick={handleBackToContacts}
                     className="p-2 hover:bg-white/10 rounded-xl transition-all duration-300 mr-3 hover:scale-105"
                   >
                     <ArrowLeft className="w-5 h-5 text-gray-400" />
@@ -261,11 +282,16 @@ const ChatApp = () => {
                 </div>
               </div>
             )}
-            <ChatWindow user={user} recipient={recipient} clerkUser={clerkUser} isMobile={isMobile} />
+            <ChatWindow
+              user={user}
+              recipient={recipient}
+              clerkUser={clerkUser}
+              isMobile={isMobile}
+            />
           </>
         ) : (
           <div className="flex-1 flex flex-col items-center justify-center text-gray-400 bg-transparent relative">
-            <motion.div 
+            <motion.div
               className="bg-gradient-to-br from-gray-900/95 via-gray-800/90 to-gray-900/95 backdrop-blur-xl rounded-3xl border border-gray-700/50 p-8 md:p-12 text-center max-w-md mx-4 shadow-2xl"
               initial={{ opacity: 0, y: 20, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -278,7 +304,8 @@ const ChatApp = () => {
                 Welcome to Campus Connect
               </h3>
               <p className="text-gray-400 mb-6 leading-relaxed">
-                Select a connection from the list to start chatting and building meaningful relationships
+                Select a connection from the list to start chatting and building
+                meaningful relationships
               </p>
               <div className="flex items-center justify-center gap-2 text-xs text-gray-500">
                 <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
@@ -300,23 +327,32 @@ const ChatApp = () => {
         .custom-scrollbar::-webkit-scrollbar {
           width: 6px;
         }
-        
+
         .custom-scrollbar::-webkit-scrollbar-track {
           background: rgba(55, 65, 81, 0.3);
           border-radius: 3px;
         }
-        
+
         .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: linear-gradient(to bottom, rgba(59, 130, 246, 0.5), rgba(147, 51, 234, 0.5));
+          background: linear-gradient(
+            to bottom,
+            rgba(59, 130, 246, 0.5),
+            rgba(147, 51, 234, 0.5)
+          );
           border-radius: 3px;
         }
-        
+
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-          background: linear-gradient(to bottom, rgba(59, 130, 246, 0.7), rgba(147, 51, 234, 0.7));
+          background: linear-gradient(
+            to bottom,
+            rgba(59, 130, 246, 0.7),
+            rgba(147, 51, 234, 0.7)
+          );
         }
 
         @keyframes pulse {
-          0%, 100% {
+          0%,
+          100% {
             opacity: 1;
           }
           50% {

@@ -42,7 +42,7 @@ const Account = () => {
   const fetchUserProfile = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:3000/api/user/profile/${user.id}`
+        `${import.meta.env.VITE_BACKEND_URL}/api/user/profile/${user.id}`
       );
       setMainUser(response.data);
     } catch (error) {
@@ -54,7 +54,9 @@ const Account = () => {
   const handleReject = async (reqId) => {
     try {
       const response = await axios.patch(
-        `http://localhost:3000/api/user/connectionsRejected/${mainUser._id}`,
+        `${import.meta.env.VITE_BACKEND_URL}/api/user/connectionsRejected/${
+          mainUser._id
+        }`,
         { senderId: reqId }
       );
       toast.success("Connection rejected successfully.");
@@ -67,7 +69,9 @@ const Account = () => {
   const handleAccept = async (reqId) => {
     try {
       const response = await axios.patch(
-        `http://localhost:3000/api/user/connectionsAccepted/${mainUser._id}`,
+        `${import.meta.env.VITE_BACKEND_URL}/api/user/connectionsAccepted/${
+          mainUser._id
+        }`,
         { senderId: reqId }
       );
       toast.success("Connection accepted successfully.");
@@ -81,14 +85,27 @@ const Account = () => {
     setShowModal(true);
   };
 
-  const MenuCard = ({ icon: Icon, label, description, onClick, variant = "default", badge }) => {
+  const MenuCard = ({
+    icon: Icon,
+    label,
+    description,
+    onClick,
+    variant = "default",
+    badge,
+  }) => {
     const variants = {
-      default: "bg-gradient-to-br from-gray-800/50 to-gray-900/50 border-gray-700/50 hover:border-gray-600/50",
-      primary: "bg-gradient-to-br from-blue-600/20 to-blue-700/20 border-blue-500/50 hover:border-blue-400/50",
-      warning: "bg-gradient-to-br from-orange-600/20 to-orange-700/20 border-orange-500/50 hover:border-orange-400/50",
-      danger: "bg-gradient-to-br from-red-600/20 to-red-700/20 border-red-500/50 hover:border-red-400/50",
-      success: "bg-gradient-to-br from-green-600/20 to-green-700/20 border-green-500/50 hover:border-green-400/50",
-      premium: "bg-gradient-to-br from-purple-600/20 to-purple-700/20 border-purple-500/50 hover:border-purple-400/50",
+      default:
+        "bg-gradient-to-br from-gray-800/50 to-gray-900/50 border-gray-700/50 hover:border-gray-600/50",
+      primary:
+        "bg-gradient-to-br from-blue-600/20 to-blue-700/20 border-blue-500/50 hover:border-blue-400/50",
+      warning:
+        "bg-gradient-to-br from-orange-600/20 to-orange-700/20 border-orange-500/50 hover:border-orange-400/50",
+      danger:
+        "bg-gradient-to-br from-red-600/20 to-red-700/20 border-red-500/50 hover:border-red-400/50",
+      success:
+        "bg-gradient-to-br from-green-600/20 to-green-700/20 border-green-500/50 hover:border-green-400/50",
+      premium:
+        "bg-gradient-to-br from-purple-600/20 to-purple-700/20 border-purple-500/50 hover:border-purple-400/50",
     };
 
     const iconVariants = {
@@ -108,7 +125,9 @@ const Account = () => {
         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
         <div className="relative flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <div className={`p-3 rounded-xl bg-gray-800/50 ${iconVariants[variant]} group-hover:scale-110 transition-transform duration-300`}>
+            <div
+              className={`p-3 rounded-xl bg-gray-800/50 ${iconVariants[variant]} group-hover:scale-110 transition-transform duration-300`}
+            >
               <Icon className="w-6 h-6" />
             </div>
             <div className="text-left">
@@ -160,8 +179,10 @@ const Account = () => {
             </div>
             <div className="flex-1">
               <div className="flex items-center gap-3 mb-2">
-                <h1 className="text-3xl font-bold text-white">{user?.fullName}</h1>
-                {mainUser?.role === 'faculty' && (
+                <h1 className="text-3xl font-bold text-white">
+                  {user?.fullName}
+                </h1>
+                {mainUser?.role === "faculty" && (
                   <Crown className="w-6 h-6 text-yellow-400" />
                 )}
               </div>
@@ -173,7 +194,8 @@ const Account = () => {
                     : "Student"}
                 </span>
                 <span className="text-gray-400 text-sm">
-                  Member since {format(new Date(user?.createdAt || Date.now()), "MMM yyyy")}
+                  Member since{" "}
+                  {format(new Date(user?.createdAt || Date.now()), "MMM yyyy")}
                 </span>
               </div>
             </div>
@@ -254,7 +276,9 @@ const Account = () => {
             <p className="text-gray-400 text-sm">
               © {format(new Date(), "yyyy")} Campus Connect
             </p>
-            <p className="text-gray-500 text-xs mt-1">Version 1.0.0 • Built with ❤️</p>
+            <p className="text-gray-500 text-xs mt-1">
+              Version 1.0.0 • Built with ❤️
+            </p>
           </div>
         </div>
       </div>

@@ -5,7 +5,15 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { FiEdit } from "react-icons/fi";
-import { Upload, X, Camera, Building2, GraduationCap, UserCheck, Shield } from "lucide-react";
+import {
+  Upload,
+  X,
+  Camera,
+  Building2,
+  GraduationCap,
+  UserCheck,
+  Shield,
+} from "lucide-react";
 
 function FacultyRole() {
   const [collegeId, setCollegeId] = useState("");
@@ -28,7 +36,7 @@ function FacultyRole() {
   const fetchUserProfile = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:3000/api/user/profile/${user.id}`
+        `${import.meta.env.VITE_BACKEND_URL}/api/user/profile/${user.id}`
       );
       const data = response.data;
       setCollegeId(data?.collegeId);
@@ -38,7 +46,7 @@ function FacultyRole() {
       console.error("Error fetching user profile:", error);
     }
   };
-  
+
   const designations = ["Principal", "HOD", "Dean", "Teacher", "Faculty"];
 
   const handleSubmit = async (e) => {
@@ -54,7 +62,7 @@ function FacultyRole() {
       }
 
       await axios.patch(
-        "http://localhost:3000/api/user/upload-profile",
+        "${import.meta.env.VITE_BACKEND_URL}/api/user/upload-profile",
         formData,
         {
           headers: { "Content-Type": "multipart/form-data" },
@@ -80,7 +88,6 @@ function FacultyRole() {
   return (
     <div className="min-h-screen bg-[#000000] text-white">
       {/* Header */}
-     
 
       {/* Main Content */}
       <div className="pt-20 pb-24 px-4 sm:px-6 lg:px-8">
@@ -89,13 +96,16 @@ function FacultyRole() {
           <div className="text-center mb-8">
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600/20 to-indigo-600/20 rounded-full border border-blue-500/30 mb-4">
               <Shield className="w-4 h-4 text-blue-400" />
-              <span className="text-sm font-medium text-blue-300">Authority Verification</span>
+              <span className="text-sm font-medium text-blue-300">
+                Authority Verification
+              </span>
             </div>
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-2">
               Complete Your Faculty Profile
             </h2>
             <p className="text-gray-400 text-lg max-w-2xl mx-auto">
-              Verify your identity and establish your authority within the campus community
+              Verify your identity and establish your authority within the
+              campus community
             </p>
           </div>
 
@@ -114,10 +124,14 @@ function FacultyRole() {
                       <UserCheck className="w-4 h-4 text-white" />
                     </div>
                   </div>
-                  <h3 className="text-xl font-semibold text-white mt-4">{user?.fullName}</h3>
-                  <p className="text-gray-400 text-sm">{user?.primaryEmailAddress?.emailAddress}</p>
+                  <h3 className="text-xl font-semibold text-white mt-4">
+                    {user?.fullName}
+                  </h3>
+                  <p className="text-gray-400 text-sm">
+                    {user?.primaryEmailAddress?.emailAddress}
+                  </p>
                 </div>
-                
+
                 <div className="space-y-4">
                   <div className="flex items-center gap-3 p-3 bg-[#1a1a1a] rounded-xl border border-gray-500/20">
                     <div className="p-2 bg-blue-600/20 rounded-lg">
@@ -125,17 +139,21 @@ function FacultyRole() {
                     </div>
                     <div>
                       <p className="text-xs text-gray-400">College ID</p>
-                      <p className="text-sm font-medium text-white">{collegeId || "Not provided"}</p>
+                      <p className="text-sm font-medium text-white">
+                        {collegeId || "Not provided"}
+                      </p>
                     </div>
                   </div>
-                  
+
                   <div className="flex items-center gap-3 p-3 bg-[#1a1a1a] rounded-xl border border-gray-500/20">
                     <div className="p-2 bg-indigo-600/20 rounded-lg">
                       <GraduationCap className="w-4 h-4 text-indigo-400" />
                     </div>
                     <div>
                       <p className="text-xs text-gray-400">Designation</p>
-                      <p className="text-sm font-medium text-white">{designation || "Not selected"}</p>
+                      <p className="text-sm font-medium text-white">
+                        {designation || "Not selected"}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -146,8 +164,12 @@ function FacultyRole() {
             <div className="lg:col-span-2">
               <div className="bg-[#111111] rounded-2xl border border-gray-500/20 overflow-hidden">
                 <div className="p-6 border-b border-gray-500/20">
-                  <h3 className="text-xl font-semibold text-white">Registration Details</h3>
-                  <p className="text-gray-400 text-sm mt-1">Fill in your faculty information below</p>
+                  <h3 className="text-xl font-semibold text-white">
+                    Registration Details
+                  </h3>
+                  <p className="text-gray-400 text-sm mt-1">
+                    Fill in your faculty information below
+                  </p>
                 </div>
 
                 <form onSubmit={handleSubmit} className="p-6 space-y-6">
@@ -186,7 +208,9 @@ function FacultyRole() {
                             />
                             <button
                               type="button"
-                              onClick={() => document.getElementById("idCardInput").click()}
+                              onClick={() =>
+                                document.getElementById("idCardInput").click()
+                              }
                               className="absolute top-2 right-2 p-2 bg-black/70 hover:bg-black/90 rounded-full text-white backdrop-blur-sm transition-all duration-200"
                             >
                               <Camera className="w-4 h-4" />
@@ -203,7 +227,9 @@ function FacultyRole() {
                               </span>{" "}
                               or drag and drop
                             </p>
-                            <p className="text-xs text-gray-500 mt-2">PNG, JPG up to 2MB</p>
+                            <p className="text-xs text-gray-500 mt-2">
+                              PNG, JPG up to 2MB
+                            </p>
                           </div>
                         )}
                         <input
@@ -230,9 +256,15 @@ function FacultyRole() {
                         className="w-full px-4 py-4 bg-[#1a1a1a] border border-gray-500/30 rounded-xl focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 text-white appearance-none pr-10 transition-all duration-200"
                         required
                       >
-                        <option value="" className="bg-[#1a1a1a] text-gray-400">Select your designation</option>
+                        <option value="" className="bg-[#1a1a1a] text-gray-400">
+                          Select your designation
+                        </option>
                         {designations.map((item) => (
-                          <option key={item} value={item.toLowerCase()} className="bg-[#1a1a1a] text-white">
+                          <option
+                            key={item}
+                            value={item.toLowerCase()}
+                            className="bg-[#1a1a1a] text-white"
+                          >
                             {item}
                           </option>
                         ))}

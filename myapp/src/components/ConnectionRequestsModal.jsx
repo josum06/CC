@@ -19,7 +19,9 @@ const ConnectionRequestsModal = ({ isOpen, onClose, userId, navigate }) => {
     setLoading(true);
     try {
       const response = await axios.get(
-        `http://localhost:3000/api/user/getPendingConnections/${userId}`
+        `${
+          import.meta.env.VITE_BACKEND_URL
+        }/api/user/getPendingConnections/${userId}`
       );
       setRequests(response.data);
     } catch (error) {
@@ -32,7 +34,9 @@ const ConnectionRequestsModal = ({ isOpen, onClose, userId, navigate }) => {
   const handleReject = async (reqId) => {
     try {
       const response = await axios.patch(
-        `http://localhost:3000/api/user/connectionsRejected/${userId}`,
+        `${
+          import.meta.env.VITE_BACKEND_URL
+        }/api/user/connectionsRejected/${userId}`,
         { senderId: reqId }
       );
       setRequests(response.data);
@@ -45,7 +49,9 @@ const ConnectionRequestsModal = ({ isOpen, onClose, userId, navigate }) => {
   const handleAccept = async (reqId) => {
     try {
       const response = await axios.patch(
-        `http://localhost:3000/api/user/connectionsAccepted/${userId}`,
+        `${
+          import.meta.env.VITE_BACKEND_URL
+        }/api/user/connectionsAccepted/${userId}`,
         { senderId: reqId }
       );
       setRequests(response.data);
@@ -72,13 +78,19 @@ const ConnectionRequestsModal = ({ isOpen, onClose, userId, navigate }) => {
                   <Bell className="w-6 h-6 text-blue-400" />
                 </div>
                 <div>
-                  <h2 className="text-2xl font-bold text-white">Connection Requests</h2>
-                  <p className="text-gray-400 text-sm">Manage your incoming requests</p>
+                  <h2 className="text-2xl font-bold text-white">
+                    Connection Requests
+                  </h2>
+                  <p className="text-gray-400 text-sm">
+                    Manage your incoming requests
+                  </p>
                 </div>
               </div>
               {requests.length > 0 && (
                 <div className="px-3 py-1 bg-gradient-to-r from-red-500/20 to-red-600/20 border border-red-500/30 rounded-full">
-                  <span className="text-red-300 text-sm font-medium">{requests.length}</span>
+                  <span className="text-red-300 text-sm font-medium">
+                    {requests.length}
+                  </span>
                 </div>
               )}
             </div>
@@ -95,7 +107,7 @@ const ConnectionRequestsModal = ({ isOpen, onClose, userId, navigate }) => {
                     className="group bg-gradient-to-br from-gray-800/60 to-gray-700/60 border border-gray-600/40 rounded-2xl p-4 backdrop-blur-sm hover:border-gray-500/60 hover:from-gray-800/80 hover:to-gray-700/80 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg relative overflow-hidden"
                     style={{
                       animationDelay: `${index * 100}ms`,
-                      animation: 'slideInUp 0.5s ease-out forwards'
+                      animation: "slideInUp 0.5s ease-out forwards",
                     }}
                   >
                     {/* Hover effect overlay */}
@@ -117,9 +129,13 @@ const ConnectionRequestsModal = ({ isOpen, onClose, userId, navigate }) => {
                             {request.fullName}
                           </h3>
                           <div className="flex items-center gap-2 mt-1">
-                            <span className="text-gray-400 text-sm">Wants to connect</span>
+                            <span className="text-gray-400 text-sm">
+                              Wants to connect
+                            </span>
                             <div className="w-1 h-1 bg-gray-500 rounded-full"></div>
-                            <span className="text-gray-500 text-xs">Just now</span>
+                            <span className="text-gray-500 text-xs">
+                              Just now
+                            </span>
                           </div>
                         </div>
                       </div>
@@ -155,8 +171,12 @@ const ConnectionRequestsModal = ({ isOpen, onClose, userId, navigate }) => {
                     <Check className="w-3 h-3 text-blue-400" />
                   </div>
                 </div>
-                <h3 className="text-white text-xl font-semibold mb-2">All caught up!</h3>
-                <p className="text-gray-400 text-sm mb-4">No pending connection requests</p>
+                <h3 className="text-white text-xl font-semibold mb-2">
+                  All caught up!
+                </h3>
+                <p className="text-gray-400 text-sm mb-4">
+                  No pending connection requests
+                </p>
                 <div className="w-16 h-1 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full mx-auto"></div>
               </div>
             )}
@@ -206,15 +226,23 @@ const ConnectionRequestsModal = ({ isOpen, onClose, userId, navigate }) => {
           border-radius: 3px;
         }
         .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: linear-gradient(to bottom, rgba(59, 130, 246, 0.5), rgba(147, 51, 234, 0.5));
+          background: linear-gradient(
+            to bottom,
+            rgba(59, 130, 246, 0.5),
+            rgba(147, 51, 234, 0.5)
+          );
           border-radius: 3px;
         }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-          background: linear-gradient(to bottom, rgba(59, 130, 246, 0.7), rgba(147, 51, 234, 0.7));
+          background: linear-gradient(
+            to bottom,
+            rgba(59, 130, 246, 0.7),
+            rgba(147, 51, 234, 0.7)
+          );
         }
       `}</style>
     </ModalWindow>
   );
 };
 
-export default ConnectionRequestsModal; 
+export default ConnectionRequestsModal;

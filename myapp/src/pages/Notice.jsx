@@ -16,7 +16,9 @@ const Notice = () => {
   const fetchPosts = async (pageNum) => {
     try {
       const res = await axios.get(
-        `http://localhost:3000/api/admin-post/get-post?page=${pageNum}&category=Notice`
+        `${
+          import.meta.env.VITE_BACKEND_URL
+        }/api/admin-post/get-post?page=${pageNum}&category=Notice`
       );
       const newPost = res.data.post;
 
@@ -27,7 +29,6 @@ const Notice = () => {
 
       setNotices((prev) => [...prev, ...newPost]);
       setPage(pageNum);
-      console.log("Post are:-", newPost);
     } catch (err) {
       console.error("Error fetching notices:", err);
     }
@@ -54,7 +55,9 @@ const Notice = () => {
           {notices.length === 0 ? (
             <div className="text-center py-12">
               <div className="text-6xl mb-4">📭</div>
-              <h3 className="text-xl font-semibold text-gray-300 mb-2">No Notices Yet</h3>
+              <h3 className="text-xl font-semibold text-gray-300 mb-2">
+                No Notices Yet
+              </h3>
               <p className="text-gray-500">Check back later for updates</p>
             </div>
           ) : (
@@ -62,7 +65,10 @@ const Notice = () => {
               <NoticeCard
                 key={index}
                 title={notice.title}
-                date={format(parseISO(notice?.createdAt), "dd MMM yyyy, hh:mm a")}
+                date={format(
+                  parseISO(notice?.createdAt),
+                  "dd MMM yyyy, hh:mm a"
+                )}
                 postedBy={notice?.author?.fullName}
                 profilePhoto={notice?.author?.profileImage}
                 role={notice?.author?.designation}

@@ -1,7 +1,7 @@
 import axios from "axios";
 import { format, parseISO } from "date-fns";
 import { useEffect, useState } from "react";
-import { Heart, MessageCircle, User, Clock } from 'lucide-react';
+import { Heart, MessageCircle, User, Clock } from "lucide-react";
 import { useUser } from "@clerk/clerk-react";
 
 function Comments({ postId }) {
@@ -13,7 +13,7 @@ function Comments({ postId }) {
     const fetchComments = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:3000/api/post/get-comments/${postId}`
+          `${import.meta.env.VITE_BACKEND_URL}/api/post/get-comments/${postId}`
         );
         setComments(response.data.comments);
       } catch (error) {
@@ -25,7 +25,7 @@ function Comments({ postId }) {
   }, [postId]);
 
   const handleLikeComment = (commentId) => {
-    setLikedComments(prev => {
+    setLikedComments((prev) => {
       const newLiked = new Set(prev);
       if (newLiked.has(commentId)) {
         newLiked.delete(commentId);
@@ -41,10 +41,10 @@ function Comments({ postId }) {
     const now = new Date();
     const diffInHours = Math.floor((now - date) / (1000 * 60 * 60));
 
-    if (diffInHours < 1) return 'Just now';
+    if (diffInHours < 1) return "Just now";
     if (diffInHours < 24) return `${diffInHours}h`;
-    if (diffInHours < 48) return 'Yesterday';
-    return format(date, 'd MMM');
+    if (diffInHours < 48) return "Yesterday";
+    return format(date, "d MMM");
   };
 
   return (
@@ -63,7 +63,7 @@ function Comments({ postId }) {
                   alt={comment?.userId?.fullName}
                   className="w-full h-full object-cover group-hover/avatar:scale-110 transition-transform duration-300"
                   onError={(e) => {
-                    e.target.src = 'https://via.placeholder.com/40';
+                    e.target.src = "https://via.placeholder.com/40";
                   }}
                 />
               </div>
@@ -79,8 +79,13 @@ function Comments({ postId }) {
                       {comment?.userId?.fullName}
                     </span>
                     <div className="flex items-center space-x-1 text-xs text-gray-500">
-                      <Clock size={10} className="sm:w-3 sm:h-3 text-gray-600" />
-                      <span className="text-xs">{getTimeAgo(comment.createdAt)}</span>
+                      <Clock
+                        size={10}
+                        className="sm:w-3 sm:h-3 text-gray-600"
+                      />
+                      <span className="text-xs">
+                        {getTimeAgo(comment.createdAt)}
+                      </span>
                     </div>
                   </div>
                   <p className="text-xs sm:text-sm text-gray-300 mt-1 break-words leading-relaxed">
@@ -110,7 +115,10 @@ function Comments({ postId }) {
               <div className="flex items-center space-x-4 sm:space-x-6 mt-2 sm:mt-3">
                 {likedComments.has(comment._id) && (
                   <span className="text-xs text-red-400 flex items-center space-x-1">
-                    <Heart size={10} className="sm:w-3 sm:h-3 fill-red-500 stroke-red-500" />
+                    <Heart
+                      size={10}
+                      className="sm:w-3 sm:h-3 fill-red-500 stroke-red-500"
+                    />
                     <span>Liked</span>
                   </span>
                 )}
@@ -125,8 +133,12 @@ function Comments({ postId }) {
           <div className="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-3 sm:mb-4 bg-gradient-to-br from-gray-800/50 to-gray-700/50 rounded-full flex items-center justify-center border border-gray-600/30">
             <MessageCircle className="w-8 h-8 sm:w-10 sm:h-10 text-gray-600" />
           </div>
-          <h3 className="text-base sm:text-lg font-semibold text-gray-300 mb-1 sm:mb-2">No comments yet</h3>
-          <p className="text-xs sm:text-sm text-gray-500 text-center">Be the first to share your thoughts</p>
+          <h3 className="text-base sm:text-lg font-semibold text-gray-300 mb-1 sm:mb-2">
+            No comments yet
+          </h3>
+          <p className="text-xs sm:text-sm text-gray-500 text-center">
+            Be the first to share your thoughts
+          </p>
         </div>
       )}
     </div>

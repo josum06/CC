@@ -5,7 +5,7 @@ import Sidebar from "./Sidebar";
 import axios from "axios";
 import { useUser } from "@clerk/clerk-react";
 const Navbar = () => {
-  const {user} = useUser();
+  const { user } = useUser();
   const navigate = useNavigate();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [searchUsers, setSearchUsers] = useState([]);
@@ -33,14 +33,16 @@ const Navbar = () => {
       return;
     }
     // Perform search logic here, e.g., API call to fetch search results
-    const res = await axios.get("http://localhost:3000/api/user/searchUser", {
-      params: {
-        query: searchQuery,
-        clerkId: user.id,
-      },
-    });
+    const res = await axios.get(
+      "${import.meta.env.VITE_BACKEND_URL}/api/user/searchUser",
+      {
+        params: {
+          query: searchQuery,
+          clerkId: user.id,
+        },
+      }
+    );
     setSearchUsers(res.data);
-    console.log(res.data);
     setIsSearchActive(true);
   };
   const toggleSidebar = () => {
@@ -48,8 +50,6 @@ const Navbar = () => {
   };
 
   const handleClick = async (userId) => {
-    // console.log(userId);
-
     navigate("/NetworkProfile", {
       state: { userData: { userId } },
     });
@@ -60,33 +60,36 @@ const Navbar = () => {
       <nav className="w-full bg-[#02040a] shadow-md z-50 border-b border-gray-600">
         <div className="container mx-auto px-4 py-3 flex items-center justify-between">
           {/* Logo */}
-          <button onClick={() => navigate("/")}  ><div className="text-2xl font-bold text-gray-100 cursor-pointer">🚀Company</div></button>
+          <button onClick={() => navigate("/")}>
+            <div className="text-2xl font-bold text-gray-100 cursor-pointer">
+              🚀Company
+            </div>
+          </button>
 
           {/* Search Bar with Button Inside */}
-         
 
           {/* Icons */}
           <div className="flex items-center gap-1">
-          <div className="hidden md:flex items-center w-full max-w-md relative">
-            <input
-              type="text"
-              placeholder="Search..."
-              onChange={handleChange}
-              className="w-full px-3 py-1 border text-md me-2 focus:border-blue-500 border-gray-500 rounded-2xl pr-10 focus:outline-none placeholder:text-gray-400/50 text-gray-100 placeholder:text-sm"
-            />
-            
-          </div>
-            <button onClick={() => navigate("/Chats")} className="hover:bg-gray-500/50 p-2 rounded-full cursor-pointer">
+            <div className="hidden md:flex items-center w-full max-w-md relative">
+              <input
+                type="text"
+                placeholder="Search..."
+                onChange={handleChange}
+                className="w-full px-3 py-1 border text-md me-2 focus:border-blue-500 border-gray-500 rounded-2xl pr-10 focus:outline-none placeholder:text-gray-400/50 text-gray-100 placeholder:text-sm"
+              />
+            </div>
+            <button
+              onClick={() => navigate("/Chats")}
+              className="hover:bg-gray-500/50 p-2 rounded-full cursor-pointer"
+            >
               <FaComments className="text-xl  text-gray-100" />
             </button>
-            <button onClick={toggleSidebar}className="hover:bg-gray-500/50 p-2 rounded-full cursor-pointer" >
-            <FaUser
-              className="text-lg  text-gray-100"
-              
-            />
-
+            <button
+              onClick={toggleSidebar}
+              className="hover:bg-gray-500/50 p-2 rounded-full cursor-pointer"
+            >
+              <FaUser className="text-lg  text-gray-100" />
             </button>
-            
           </div>
         </div>
 

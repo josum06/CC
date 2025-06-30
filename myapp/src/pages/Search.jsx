@@ -1,7 +1,16 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaSearch, FaComments, FaUser, FaArrowLeft } from "react-icons/fa";
-import { Eye, User, FileText, Bell, Star, TrendingUp, Calendar, Clock } from 'lucide-react';
+import {
+  Eye,
+  User,
+  FileText,
+  Bell,
+  Star,
+  TrendingUp,
+  Calendar,
+  Clock,
+} from "lucide-react";
 import axios from "axios";
 import { useUser } from "@clerk/clerk-react";
 
@@ -41,12 +50,15 @@ const SearchPage = () => {
 
     setIsLoading(true);
     try {
-      const res = await axios.get("http://localhost:3000/api/user/searchUser", {
-        params: {
-          query: query,
-          clerkId: user.id,
-        },
-      });
+      const res = await axios.get(
+        `${import.meta.env.VITE_BACKEND_URL}/api/user/searchUser`,
+        {
+          params: {
+            query: query,
+            clerkId: user.id,
+          },
+        }
+      );
       setSearchUsers(res.data);
       setIsSearchActive(true);
     } catch (err) {
@@ -115,80 +127,88 @@ const SearchPage = () => {
           </div>
 
           {/* Search Results Dropdown */}
-          {isSearchActive &&
-            (searchUsers.length > 0 || isLoading || error) && (
-              <div className="absolute left-0 right-0 mt-3 bg-gradient-to-br from-gray-800/95 via-gray-700/90 to-gray-800/95 
-                border border-gray-500/30 shadow-2xl rounded-2xl z-50 max-h-80 overflow-y-auto backdrop-blur-md">
-                {isLoading && (
-                  <div className="flex items-center justify-center py-8">
-                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
-                    <span className="ml-3 text-gray-300">Searching...</span>
+          {isSearchActive && (searchUsers.length > 0 || isLoading || error) && (
+            <div
+              className="absolute left-0 right-0 mt-3 bg-gradient-to-br from-gray-800/95 via-gray-700/90 to-gray-800/95 
+                border border-gray-500/30 shadow-2xl rounded-2xl z-50 max-h-80 overflow-y-auto backdrop-blur-md"
+            >
+              {isLoading && (
+                <div className="flex items-center justify-center py-8">
+                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
+                  <span className="ml-3 text-gray-300">Searching...</span>
+                </div>
+              )}
+
+              {error && (
+                <div className="px-6 py-4 text-red-400 text-center bg-red-500/10 border-b border-red-500/20">
+                  {error}
+                </div>
+              )}
+
+              {!isLoading &&
+                !error &&
+                searchUsers.length === 0 &&
+                searchQuery && (
+                  <div className="px-6 py-8 text-gray-400 text-center">
+                    <div className="text-4xl mb-3">🔍</div>
+                    <p>No users found for "{searchQuery}"</p>
                   </div>
                 )}
 
-                {error && (
-                  <div className="px-6 py-4 text-red-400 text-center bg-red-500/10 border-b border-red-500/20">
-                    {error}
-                  </div>
-                )}
-
-                {!isLoading &&
-                  !error &&
-                  searchUsers.length === 0 &&
-                  searchQuery && (
-                    <div className="px-6 py-8 text-gray-400 text-center">
-                      <div className="text-4xl mb-3">🔍</div>
-                      <p>No users found for "{searchQuery}"</p>
-                    </div>
-                  )}
-
-                {!isLoading &&
-                  !error &&
-                  searchUsers.map((user) => (
-                    <div
-                      key={user._id}
-                      className="flex items-center px-6 py-4 hover:bg-white/5 cursor-pointer transition-all duration-300 
+              {!isLoading &&
+                !error &&
+                searchUsers.map((user) => (
+                  <div
+                    key={user._id}
+                    className="flex items-center px-6 py-4 hover:bg-white/5 cursor-pointer transition-all duration-300 
                         border-b border-gray-500/20 last:border-b-0 group"
-                      onClick={() => handleUserClick(user._id)}
-                    >
-                      <div className="relative mr-4">
-                        <img
-                          src={user.profileImage || "/default-avatar.png"}
-                          alt={`${user.fullName}'s avatar`}
-                          className="w-12 h-12 rounded-full object-cover ring-2 ring-white/20 
+                    onClick={() => handleUserClick(user._id)}
+                  >
+                    <div className="relative mr-4">
+                      <img
+                        src={user.profileImage || "/default-avatar.png"}
+                        alt={`${user.fullName}'s avatar`}
+                        className="w-12 h-12 rounded-full object-cover ring-2 ring-white/20 
                             group-hover:ring-blue-400/50 transition-all duration-300"
-                          onError={(e) => {
-                            e.target.style.display = 'none';
-                            e.target.nextSibling.style.display = 'flex';
-                          }}
-                        />
-                        <div className="hidden w-12 h-12 rounded-full bg-gradient-to-br from-gray-600 to-gray-700 
-                          items-center justify-center ring-2 ring-white/20">
-                          <User size={20} className="text-gray-300" />
-                        </div>
-                        <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-gray-800"></div>
+                        onError={(e) => {
+                          e.target.style.display = "none";
+                          e.target.nextSibling.style.display = "flex";
+                        }}
+                      />
+                      <div
+                        className="hidden w-12 h-12 rounded-full bg-gradient-to-br from-gray-600 to-gray-700 
+                          items-center justify-center ring-2 ring-white/20"
+                      >
+                        <User size={20} className="text-gray-300" />
                       </div>
-                      <div className="flex-1">
-                        <span className="text-gray-100 font-semibold block group-hover:text-blue-400 transition-colors duration-300">
-                          {user.fullName}
-                        </span>
-                        {user.username && (
-                          <span className="text-gray-400 text-sm">
-                            @{user.username}
-                          </span>
-                        )}
-                      </div>
-                      <Eye size={18} className="text-gray-400 group-hover:text-blue-400 transition-colors duration-300" />
+                      <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-gray-800"></div>
                     </div>
-                  ))}
-              </div>
-            )}
+                    <div className="flex-1">
+                      <span className="text-gray-100 font-semibold block group-hover:text-blue-400 transition-colors duration-300">
+                        {user.fullName}
+                      </span>
+                      {user.username && (
+                        <span className="text-gray-400 text-sm">
+                          @{user.username}
+                        </span>
+                      )}
+                    </div>
+                    <Eye
+                      size={18}
+                      className="text-gray-400 group-hover:text-blue-400 transition-colors duration-300"
+                    />
+                  </div>
+                ))}
+            </div>
+          )}
         </div>
 
         {/* Search Tips */}
         {!searchQuery && (
-          <div className="bg-gradient-to-br from-gray-800/30 via-gray-700/20 to-gray-800/30 rounded-2xl p-8 
-            border border-gray-500/30 backdrop-blur-sm">
+          <div
+            className="bg-gradient-to-br from-gray-800/30 via-gray-700/20 to-gray-800/30 rounded-2xl p-8 
+            border border-gray-500/30 backdrop-blur-sm"
+          >
             <h3 className="text-xl font-semibold text-gray-100 mb-4 flex items-center gap-2">
               <FileText size={24} className="text-blue-400" />
               Search Tips
@@ -248,12 +268,14 @@ const SearchPage = () => {
                             className="w-12 h-12 rounded-full object-cover ring-2 ring-white/20 
                               group-hover:ring-blue-400/50 transition-all duration-300"
                             onError={(e) => {
-                              e.target.style.display = 'none';
-                              e.target.nextSibling.style.display = 'flex';
+                              e.target.style.display = "none";
+                              e.target.nextSibling.style.display = "flex";
                             }}
                           />
-                          <div className="hidden w-12 h-12 rounded-full bg-gradient-to-br from-gray-600 to-gray-700 
-                            items-center justify-center ring-2 ring-white/20">
+                          <div
+                            className="hidden w-12 h-12 rounded-full bg-gradient-to-br from-gray-600 to-gray-700 
+                            items-center justify-center ring-2 ring-white/20"
+                          >
                             <User size={24} className="text-gray-300" />
                           </div>
                           <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-gray-800"></div>
@@ -269,13 +291,18 @@ const SearchPage = () => {
                           )}
                         </div>
                       </div>
-                      <Eye size={20} className="text-gray-400 group-hover:text-blue-400 transition-colors duration-300" />
+                      <Eye
+                        size={20}
+                        className="text-gray-400 group-hover:text-blue-400 transition-colors duration-300"
+                      />
                     </div>
                   </div>
 
                   {/* Hover Effect Overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-r from-blue-500/0 via-blue-500/5 to-purple-500/0 
-                    opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
+                  <div
+                    className="absolute inset-0 bg-gradient-to-r from-blue-500/0 via-blue-500/5 to-purple-500/0 
+                    opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+                  ></div>
                 </div>
               ))}
             </div>

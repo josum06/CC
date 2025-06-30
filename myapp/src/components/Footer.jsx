@@ -24,7 +24,7 @@ const Footer = () => {
   const fetchUserProfile = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:3000/api/user/profile/${user.id}`
+        `${import.meta.env.VITE_BACKEND_URL}/api/user/profile/${user.id}`
       );
       const data = response.data;
       setCurrentUserRole(data?.role);

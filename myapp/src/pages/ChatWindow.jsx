@@ -38,7 +38,7 @@ const ChatWindow = ({ user, recipient }) => {
     fetchMessages();
     const handleReceiveMessage = (data) => {
       if (data.roomId !== roomId) return; // Ignore messages not in this room
-      console.log("Received message:", data);
+
       setChat((prev) => [...prev, data]);
 
       const container = chatContainerRef.current;
@@ -120,7 +120,9 @@ const ChatWindow = ({ user, recipient }) => {
   const fetchMessages = async () => {
     try {
       const res = await axios.get(
-        `http://localhost:3000/api/chat/chats/${recipient._id}?senderId=${user._id}`
+        `${import.meta.env.VITE_BACKEND_URL}/api/chat/chats/${
+          recipient._id
+        }?senderId=${user._id}`
       );
       setChat(res.data);
 
@@ -135,7 +137,9 @@ const ChatWindow = ({ user, recipient }) => {
 
   const handleProfileClick = () => {
     if (recipient && recipient._id) {
-      navigate('/NetworkProfile', { state: { userData: { userId: recipient._id } } });
+      navigate("/NetworkProfile", {
+        state: { userData: { userId: recipient._id } },
+      });
     }
   };
 
@@ -184,7 +188,7 @@ const ChatWindow = ({ user, recipient }) => {
     setShouldScroll(true);
 
     try {
-      await axios.post(`http://localhost:3000/api/chat/chats`, {
+      await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/chat/chats`, {
         recipientId: recipient._id,
         content: message,
         userId: user._id,
@@ -204,7 +208,10 @@ const ChatWindow = ({ user, recipient }) => {
       <div className="bg-[#000000] backdrop-blur-xl border-b border-gray-700/50 px-4 py-3 md:px-6 md:py-4 shadow-lg relative">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3 md:gap-4">
-            <div className="relative group cursor-pointer" onClick={() => setShowProfilePhotoModal(true)}>
+            <div
+              className="relative group cursor-pointer"
+              onClick={() => setShowProfilePhotoModal(true)}
+            >
               <img
                 src={recipient.profileImage || "default-user.jpg"}
                 alt={recipient.fullName}
@@ -219,19 +226,6 @@ const ChatWindow = ({ user, recipient }) => {
               >
                 {recipient.fullName}
               </h2>
-              <p className="text-xs md:text-sm text-green-400 flex items-center">
-                {isTyping ? (
-                  <span className="text-green-400 flex items-center">
-                    <span className="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></span>
-                    typing...
-                  </span>
-                ) : (
-                  <>
-                    <span className="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></span>
-                    online
-                  </>
-                )}
-              </p>
             </div>
           </div>
           <div className="flex items-center gap-1 md:gap-2">
@@ -248,27 +242,46 @@ const ChatWindow = ({ user, recipient }) => {
 
       {/* Profile Photo Modal */}
       {showProfilePhotoModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4" onClick={() => setShowProfilePhotoModal(false)}>
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
+          onClick={() => setShowProfilePhotoModal(false)}
+        >
           <div
             className="relative max-w-lg w-full mx-auto bg-gradient-to-br from-gray-900/95 via-gray-800/90 to-gray-900/95 rounded-3xl shadow-2xl border border-gray-700/50 flex flex-col items-center p-6 animate-fadeIn"
-            onClick={e => e.stopPropagation()}
+            onClick={(e) => e.stopPropagation()}
           >
             <button
               className="absolute top-4 right-4 text-white hover:text-gray-300 transition-colors p-2 bg-black/40 rounded-full cursor-pointer"
               onClick={() => setShowProfilePhotoModal(false)}
               aria-label="Close"
             >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+              <svg
+                className="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
             </button>
             <img
               src={recipient.profileImage || "default-user.jpg"}
               alt={recipient.fullName}
               className="w-48 h-48 md:w-64 md:h-64 rounded-2xl object-cover border-4 border-gray-900 shadow-2xl mx-auto"
-              style={{ maxWidth: '90vw', maxHeight: '60vh' }}
+              style={{ maxWidth: "90vw", maxHeight: "60vh" }}
             />
             <div className="mt-6 text-center">
-              <h3 className="text-xl font-semibold text-white mb-1">{recipient.fullName}</h3>
-              <p className="text-sm text-gray-400">{recipient.designation || "Student"}</p>
+              <h3 className="text-xl font-semibold text-white mb-1">
+                {recipient.fullName}
+              </h3>
+              <p className="text-sm text-gray-400">
+                {recipient.designation || "Student"}
+              </p>
             </div>
           </div>
         </div>
@@ -319,7 +332,9 @@ const ChatWindow = ({ user, recipient }) => {
                               <FaMicrophone className="w-4 h-4 text-white" />
                             </div>
                             <div className="flex-1">
-                              <p className="text-sm font-medium">Voice Message</p>
+                              <p className="text-sm font-medium">
+                                Voice Message
+                              </p>
                               <div className="w-full bg-gray-600/50 rounded-full h-1.5 mt-1">
                                 <div
                                   className="bg-gradient-to-r from-blue-500 to-purple-500 h-1.5 rounded-full transition-all duration-300"
@@ -338,14 +353,15 @@ const ChatWindow = ({ user, recipient }) => {
                         )}
                       </div>
                     )}
-                    <p className="text-sm md:text-base leading-relaxed">{msg.content}</p>
+                    <p className="text-sm md:text-base leading-relaxed">
+                      {msg.content}
+                    </p>
                     <div className="flex items-center justify-end mt-2 gap-2">
                       <p className="text-xs text-gray-400">
                         {dayjs(msg.timestamp).format("hh:mm A")}
                       </p>
                     </div>
-
-                </motion.div>
+                  </motion.div>
                 </div>
               </motion.div>
             );
@@ -365,7 +381,7 @@ const ChatWindow = ({ user, recipient }) => {
               <Smile className="w-5 h-5" />
             </button>
             {showEmojiPicker && (
-              <motion.div 
+              <motion.div
                 className="absolute bottom-full left-0 mb-2 z-50"
                 initial={{ opacity: 0, y: 10, scale: 0.9 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -382,10 +398,6 @@ const ChatWindow = ({ user, recipient }) => {
               </motion.div>
             )}
           </div>
-
-          <button className="text-gray-400 hover:text-blue-400 transition-all duration-300 p-1 md:p-2 hover:bg-white/10 rounded-xl hover:scale-105 cursor-pointer">
-            <Paperclip className="w-5 h-5" />
-          </button>
 
           <input
             className="flex-1 bg-transparent border-none focus:outline-none text-white placeholder-gray-400 text-sm md:text-base"
@@ -419,23 +431,37 @@ const ChatWindow = ({ user, recipient }) => {
         .custom-scrollbar::-webkit-scrollbar {
           width: 6px;
         }
-        
+
         .custom-scrollbar::-webkit-scrollbar-track {
           background: rgba(55, 65, 81, 0.3);
           border-radius: 3px;
         }
-        
+
         .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: linear-gradient(to bottom, rgba(59, 130, 246, 0.5), rgba(147, 51, 234, 0.5));
+          background: linear-gradient(
+            to bottom,
+            rgba(59, 130, 246, 0.5),
+            rgba(147, 51, 234, 0.5)
+          );
           border-radius: 3px;
         }
-        
+
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-          background: linear-gradient(to bottom, rgba(59, 130, 246, 0.7), rgba(147, 51, 234, 0.7));
+          background: linear-gradient(
+            to bottom,
+            rgba(59, 130, 246, 0.7),
+            rgba(147, 51, 234, 0.7)
+          );
         }
         @keyframes fadeIn {
-          from { opacity: 0; transform: scale(0.95); }
-          to { opacity: 1; transform: scale(1); }
+          from {
+            opacity: 0;
+            transform: scale(0.95);
+          }
+          to {
+            opacity: 1;
+            transform: scale(1);
+          }
         }
         .animate-fadeIn {
           animation: fadeIn 0.3s ease;

@@ -2,7 +2,21 @@ import React, { useState, useEffect } from "react";
 import { useUser } from "@clerk/clerk-react";
 import { toast, ToastContainer } from "react-toastify";
 import axios from "axios";
-import { X, UploadCloud, ArrowLeft, Camera, Github, Linkedin, BookOpen, Building, GraduationCap, User, Mail, CheckCircle, AlertCircle } from 'lucide-react';
+import {
+  X,
+  UploadCloud,
+  ArrowLeft,
+  Camera,
+  Github,
+  Linkedin,
+  BookOpen,
+  Building,
+  GraduationCap,
+  User,
+  Mail,
+  CheckCircle,
+  AlertCircle,
+} from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -26,10 +40,10 @@ const CompleteYourProfile = () => {
   const allowedBranchCodes = {
     "027": "Computer Science Engineering",
     "031": "Information Technology",
-    "119": "Artificial Intelligence and Data Science",
+    119: "Artificial Intelligence and Data Science",
     "049": "Electrical Engineering",
     "028": "Electronics and Communication Engineering",
-    "157": "Computer Science Engineering in Data Science",
+    157: "Computer Science Engineering in Data Science",
   };
 
   const VALID_COLLEGE_CODE = "208";
@@ -81,10 +95,9 @@ const CompleteYourProfile = () => {
   const fetchUserProfile = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:3000/api/user/profile/${user.id}`
+        `${import.meta.env.VITE_BACKEND_URL}/api/user/profile/${user.id}`
       );
       const data = response.data;
-      console.log(data);
       setEnrollmentNumber(data.enrollmentNumber || "");
       setGithubUrl(data.githubUrl || "");
       setLinkedinUrl(data.linkedinUrl || "");
@@ -133,7 +146,7 @@ const CompleteYourProfile = () => {
         formData.append("idCardPhoto", idCardPhoto);
 
       const response = await axios.patch(
-        "http://localhost:3000/api/user/upload-profile",
+        "${import.meta.env.VITE_BACKEND_URL}/api/user/upload-profile",
         formData,
         {
           headers: { "Content-Type": "multipart/form-data" },
@@ -142,7 +155,6 @@ const CompleteYourProfile = () => {
 
       toast.success("Profile updated successfully!");
       navigate("/");
-      console.log("Updated User:", response.data.user);
     } catch (error) {
       console.error("Error updating profile:", error);
       toast.error("Failed to update profile. Please try again.");
@@ -190,13 +202,15 @@ const CompleteYourProfile = () => {
                 </button>
               </div>
             </div>
-            
+
             <div className="flex-1 min-w-0">
               <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-2 leading-tight">
                 Complete Your Profile
               </h1>
               <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-400 max-w-2xl leading-relaxed">
-                Take a moment to set up your professional profile. This information helps us personalize your experience and connect you with opportunities.
+                Take a moment to set up your professional profile. This
+                information helps us personalize your experience and connect you
+                with opportunities.
               </p>
             </div>
           </div>
@@ -209,7 +223,7 @@ const CompleteYourProfile = () => {
           <div className="px-4 sm:px-6 lg:px-8 py-4 sm:py-6 border-b border-gray-500/30 bg-gradient-to-r from-gray-700/20 via-gray-600/10 to-gray-700/20">
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
               <div className="flex-1 h-2 sm:h-3 bg-gray-700/50 rounded-full overflow-hidden backdrop-blur-sm">
-                <div 
+                <div
                   className="h-full bg-gradient-to-r from-blue-500 to-purple-500 transition-all duration-700 ease-out shadow-lg"
                   style={{ width: `${calculateProgress()}%` }}
                 />
@@ -235,7 +249,9 @@ const CompleteYourProfile = () => {
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
                       <h2 className="text-lg sm:text-xl lg:text-2xl font-semibold text-white flex items-center gap-2 sm:gap-3">
                         <User className="w-5 h-5 sm:w-6 sm:h-6 text-blue-400" />
-                        <span className="text-base sm:text-lg lg:text-xl">Personal Information</span>
+                        <span className="text-base sm:text-lg lg:text-xl">
+                          Personal Information
+                        </span>
                       </h2>
                       <span className="px-2 sm:px-3 py-1 bg-gradient-to-r from-blue-600/20 to-blue-700/20 text-blue-300 text-xs sm:text-sm font-medium rounded-full border border-blue-500/30 self-start sm:self-auto">
                         Required
@@ -250,8 +266,12 @@ const CompleteYourProfile = () => {
                             <User className="w-4 h-4 sm:w-5 sm:h-5 text-blue-400" />
                           </div>
                           <div className="min-w-0 flex-1">
-                            <label className="text-xs sm:text-sm font-medium text-gray-400">Full Name</label>
-                            <p className="text-sm sm:text-base lg:text-lg font-medium text-white mt-1 break-words">{user?.fullName}</p>
+                            <label className="text-xs sm:text-sm font-medium text-gray-400">
+                              Full Name
+                            </label>
+                            <p className="text-sm sm:text-base lg:text-lg font-medium text-white mt-1 break-words">
+                              {user?.fullName}
+                            </p>
                           </div>
                         </div>
                         <div className="flex items-start sm:items-center gap-3">
@@ -259,7 +279,9 @@ const CompleteYourProfile = () => {
                             <Mail className="w-4 h-4 sm:w-5 sm:h-5 text-green-400" />
                           </div>
                           <div className="min-w-0 flex-1">
-                            <label className="text-xs sm:text-sm font-medium text-gray-400">Email Address</label>
+                            <label className="text-xs sm:text-sm font-medium text-gray-400">
+                              Email Address
+                            </label>
                             <p className="text-sm sm:text-base lg:text-lg font-medium text-white mt-1 break-all">
                               {user?.primaryEmailAddress?.emailAddress}
                             </p>
@@ -286,7 +308,9 @@ const CompleteYourProfile = () => {
                               }
                             }}
                             className={`w-full p-3 sm:p-4 text-sm sm:text-base border rounded-lg sm:rounded-xl bg-gray-800/50 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 text-white placeholder-gray-400 ${
-                              status ? "bg-gray-700/50 cursor-not-allowed" : "hover:border-gray-600"
+                              status
+                                ? "bg-gray-700/50 cursor-not-allowed"
+                                : "hover:border-gray-600"
                             }`}
                             placeholder="Enter your 11-digit enrollment number"
                           />
@@ -303,7 +327,9 @@ const CompleteYourProfile = () => {
                           <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 p-3 sm:p-4 rounded-lg sm:rounded-xl border border-gray-700/50 hover:border-gray-600/50 transition-colors duration-300">
                             <div className="flex items-center space-x-2 text-gray-400 mb-2">
                               <BookOpen size={14} className="sm:w-4 sm:h-4" />
-                              <span className="text-xs sm:text-sm font-medium">Roll Number</span>
+                              <span className="text-xs sm:text-sm font-medium">
+                                Roll Number
+                              </span>
                             </div>
                             <p className="text-sm sm:text-base lg:text-lg font-semibold text-white">
                               {enrollmentNumber.substring(0, 3)}
@@ -313,7 +339,9 @@ const CompleteYourProfile = () => {
                           <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 p-3 sm:p-4 rounded-lg sm:rounded-xl border border-gray-700/50 hover:border-gray-600/50 transition-colors duration-300">
                             <div className="flex items-center space-x-2 text-gray-400 mb-2">
                               <Building size={14} className="sm:w-4 sm:h-4" />
-                              <span className="text-xs sm:text-sm font-medium">Batch Year</span>
+                              <span className="text-xs sm:text-sm font-medium">
+                                Batch Year
+                              </span>
                             </div>
                             <p className="text-sm sm:text-base lg:text-lg font-semibold text-white">
                               {"20" + enrollmentNumber.substring(9, 11)}
@@ -322,11 +350,18 @@ const CompleteYourProfile = () => {
 
                           <div className="col-span-1 sm:col-span-2 bg-gradient-to-br from-gray-800/50 to-gray-900/50 p-3 sm:p-4 rounded-lg sm:rounded-xl border border-gray-700/50 hover:border-gray-600/50 transition-colors duration-300">
                             <div className="flex items-center space-x-2 text-gray-400 mb-2">
-                              <GraduationCap size={14} className="sm:w-4 sm:h-4" />
-                              <span className="text-xs sm:text-sm font-medium">Branch</span>
+                              <GraduationCap
+                                size={14}
+                                className="sm:w-4 sm:h-4"
+                              />
+                              <span className="text-xs sm:text-sm font-medium">
+                                Branch
+                              </span>
                             </div>
                             <p className="text-sm sm:text-base lg:text-lg font-semibold text-white">
-                              {allowedBranchCodes[enrollmentNumber.substring(6,9)] || ""}
+                              {allowedBranchCodes[
+                                enrollmentNumber.substring(6, 9)
+                              ] || ""}
                             </p>
                           </div>
                         </div>
@@ -340,7 +375,9 @@ const CompleteYourProfile = () => {
                       <div className="p-1.5 sm:p-2 bg-purple-500/20 rounded-lg">
                         <Linkedin className="w-4 h-4 sm:w-5 sm:h-5 text-purple-400" />
                       </div>
-                      <span className="text-base sm:text-lg lg:text-xl">Social Presence</span>
+                      <span className="text-base sm:text-lg lg:text-xl">
+                        Social Presence
+                      </span>
                     </h3>
                     <div className="space-y-3 sm:space-y-4">
                       <div className="group">
@@ -387,24 +424,30 @@ const CompleteYourProfile = () => {
                         <div className="p-1.5 sm:p-2 bg-orange-500/20 rounded-lg">
                           <BookOpen className="w-4 h-4 sm:w-5 sm:h-5 text-orange-400" />
                         </div>
-                        <span className="text-base sm:text-lg lg:text-xl">Skills & Expertise</span>
+                        <span className="text-base sm:text-lg lg:text-xl">
+                          Skills & Expertise
+                        </span>
                       </h3>
                       <span className="px-2 sm:px-3 py-1 bg-gradient-to-r from-orange-600/20 to-orange-700/20 text-orange-300 text-xs sm:text-sm font-medium rounded-full border border-orange-500/30 self-start sm:self-auto">
                         {skills.length} Added
                       </span>
                     </div>
-                    
+
                     <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 rounded-lg sm:rounded-xl border border-gray-700/50 p-4 sm:p-6 backdrop-blur-sm">
                       <div className="flex flex-wrap gap-2 mb-4">
                         {skills.map((skill, index) => (
-                          <span 
-                            key={index} 
+                          <span
+                            key={index}
                             className="group flex items-center bg-gray-700/50 px-2 sm:px-3 py-1 sm:py-1.5 rounded-md sm:rounded-lg border border-gray-600/50 hover:border-gray-500/50 transition-all duration-300"
                           >
-                            <span className="text-xs sm:text-sm font-medium text-gray-200">{skill}</span>
-                            <button 
+                            <span className="text-xs sm:text-sm font-medium text-gray-200">
+                              {skill}
+                            </span>
+                            <button
                               type="button"
-                              onClick={() => setSkills(skills.filter((s) => s !== skill))}
+                              onClick={() =>
+                                setSkills(skills.filter((s) => s !== skill))
+                              }
                               className="ml-1.5 sm:ml-2 text-gray-400 hover:text-red-400 transition-colors"
                             >
                               <X size={12} className="sm:w-3.5 sm:h-3.5" />
@@ -412,7 +455,7 @@ const CompleteYourProfile = () => {
                           </span>
                         ))}
                       </div>
-                      
+
                       <div className="flex">
                         <input
                           type="text"
@@ -424,8 +467,14 @@ const CompleteYourProfile = () => {
                         <button
                           type="button"
                           onClick={() => {
-                            if (skillsInput.trim() && !skills.includes(skillsInput.trim().toLowerCase())) {
-                              setSkills([...skills, skillsInput.trim().toLowerCase()]);
+                            if (
+                              skillsInput.trim() &&
+                              !skills.includes(skillsInput.trim().toLowerCase())
+                            ) {
+                              setSkills([
+                                ...skills,
+                                skillsInput.trim().toLowerCase(),
+                              ]);
                               setSkillsInput("");
                             }
                           }}
@@ -443,7 +492,9 @@ const CompleteYourProfile = () => {
                       <div className="p-1.5 sm:p-2 bg-green-500/20 rounded-lg">
                         <User className="w-4 h-4 sm:w-5 sm:h-5 text-green-400" />
                       </div>
-                      <span className="text-base sm:text-lg lg:text-xl">About Me</span>
+                      <span className="text-base sm:text-lg lg:text-xl">
+                        About Me
+                      </span>
                     </h3>
                     <div className="relative">
                       <textarea
@@ -465,7 +516,9 @@ const CompleteYourProfile = () => {
                       <div className="p-1.5 sm:p-2 bg-red-500/20 rounded-lg">
                         <AlertCircle className="w-4 h-4 sm:w-5 sm:h-5 text-red-400" />
                       </div>
-                      <span className="text-base sm:text-lg lg:text-xl">College ID Card</span>
+                      <span className="text-base sm:text-lg lg:text-xl">
+                        College ID Card
+                      </span>
                     </h3>
                     <div className="relative group">
                       <div className="relative w-full aspect-[16/10] rounded-lg sm:rounded-xl bg-gradient-to-br from-gray-800/50 to-gray-900/50 border-2 border-dashed border-gray-600/50 hover:border-blue-500/50 transition-all duration-300 overflow-hidden backdrop-blur-sm">
@@ -479,7 +532,11 @@ const CompleteYourProfile = () => {
                         {idCardPhoto ? (
                           <div className="relative w-full h-full">
                             <img
-                              src={typeof idCardPhoto === "string" ? idCardPhoto : URL.createObjectURL(idCardPhoto)}
+                              src={
+                                typeof idCardPhoto === "string"
+                                  ? idCardPhoto
+                                  : URL.createObjectURL(idCardPhoto)
+                              }
                               alt="ID Card"
                               className="w-full h-full object-contain"
                             />
@@ -492,9 +549,16 @@ const CompleteYourProfile = () => {
                           </div>
                         ) : (
                           <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-400 hover:text-blue-400 transition-colors duration-300 p-4">
-                            <UploadCloud size={32} className="sm:w-10 sm:h-10" />
-                            <p className="mt-2 text-xs sm:text-sm font-medium text-center">Click or drag to upload your ID card</p>
-                            <p className="text-xs text-gray-500 mt-1 text-center">Supported formats: JPG, PNG</p>
+                            <UploadCloud
+                              size={32}
+                              className="sm:w-10 sm:h-10"
+                            />
+                            <p className="mt-2 text-xs sm:text-sm font-medium text-center">
+                              Click or drag to upload your ID card
+                            </p>
+                            <p className="text-xs text-gray-500 mt-1 text-center">
+                              Supported formats: JPG, PNG
+                            </p>
                           </div>
                         )}
                       </div>
@@ -521,7 +585,9 @@ const CompleteYourProfile = () => {
                     ) : (
                       <>
                         <span>Complete Profile</span>
-                        <span className="group-hover:translate-x-1 transition-transform duration-300">→</span>
+                        <span className="group-hover:translate-x-1 transition-transform duration-300">
+                          →
+                        </span>
                       </>
                     )}
                   </span>
@@ -532,7 +598,7 @@ const CompleteYourProfile = () => {
         </div>
       </div>
 
-      <ToastContainer 
+      <ToastContainer
         position="bottom-right"
         theme="dark"
         className="toast-container"

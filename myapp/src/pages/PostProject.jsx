@@ -85,13 +85,11 @@ const PostProject = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      console.log("Form Data:", formData);
       const response = await axios.get(
-        `http://localhost:3000/api/user/profile/${user.id}`
+        `${import.meta.env.VITE_BACKEND_URL}/api/user/profile/${user.id}`
       );
       const data = response.data;
       const userId = data._id;
-      console.log("User ID:", userId);
       const form = new FormData();
       form.append("title", formData.title);
       form.append("description", formData.description);
@@ -106,7 +104,7 @@ const PostProject = () => {
       formData.skills.forEach((skill) => form.append("TechStack", skill));
       form.append("userId", userId);
       await axios.post(
-        "http://localhost:3000/api/project/create-project",
+        "${import.meta.env.VITE_BACKEND_URL}/api/project/create-project",
         form,
         {
           headers: { "Content-Type": "multipart/form-data" },
@@ -121,7 +119,6 @@ const PostProject = () => {
     } finally {
       setIsSubmitting(false);
     }
-    
   };
 
   return (
@@ -129,7 +126,6 @@ const PostProject = () => {
       {/* Header Section */}
       <div className="border-b border-gray-500/50 px-4 py-6 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
-         
           <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-100">
             Share Your Project
           </h1>
@@ -151,7 +147,9 @@ const PostProject = () => {
                 className="w-12 h-12 sm:w-14 sm:h-14 rounded-full object-cover ring-2 ring-blue-500/30 shadow-lg"
               />
               <div>
-                <h2 className="font-semibold text-gray-100 text-lg">{user?.fullName}</h2>
+                <h2 className="font-semibold text-gray-100 text-lg">
+                  {user?.fullName}
+                </h2>
                 <p className="text-sm text-gray-400">Project Creator</p>
               </div>
             </div>
@@ -161,7 +159,9 @@ const PostProject = () => {
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Title Input */}
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-300">Project Title</label>
+                <label className="text-sm font-medium text-gray-300">
+                  Project Title
+                </label>
                 <div className="relative">
                   <FileText className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
                   <input
@@ -178,7 +178,9 @@ const PostProject = () => {
 
               {/* Description Input */}
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-300">Project Description</label>
+                <label className="text-sm font-medium text-gray-300">
+                  Project Description
+                </label>
                 <textarea
                   name="description"
                   value={formData.description}
@@ -194,7 +196,9 @@ const PostProject = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Project URL */}
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-300">Project URL</label>
+                  <label className="text-sm font-medium text-gray-300">
+                    Project URL
+                  </label>
                   <div className="relative">
                     <Link className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
                     <input
@@ -210,7 +214,9 @@ const PostProject = () => {
 
                 {/* GitHub URL */}
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-300">GitHub Repository</label>
+                  <label className="text-sm font-medium text-gray-300">
+                    GitHub Repository
+                  </label>
                   <div className="relative">
                     <Github className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
                     <input
@@ -227,7 +233,9 @@ const PostProject = () => {
 
               {/* Skills Section */}
               <div className="space-y-3">
-                <label className="text-sm font-medium text-gray-300">Technologies & Skills Used</label>
+                <label className="text-sm font-medium text-gray-300">
+                  Technologies & Skills Used
+                </label>
                 <div className="space-y-3">
                   {/* Skills Input */}
                   <div className="flex gap-2">
@@ -281,7 +289,9 @@ const PostProject = () => {
               {/* Contributors Section */}
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <label className="text-sm font-medium text-gray-300">Project Contributors</label>
+                  <label className="text-sm font-medium text-gray-300">
+                    Project Contributors
+                  </label>
                   <button
                     type="button"
                     onClick={handleAddContributor}
@@ -331,7 +341,9 @@ const PostProject = () => {
 
               {/* File Upload Section */}
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-300">Project Media</label>
+                <label className="text-sm font-medium text-gray-300">
+                  Project Media
+                </label>
                 <div className="relative group">
                   <div className="relative w-full aspect-video rounded-xl overflow-hidden bg-gradient-to-br from-gray-500/10 via-gray-600/5 to-gray-700/5 border-2 border-dashed border-gray-500/50 hover:border-blue-500/50 transition-all duration-300">
                     {formData.file ? (
@@ -360,8 +372,12 @@ const PostProject = () => {
                     ) : (
                       <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-500 group-hover:text-blue-400 transition-colors">
                         <ImageIcon size={48} className="mb-3" />
-                        <p className="text-sm font-medium">Click or drag files to upload</p>
-                        <p className="text-xs text-gray-600 mt-1">Images or videos up to 10MB</p>
+                        <p className="text-sm font-medium">
+                          Click or drag files to upload
+                        </p>
+                        <p className="text-xs text-gray-600 mt-1">
+                          Images or videos up to 10MB
+                        </p>
                       </div>
                     )}
                     <input
@@ -402,11 +418,16 @@ const PostProject = () => {
 
         {/* Additional Info Card */}
         <div className="mt-6 bg-gradient-to-br from-[#232526] via-[#1a1b1c] to-[#000000] rounded-2xl border border-gray-500/30 p-6">
-          <h3 className="text-lg font-semibold text-gray-100 mb-3">Project Guidelines</h3>
+          <h3 className="text-lg font-semibold text-gray-100 mb-3">
+            Project Guidelines
+          </h3>
           <div className="space-y-2 text-sm text-gray-400">
             <div className="flex items-start gap-2">
               <div className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
-              <p>Include a clear description of what your project does and the problem it solves</p>
+              <p>
+                Include a clear description of what your project does and the
+                problem it solves
+              </p>
             </div>
             <div className="flex items-start gap-2">
               <div className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
@@ -414,11 +435,16 @@ const PostProject = () => {
             </div>
             <div className="flex items-start gap-2">
               <div className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
-              <p>Provide live demo links and GitHub repository URLs when available</p>
+              <p>
+                Provide live demo links and GitHub repository URLs when
+                available
+              </p>
             </div>
             <div className="flex items-start gap-2">
               <div className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
-              <p>Add high-quality screenshots or videos to showcase your project</p>
+              <p>
+                Add high-quality screenshots or videos to showcase your project
+              </p>
             </div>
             <div className="flex items-start gap-2">
               <div className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>

@@ -42,7 +42,9 @@ const Events = () => {
     setLoading(true);
     try {
       const response = await axios.get(
-        `http://localhost:3000/api/admin-post/get-post?page=${currentPage}&category=Event`
+        `${
+          import.meta.env.VITE_BACKEND_URL
+        }/api/admin-post/get-post?page=${currentPage}&category=Event`
       );
       const newEvents = response.data.post;
 

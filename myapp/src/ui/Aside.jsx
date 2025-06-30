@@ -15,7 +15,7 @@ import { toast } from "react-toastify";
 
 const Aside = () => {
   const [expanded, setExpanded] = useState(null);
-  const [screenSize, setScreenSize] = useState('desktop');
+  const [screenSize, setScreenSize] = useState("desktop");
   const navigate = useNavigate();
   const { user } = useUser();
   const [mainUser, setMainUser] = useState();
@@ -50,18 +50,18 @@ const Aside = () => {
     const checkScreenSize = () => {
       const width = window.innerWidth;
       if (width < 768) {
-        setScreenSize('mobile');
+        setScreenSize("mobile");
       } else if (width >= 768 && width < 1024) {
-        setScreenSize('tablet');
+        setScreenSize("tablet");
       } else {
-        setScreenSize('desktop');
+        setScreenSize("desktop");
       }
     };
 
     checkScreenSize();
-    window.addEventListener('resize', checkScreenSize);
+    window.addEventListener("resize", checkScreenSize);
 
-    return () => window.removeEventListener('resize', checkScreenSize);
+    return () => window.removeEventListener("resize", checkScreenSize);
   }, []);
 
   const handleNavClick = (item) => {
@@ -84,7 +84,7 @@ const Aside = () => {
   const fetchUserProfile = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:3000/api/user/profile/${user.id}`
+        `${import.meta.env.VITE_BACKEND_URL}/api/user/profile/${user.id}`
       );
       const data = response.data;
       setMainUser(data);
@@ -95,8 +95,7 @@ const Aside = () => {
   };
 
   // Mobile footer navigation
-  if (screenSize === 'mobile') {
-    console.log('navItems:', navItems);
+  if (screenSize === "mobile") {
     return (
       <nav className="fixed bottom-0 left-0 right-0 w-full bg-[#000000] border-t border-gray-500/50 z-50">
         <div className="grid grid-cols-6 gap-1 items-center py-2 px-1 w-full bg-[#000000]">
@@ -179,7 +178,7 @@ const Aside = () => {
   }
 
   // Tablet sidebar navigation (icons only)
-  if (screenSize === 'tablet') {
+  if (screenSize === "tablet") {
     return (
       <aside className="bg-[#000000] text-white w-16 min-h-screen flex flex-col py-6 px-2 border-r border-gray-500/50 relative">
         <div className="mb-8 text-lg font-bold tracking-wide text-center">
@@ -211,7 +210,7 @@ const Aside = () => {
             </React.Fragment>
           ))}
         </nav>
-        
+
         {/* Tablet submenu overlay - positioned outside the aside */}
         {expanded && (
           <div className="fixed left-16 top-0 h-full bg-[#000000] border-r border-gray-500/50 p-4 min-w-48 z-40">
@@ -226,7 +225,7 @@ const Aside = () => {
                 ×
               </button>
             </div>
-            
+
             {expanded === "Explore" && (
               <div className="flex flex-col gap-2">
                 <button
@@ -251,7 +250,7 @@ const Aside = () => {
                 </button>
               </div>
             )}
-            
+
             {expanded === "Post" && (
               <div className="flex flex-col gap-2">
                 <button

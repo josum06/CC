@@ -1,7 +1,15 @@
 import axios from "axios";
 import { format, parseISO } from "date-fns";
 import { useEffect, useState } from "react";
-import { Heart, MoreHorizontal, MessageCircle, Send, User, Clock, Code } from 'lucide-react';
+import {
+  Heart,
+  MoreHorizontal,
+  MessageCircle,
+  Send,
+  User,
+  Clock,
+  Code,
+} from "lucide-react";
 
 function CommentProject({ projectId }) {
   const [comments, setComments] = useState([]);
@@ -12,7 +20,9 @@ function CommentProject({ projectId }) {
     const fetchProjectComments = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:3000/api/project/get-project-comments/${projectId}`
+          `${
+            import.meta.env.VITE_BACKEND_URL
+          }/api/project/get-project-comments/${projectId}`
         );
         const fetchedProjectComments = response.data.comments;
         setComments(fetchedProjectComments);
@@ -25,7 +35,7 @@ function CommentProject({ projectId }) {
   }, [projectId]);
 
   const handleLikeComment = (commentId) => {
-    setLikedComments(prev => {
+    setLikedComments((prev) => {
       const newLiked = new Set(prev);
       if (newLiked.has(commentId)) {
         newLiked.delete(commentId);
@@ -41,17 +51,17 @@ function CommentProject({ projectId }) {
     const now = new Date();
     const diffInHours = Math.floor((now - date) / (1000 * 60 * 60));
 
-    if (diffInHours < 1) return 'Just now';
+    if (diffInHours < 1) return "Just now";
     if (diffInHours < 24) return `${diffInHours}h`;
-    if (diffInHours < 48) return 'Yesterday';
-    return format(date, 'd MMM');
+    if (diffInHours < 48) return "Yesterday";
+    return format(date, "d MMM");
   };
 
   return (
     <div className="px-6 py-4 max-h-[400px] overflow-y-auto custom-scrollbar">
       {comments.map((comment) => (
-        <div 
-          key={comment._id} 
+        <div
+          key={comment._id}
           className="mb-4 group hover:bg-gradient-to-r hover:from-gray-800/30 hover:to-gray-700/20 rounded-2xl p-4 transition-all duration-300 border border-transparent hover:border-gray-600/30"
         >
           <div className="flex items-start space-x-4">
@@ -63,13 +73,13 @@ function CommentProject({ projectId }) {
                   alt={comment?.userId?.fullName}
                   className="w-full h-full object-cover group-hover/avatar:scale-110 transition-transform duration-300"
                   onError={(e) => {
-                    e.target.src = 'https://via.placeholder.com/40';
+                    e.target.src = "https://via.placeholder.com/40";
                   }}
                 />
               </div>
               <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-gray-900"></div>
             </div>
-            
+
             {/* Comment Content */}
             <div className="flex-1 min-w-0">
               <div className="flex items-start justify-between">
@@ -87,7 +97,7 @@ function CommentProject({ projectId }) {
                     {comment.text}
                   </p>
                 </div>
-                
+
                 {/* Actions */}
                 <div className="flex items-center space-x-2 opacity-0 group-hover:opacity-100 transition-all duration-300 ml-4">
                   {/* <button 
@@ -108,21 +118,24 @@ function CommentProject({ projectId }) {
                   </button> */}
                 </div>
               </div>
-              
+
               {/* Comment Actions */}
-             
             </div>
           </div>
         </div>
       ))}
-      
+
       {comments.length === 0 && (
         <div className="flex flex-col items-center justify-center py-12 text-gray-500">
           <div className="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-gray-800/50 to-gray-700/50 rounded-full flex items-center justify-center border border-gray-600/30">
             <Code className="w-10 h-10 text-gray-600" />
           </div>
-          <h3 className="text-lg font-semibold text-gray-300 mb-2">No comments yet</h3>
-          <p className="text-sm text-gray-500 text-center">Be the first to share your thoughts on this project</p>
+          <h3 className="text-lg font-semibold text-gray-300 mb-2">
+            No comments yet
+          </h3>
+          <p className="text-sm text-gray-500 text-center">
+            Be the first to share your thoughts on this project
+          </p>
         </div>
       )}
     </div>

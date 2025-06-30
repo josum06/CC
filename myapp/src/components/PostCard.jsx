@@ -52,7 +52,7 @@ const PostCard = ({
       if (!currUserId) return;
       try {
         const response = await axios.get(
-          `http://localhost:3000/api/post/like/${postId}`
+          `${import.meta.env.VITE_BACKEND_URL}/api/post/like/${postId}`
         );
         const likedUsers = response.data.likedByUsers;
         setLikedByCurrentUser(likedUsers.some((user) => user === currUserId));
@@ -69,7 +69,7 @@ const PostCard = ({
   const fetchUserProfile = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:3000/api/user/profile/${user.id}`
+        `${import.meta.env.VITE_BACKEND_URL}/api/user/profile/${user.id}`
       );
       const data = response.data;
       setCurrUserId(data._id);
@@ -87,9 +87,10 @@ const PostCard = ({
     if (isLiking) return;
     setIsLiking(true);
     try {
-      console.log(currUserId);
       const response = await axios.patch(
-        `http://localhost:3000/api/post/like/${postId}/like-toggle`,
+        `${
+          import.meta.env.VITE_BACKEND_URL
+        }/api/post/like/${postId}/like-toggle`,
         { userId: currUserId }
       );
       setLikes(response.data.post.likes);
@@ -112,7 +113,7 @@ const PostCard = ({
       formData.append("postId", postId);
       formData.append("userId", currUserId);
       await axios.post(
-        "http://localhost:3000/api/post/create-comment",
+        "${import.meta.env.VITE_BACKEND_URL}/api/post/create-comment",
         formData,
         {
           headers: { "Content-Type": "application/json" },
@@ -132,13 +133,10 @@ const PostCard = ({
         navigate("/NetworkProfile", {
           state: { userData: { userId } },
         });
-        console.log("View profile clicked");
         break;
       case "message":
-        console.log("Message clicked");
         break;
       case "share":
-        console.log("Share clicked");
         break;
 
       default:
@@ -151,7 +149,7 @@ const PostCard = ({
     <div className="bg-gradient-to-br from-gray-900/80 via-gray-800/60 to-gray-900/80 backdrop-blur-xl rounded-3xl border border-gray-700/50 shadow-2xl max-w-md w-full mx-auto mb-6 overflow-hidden hover:shadow-3xl transition-all duration-500 group relative">
       {/* Shimmer effect on hover */}
       <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
-      
+
       {/* Header */}
       <div className="relative z-10 flex items-center justify-between px-4 sm:px-6 py-4 sm:py-5 border-b border-gray-700/50 bg-gradient-to-r from-gray-800/30 via-gray-700/20 to-gray-800/30">
         <div className="flex items-center space-x-3 sm:space-x-4">
@@ -170,7 +168,10 @@ const PostCard = ({
               {username}
             </p>
             <div className="flex items-center space-x-2 text-xs sm:text-sm text-gray-500">
-              <Clock size={12} className="sm:w-[14px] sm:h-[14px] text-gray-600" />
+              <Clock
+                size={12}
+                className="sm:w-[14px] sm:h-[14px] text-gray-600"
+              />
               <span>{time}</span>
             </div>
           </div>
@@ -201,11 +202,12 @@ const PostCard = ({
                   onClick={() => handleOptionClick("profile")}
                   className="flex items-center space-x-3 px-4 py-3 text-xs sm:text-sm text-gray-300 hover:text-gray-100 hover:bg-gray-700/50 w-full text-left transition-all duration-300 group"
                 >
-                  <User size={14} className="sm:w-4 sm:h-4 text-blue-400 group-hover:text-blue-300" />
+                  <User
+                    size={14}
+                    className="sm:w-4 sm:h-4 text-blue-400 group-hover:text-blue-300"
+                  />
                   <span>View Profile</span>
                 </button>
-               
-                
               </div>
             </>
           )}
@@ -241,7 +243,9 @@ const PostCard = ({
           <div className="w-full h-48 sm:h-64 flex items-center justify-center bg-gradient-to-br from-gray-800/20 via-gray-700/10 to-gray-800/20">
             <div className="text-center">
               <Smile className="w-8 h-8 sm:w-12 sm:h-12 text-gray-600 mx-auto mb-2" />
-              <span className="text-xs sm:text-sm text-gray-500">No media available</span>
+              <span className="text-xs sm:text-sm text-gray-500">
+                No media available
+              </span>
             </div>
           </div>
         )}

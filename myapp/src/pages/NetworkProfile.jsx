@@ -25,7 +25,6 @@ function NetworkProfile() {
   const navigate = useNavigate();
   const location = useLocation();
   const userData = location.state?.userData;
-  // console.log(userData.userId);
   const [activeTab, setActiveTab] = useState("posts"); // 'posts' or 'projects'
   const [currUserId, setCurrUserId] = useState(null);
   const [selectedPost, setSelectedPost] = useState(null);
@@ -49,12 +48,24 @@ function NetworkProfile() {
       const [userResponse, postResponse, userAuthResponse, projectResponse] =
         await Promise.all([
           axios.get(
-            `http://localhost:3000/api/user/profileById/${userData.userId}`
+            `${import.meta.env.VITE_BACKEND_URL}/api/user/profileById/${
+              userData.userId
+            }`
           ),
-          axios.get(`http://localhost:3000/api/user/posts/${userData.userId}`),
-          axios.get(`http://localhost:3000/api/user/profile/${clerkUser.id}`),
           axios.get(
-            `http://localhost:3000/api/project/get-project/${userData.userId}`
+            `${import.meta.env.VITE_BACKEND_URL}/api/user/posts/${
+              userData.userId
+            }`
+          ),
+          axios.get(
+            `${import.meta.env.VITE_BACKEND_URL}/api/user/profile/${
+              clerkUser.id
+            }`
+          ),
+          axios.get(
+            `${import.meta.env.VITE_BACKEND_URL}/api/project/get-project/${
+              userData.userId
+            }`
           ),
         ]);
       const data = userResponse.data;
@@ -75,10 +86,11 @@ function NetworkProfile() {
     const fetchLikes = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:3000/api/post/like/${selectedPost._id}`
+          `${import.meta.env.VITE_BACKEND_URL}/api/post/like/${
+            selectedPost._id
+          }`
         );
         const likedUsers = response.data.likedByUsers;
-        console.log("Liked users:", likedUsers);
         setLikedByCurrentUser(likedUsers.some((user) => user === currUserId));
       } catch (error) {
         console.error("Error fetching likes:", error);
@@ -94,9 +106,10 @@ function NetworkProfile() {
     const checkCategoryStatus = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:3000/api/user/isPending/${currUserId}?receiverId=${user._id}`
+          `${
+            import.meta.env.VITE_BACKEND_URL
+          }/api/user/isPending/${currUserId}?receiverId=${user._id}`
         );
-        console.log("Pending status response:", response);
         setCategory(response.data?.category);
       } catch (error) {
         console.error("Error checking pending status:", error);
@@ -111,12 +124,13 @@ function NetworkProfile() {
   const handleClick = async () => {
     try {
       const res = await axios.patch(
-        `http://localhost:3000/api/user/updateConnectionsPending/${currUserId}`,
+        `${
+          import.meta.env.VITE_BACKEND_URL
+        }/api/user/updateConnectionsPending/${currUserId}`,
         {
           receiverId: user._id,
         }
       );
-      console.log(res.data);
       setCategory("pending");
       toast.success("Connection sent successfully!");
     } catch (err) {
@@ -128,7 +142,9 @@ function NetworkProfile() {
   const handleLike = async () => {
     try {
       const response = await axios.patch(
-        `http://localhost:3000/api/post/like/${selectedPost._id}/like-toggle`,
+        `${import.meta.env.VITE_BACKEND_URL}/api/post/like/${
+          selectedPost._id
+        }/like-toggle`,
         { userId: currUserId }
       );
       const updatedPost = {
@@ -157,7 +173,7 @@ function NetworkProfile() {
       formData.append("postId", selectedPost._id);
       formData.append("userId", currUserId);
       await axios.post(
-        "http://localhost:3000/api/post/create-comment",
+        "${import.meta.env.VITE_BACKEND_URL}/api/post/create-comment",
         formData,
         {
           headers: { "Content-Type": "application/json" },
@@ -188,9 +204,6 @@ function NetworkProfile() {
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-r from-blue-500/5 to-purple-500/5 rounded-full blur-3xl"></div>
       </div>
 
-     
-      
-
       {/* Profile Header */}
       <div className="max-w-4xl mx-auto px-4 py-6 relative z-10">
         <div className="bg-gradient-to-br from-[#232526] via-[#1a1b1c] to-[#000000] rounded-2xl border border-gray-500/30 shadow-2xl overflow-hidden">
@@ -212,7 +225,9 @@ function NetworkProfile() {
               {/* Profile Info */}
               <div className="flex-1">
                 <div className="flex flex-col md:flex-row md:items-center gap-4 mb-6">
-                  <h2 className="text-3xl font-bold text-gray-100">{user?.fullName}</h2>
+                  <h2 className="text-3xl font-bold text-gray-100">
+                    {user?.fullName}
+                  </h2>
                   <div className="flex gap-3">
                     {user?._id != currUserId && (
                       <button
@@ -239,18 +254,24 @@ function NetworkProfile() {
                 {/* Stats */}
                 <div className="flex gap-8 mb-6">
                   <div className="text-center">
-                    <div className="font-bold text-2xl text-gray-100">{posts?.length || 0}</div>
+                    <div className="font-bold text-2xl text-gray-100">
+                      {posts?.length || 0}
+                    </div>
                     <div className="text-sm text-gray-400">Posts</div>
                   </div>
                   <div className="text-center">
-                    <div className="font-bold text-2xl text-gray-100">{projects.length || 0}</div>
+                    <div className="font-bold text-2xl text-gray-100">
+                      {projects.length || 0}
+                    </div>
                     <div className="text-sm text-gray-400">Projects</div>
                   </div>
                 </div>
 
                 {/* Bio and Details */}
                 <div className="space-y-3 mb-6">
-                  <p className="text-gray-300 leading-relaxed">{user?.aboutMe}</p>
+                  <p className="text-gray-300 leading-relaxed">
+                    {user?.aboutMe}
+                  </p>
 
                   <div className="flex items-center gap-2 text-blue-400">
                     <LinkIcon size={16} />
@@ -312,121 +333,125 @@ function NetworkProfile() {
             {/* Content Grid */}
             <div className="p-6">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {activeTab === "posts"
-                  ? // Posts Grid with hover effects
-                    posts?.map((post) => (
-                      <div
-                        key={post._id}
-                        className="aspect-square bg-gradient-to-br from-gray-700/30 to-gray-800/30 rounded-2xl overflow-hidden relative group cursor-pointer border border-gray-600/30 hover:border-gray-500/50 transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl"
-                        onClick={() => handlePostClick(post)}
-                      >
-                        {/* Check if it's a video file */}
-                        {post?.mediaUrl &&
-                        post.mediaUrl.toLowerCase().endsWith(".mp4") ? (
-                          <video
-                            src={post.mediaUrl}
-                            className="w-full h-full object-cover"
-                            muted
-                            preload="metadata" // This helps generate a thumbnail
-                          />
-                        ) : (
-                          <img
-                            src={post?.mediaUrl}
-                            alt="Post"
-                            className="w-full h-full object-cover"
-                          />
+                {activeTab === "posts" ? (
+                  // Posts Grid with hover effects
+                  posts?.map((post) => (
+                    <div
+                      key={post._id}
+                      className="aspect-square bg-gradient-to-br from-gray-700/30 to-gray-800/30 rounded-2xl overflow-hidden relative group cursor-pointer border border-gray-600/30 hover:border-gray-500/50 transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl"
+                      onClick={() => handlePostClick(post)}
+                    >
+                      {/* Check if it's a video file */}
+                      {post?.mediaUrl &&
+                      post.mediaUrl.toLowerCase().endsWith(".mp4") ? (
+                        <video
+                          src={post.mediaUrl}
+                          className="w-full h-full object-cover"
+                          muted
+                          preload="metadata" // This helps generate a thumbnail
+                        />
+                      ) : (
+                        <img
+                          src={post?.mediaUrl}
+                          alt="Post"
+                          className="w-full h-full object-cover"
+                        />
+                      )}
+
+                      {/* Hover Overlay */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-end justify-center pb-4">
+                        <div className="flex items-center space-x-6">
+                          <div className="flex items-center text-white">
+                            <Heart size={24} className="fill-white" />
+                            <span className="ml-2 font-semibold">
+                              {post.likes}
+                            </span>
+                          </div>
+                          <div className="flex items-center text-white">
+                            <MessageCircle size={24} className="fill-white" />
+                            <span className="ml-2 font-semibold">
+                              {post?.comments?.length || 0}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Video play indicator */}
+                      {post?.mediaUrl &&
+                        post.mediaUrl.toLowerCase().endsWith(".mp4") && (
+                          <div className="absolute top-3 right-3 bg-black/70 rounded-full p-2 backdrop-blur-sm">
+                            <svg
+                              width="16"
+                              height="16"
+                              viewBox="0 0 24 24"
+                              fill="white"
+                            >
+                              <path d="M8 5v14l11-7z" />
+                            </svg>
+                          </div>
                         )}
-
-                        {/* Hover Overlay */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-end justify-center pb-4">
-                          <div className="flex items-center space-x-6">
-                            <div className="flex items-center text-white">
-                              <Heart size={24} className="fill-white" />
-                              <span className="ml-2 font-semibold">
-                                {post.likes}
-                              </span>
-                            </div>
-                            <div className="flex items-center text-white">
-                              <MessageCircle size={24} className="fill-white" />
-                              <span className="ml-2 font-semibold">
-                                {post?.comments?.length || 0}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Video play indicator */}
-                        {post?.mediaUrl &&
-                          post.mediaUrl.toLowerCase().endsWith(".mp4") && (
-                            <div className="absolute top-3 right-3 bg-black/70 rounded-full p-2 backdrop-blur-sm">
-                              <svg
-                                width="16"
-                                height="16"
-                                viewBox="0 0 24 24"
-                                fill="white"
-                              >
-                                <path d="M8 5v14l11-7z" />
-                              </svg>
-                            </div>
-                          )}
+                    </div>
+                  ))
+                ) : // Projects Grid
+                projects.length > 0 ? (
+                  projects.map((project, i) => (
+                    <div
+                      key={i}
+                      className="bg-gradient-to-br from-[#232526] via-[#1a1b1c] to-[#000000] p-6 rounded-2xl shadow-xl border border-gray-500/30 hover:border-gray-400/50 transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl cursor-pointer"
+                      onClick={() => setSelectedProject(project)}
+                    >
+                      <h3 className="font-semibold text-gray-100 text-lg mb-3">
+                        {project.title}
+                      </h3>
+                      <p className="text-gray-400 text-sm mb-4 leading-relaxed">
+                        {project.description}
+                      </p>
+                      <div className="mb-4">
+                        <img
+                          src={project.mediaUrl}
+                          alt="Project"
+                          className="w-full h-32 object-cover rounded-xl"
+                        />
                       </div>
-                    ))
-                  : // Projects Grid
-                    projects.length > 0
-                    ? projects.map((project, i) => (
-                        <div
-                          key={i}
-                          className="bg-gradient-to-br from-[#232526] via-[#1a1b1c] to-[#000000] p-6 rounded-2xl shadow-xl border border-gray-500/30 hover:border-gray-400/50 transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl cursor-pointer"
-                          onClick={() => setSelectedProject(project)}
+                      <div className="flex flex-wrap gap-2 mb-4">
+                        {project?.TechStack?.map((tech, index) => (
+                          <span
+                            key={index}
+                            className="px-3 py-1 bg-gradient-to-r from-blue-600/20 to-blue-700/20 text-blue-400 rounded-lg text-xs border border-blue-500/30"
+                          >
+                            {tech}
+                          </span>
+                        ))}
+                      </div>
+                      <div className="space-y-2">
+                        <a
+                          href={project?.githubUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-2 text-blue-400 hover:text-blue-300 transition-colors text-sm"
                         >
-                          <h3 className="font-semibold text-gray-100 text-lg mb-3">{project.title}</h3>
-                          <p className="text-gray-400 text-sm mb-4 leading-relaxed">
-                            {project.description}
-                          </p>
-                          <div className="mb-4">
-                            <img
-                              src={project.mediaUrl}
-                              alt="Project"
-                              className="w-full h-32 object-cover rounded-xl"
-                            />
-                          </div>
-                          <div className="flex flex-wrap gap-2 mb-4">
-                            {project?.TechStack?.map((tech, index) => (
-                              <span
-                                key={index}
-                                className="px-3 py-1 bg-gradient-to-r from-blue-600/20 to-blue-700/20 text-blue-400 rounded-lg text-xs border border-blue-500/30"
-                              >
-                                {tech}
-                              </span>
-                            ))}
-                          </div>
-                          <div className="space-y-2">
-                            <a
-                              href={project?.githubUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="flex items-center gap-2 text-blue-400 hover:text-blue-300 transition-colors text-sm"
-                            >
-                              <Github size={16} />
-                              <span>View on GitHub</span>
-                            </a>
-                            <a
-                              href={project?.projectUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="flex items-center gap-2 text-blue-400 hover:text-blue-300 transition-colors text-sm"
-                            >
-                              <ExternalLink size={16} />
-                              <span>Live Demo</span>
-                            </a>
-                          </div>
-                        </div>
-                      ))
-                    : (
-                      <div className="col-span-full text-center py-12">
-                        <div className="text-gray-400 text-lg">No projects to show</div>
+                          <Github size={16} />
+                          <span>View on GitHub</span>
+                        </a>
+                        <a
+                          href={project?.projectUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-2 text-blue-400 hover:text-blue-300 transition-colors text-sm"
+                        >
+                          <ExternalLink size={16} />
+                          <span>Live Demo</span>
+                        </a>
                       </div>
-                    )}
+                    </div>
+                  ))
+                ) : (
+                  <div className="col-span-full text-center py-12">
+                    <div className="text-gray-400 text-lg">
+                      No projects to show
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -443,7 +468,10 @@ function NetworkProfile() {
               className="absolute top-1 left-1 sm:top-2 sm:left-2 md:top-4 md:left-4 p-1.5 sm:p-2 bg-gray-800/50 hover:bg-gray-700/50 rounded-full cursor-pointer transition-all duration-300 border border-gray-600/30 hover:border-gray-500/50 z-50"
               aria-label="Close post modal"
             >
-              <X size={16} className="text-gray-300 sm:w-4 sm:h-4 md:w-5 md:h-5" />
+              <X
+                size={16}
+                className="text-gray-300 sm:w-4 sm:h-4 md:w-5 md:h-5"
+              />
             </button>
 
             {/* Media Section (photo, video, etc.) */}
@@ -477,7 +505,9 @@ function NetworkProfile() {
                     />
                   )
                 ) : (
-                  <div className="flex items-center justify-center w-full h-40 text-gray-400">No media available</div>
+                  <div className="flex items-center justify-center w-full h-40 text-gray-400">
+                    No media available
+                  </div>
                 )}
               </div>
             </div>
@@ -493,16 +523,20 @@ function NetworkProfile() {
                     className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 lg:w-12 lg:h-12 rounded-full object-cover ring-2 ring-gray-600/50"
                   />
                   <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-gray-100 text-xs sm:text-sm md:text-base truncate">{selectedPost.caption}</p>
-                    <p className="text-xs text-gray-400">
-                      {selectedPost.time}
+                    <p className="font-semibold text-gray-100 text-xs sm:text-sm md:text-base truncate">
+                      {selectedPost.caption}
                     </p>
+                    <p className="text-xs text-gray-400">{selectedPost.time}</p>
                   </div>
                 </div>
               </div>
 
               {/* Comments Section - Hidden on mobile and tablet unless comment button is clicked */}
-              <div className={`flex-1 overflow-y-auto min-h-0 ${commentModalOpen ? 'block' : 'hidden lg:block'}`}>
+              <div
+                className={`flex-1 overflow-y-auto min-h-0 ${
+                  commentModalOpen ? "block" : "hidden lg:block"
+                }`}
+              >
                 <Comments postId={selectedPost._id} />
               </div>
 
@@ -528,11 +562,17 @@ function NetworkProfile() {
                       onClick={() => setCommentModalOpen(!commentModalOpen)}
                       className="p-1 sm:p-1.5 md:p-2 hover:bg-gray-700/50 rounded-full transition-all duration-300"
                     >
-                      <MessageCircle size={18} className="text-gray-400 hover:text-gray-300 sm:w-5 sm:h-5 md:w-6 md:h-6" />
+                      <MessageCircle
+                        size={18}
+                        className="text-gray-400 hover:text-gray-300 sm:w-5 sm:h-5 md:w-6 md:h-6"
+                      />
                     </button>
 
                     <button className="p-1 sm:p-1.5 md:p-2 hover:bg-gray-700/50 rounded-full transition-all duration-300">
-                      <Share2 size={18} className="text-gray-400 hover:text-gray-300 sm:w-5 sm:h-5 md:w-6 md:h-6" />
+                      <Share2
+                        size={18}
+                        className="text-gray-400 hover:text-gray-300 sm:w-5 sm:h-5 md:w-6 md:h-6"
+                      />
                     </button>
                   </div>
                 </div>
@@ -564,7 +604,9 @@ function NetworkProfile() {
                     </button>
                   </form>
                 )}
-                <p className="text-xs sm:text-sm text-gray-500 mt-1 sm:mt-2 md:mt-3">{selectedPost.time}</p>
+                <p className="text-xs sm:text-sm text-gray-500 mt-1 sm:mt-2 md:mt-3">
+                  {selectedPost.time}
+                </p>
               </div>
             </div>
           </div>
@@ -581,7 +623,10 @@ function NetworkProfile() {
               className="absolute top-1 left-1 sm:top-2 sm:left-2 md:top-4 md:left-4 p-1.5 sm:p-2 bg-gray-800/50 hover:bg-gray-700/50 rounded-full cursor-pointer transition-all duration-300 border border-gray-600/30 hover:border-gray-500/50 z-50"
               aria-label="Close project modal"
             >
-              <X size={16} className="text-gray-300 sm:w-4 sm:h-4 md:w-5 md:h-5" />
+              <X
+                size={16}
+                className="text-gray-300 sm:w-4 sm:h-4 md:w-5 md:h-5"
+              />
             </button>
 
             {/* Project Image Section */}
@@ -589,7 +634,7 @@ function NetworkProfile() {
               <div className="w-full flex items-center justify-center">
                 <img
                   src={selectedProject.mediaUrl}
-                  alt='Project content'
+                  alt="Project content"
                   className="object-contain aspect-[4/3] mx-auto my-4
                     w-full
                     max-w-[95vw] max-h-[45vh] min-h-[180px]
@@ -604,8 +649,12 @@ function NetworkProfile() {
             <div className="w-full lg:w-5/12 flex-1 flex lg:border-l border-gray-500/30 flex-col min-h-0 lg:min-h-full bg-gradient-to-br from-[#232526] via-[#1a1b1c] to-[#000000] overflow-y-auto px-2 sm:px-4 md:px-6">
               {/* Project Header */}
               <div className="p-2 sm:p-3 md:p-4 lg:p-6 border-b border-gray-500/30 bg-gradient-to-r from-gray-700/20 via-gray-600/10 to-gray-700/20 flex-shrink-0">
-                <h2 className="font-semibold text-gray-100 text-lg sm:text-xl md:text-2xl truncate">{selectedProject.title}</h2>
-                <p className="text-xs text-gray-400 mt-1">{selectedProject.description}</p>
+                <h2 className="font-semibold text-gray-100 text-lg sm:text-xl md:text-2xl truncate">
+                  {selectedProject.title}
+                </h2>
+                <p className="text-xs text-gray-400 mt-1">
+                  {selectedProject.description}
+                </p>
               </div>
 
               {/* Tech Stack */}

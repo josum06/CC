@@ -24,7 +24,9 @@ const Network = () => {
     try {
       setIsLoading(true);
       const res = await axios.get(
-        `http://localhost:3000/api/post/getAll-post?page=${pageNum}`
+        `${
+          import.meta.env.VITE_BACKEND_URL
+        }/api/post/getAll-post?page=${pageNum}`
       );
       const newPost = res.data.post;
       if (newPost.length === 0) {
@@ -49,10 +51,9 @@ const Network = () => {
   const fetchProjects = async () => {
     try {
       const res = await axios.get(
-        "http://localhost:3000/api/project/get-projects"
+        `${import.meta.env.VITE_BACKEND_URL}/api/project/get-projects`
       );
       const data = res.data;
-      console.log("Projects are:-", data);
       setProjects(data);
     } catch (err) {
       console.error("Error fetching projects:", err);
@@ -102,12 +103,16 @@ const Network = () => {
                     : "text-gray-400 hover:text-gray-300 hover:bg-gray-700/30"
                 }`}
               >
-                <div className={`absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ${
-                  activeTab === "posts" ? "translate-x-full" : ""
-                }`}></div>
-                <Grid className={`w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5 transition-all duration-300 ${
-                  activeTab === "posts" ? "text-blue-400" : "text-gray-500"
-                }`} />
+                <div
+                  className={`absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ${
+                    activeTab === "posts" ? "translate-x-full" : ""
+                  }`}
+                ></div>
+                <Grid
+                  className={`w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5 transition-all duration-300 ${
+                    activeTab === "posts" ? "text-blue-400" : "text-gray-500"
+                  }`}
+                />
                 <span className="relative z-10">Posts</span>
                 {activeTab === "posts" && (
                   <span className="relative z-10 ml-1 sm:ml-2 px-1 sm:px-2 py-0.5 sm:py-1 text-xs bg-blue-500/20 text-blue-300 rounded-full border border-blue-500/30">
@@ -115,7 +120,7 @@ const Network = () => {
                   </span>
                 )}
               </button>
-              
+
               <button
                 onClick={() => setActiveTab("projects")}
                 className={`flex-1 px-3 py-2 sm:px-4 sm:py-3 md:px-6 md:py-4 rounded-lg sm:rounded-xl text-xs sm:text-sm font-semibold transition-all duration-300 flex items-center justify-center gap-1 sm:gap-2 md:gap-3 group relative overflow-hidden ${
@@ -124,12 +129,18 @@ const Network = () => {
                     : "text-gray-400 hover:text-gray-300 hover:bg-gray-700/30"
                 }`}
               >
-                <div className={`absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ${
-                  activeTab === "projects" ? "translate-x-full" : ""
-                }`}></div>
-                <Briefcase className={`w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5 transition-all duration-300 ${
-                  activeTab === "projects" ? "text-purple-400" : "text-gray-500"
-                }`} />
+                <div
+                  className={`absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ${
+                    activeTab === "projects" ? "translate-x-full" : ""
+                  }`}
+                ></div>
+                <Briefcase
+                  className={`w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5 transition-all duration-300 ${
+                    activeTab === "projects"
+                      ? "text-purple-400"
+                      : "text-gray-500"
+                  }`}
+                />
                 <span className="relative z-10">Projects</span>
                 {activeTab === "projects" && (
                   <span className="relative z-10 ml-1 sm:ml-2 px-1 sm:px-2 py-0.5 sm:py-1 text-xs bg-purple-500/20 text-purple-300 rounded-full border border-purple-500/30">
@@ -147,26 +158,36 @@ const Network = () => {
                 <div className="animate-spin rounded-full h-8 w-8 sm:h-10 sm:w-10 md:h-12 md:w-12 border-t-2 border-b-2 border-blue-500"></div>
               </div>
             )}
-            
+
             {!isLoading && activeTab === "posts" && posts.length === 0 && (
               <div className="bg-gradient-to-br from-gray-900/80 to-gray-800/80 backdrop-blur-xl rounded-xl sm:rounded-2xl border border-gray-700/50 p-6 sm:p-8 md:p-12 text-center">
                 <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 mx-auto mb-4 sm:mb-6 bg-gradient-to-br from-blue-500/20 to-blue-600/20 rounded-full flex items-center justify-center">
                   <Grid className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 text-blue-400" />
                 </div>
-                <h3 className="text-lg sm:text-xl md:text-2xl font-semibold text-white mb-2 leading-tight">No Posts Yet</h3>
-                <p className="text-sm sm:text-base text-gray-400 leading-relaxed">Be the first to share something with your campus community!</p>
+                <h3 className="text-lg sm:text-xl md:text-2xl font-semibold text-white mb-2 leading-tight">
+                  No Posts Yet
+                </h3>
+                <p className="text-sm sm:text-base text-gray-400 leading-relaxed">
+                  Be the first to share something with your campus community!
+                </p>
               </div>
             )}
-            
-            {!isLoading && activeTab === "projects" && (!projects || projects.length === 0) && (
-              <div className="bg-gradient-to-br from-gray-900/80 to-gray-800/80 backdrop-blur-xl rounded-xl sm:rounded-2xl border border-gray-700/50 p-6 sm:p-8 md:p-12 text-center">
-                <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 mx-auto mb-4 sm:mb-6 bg-gradient-to-br from-purple-500/20 to-purple-600/20 rounded-full flex items-center justify-center">
-                  <Briefcase className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 text-purple-400" />
+
+            {!isLoading &&
+              activeTab === "projects" &&
+              (!projects || projects.length === 0) && (
+                <div className="bg-gradient-to-br from-gray-900/80 to-gray-800/80 backdrop-blur-xl rounded-xl sm:rounded-2xl border border-gray-700/50 p-6 sm:p-8 md:p-12 text-center">
+                  <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 mx-auto mb-4 sm:mb-6 bg-gradient-to-br from-purple-500/20 to-purple-600/20 rounded-full flex items-center justify-center">
+                    <Briefcase className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 text-purple-400" />
+                  </div>
+                  <h3 className="text-lg sm:text-xl md:text-2xl font-semibold text-white mb-2 leading-tight">
+                    No Projects Yet
+                  </h3>
+                  <p className="text-sm sm:text-base text-gray-400 leading-relaxed">
+                    Start showcasing your amazing projects to the community!
+                  </p>
                 </div>
-                <h3 className="text-lg sm:text-xl md:text-2xl font-semibold text-white mb-2 leading-tight">No Projects Yet</h3>
-                <p className="text-sm sm:text-base text-gray-400 leading-relaxed">Start showcasing your amazing projects to the community!</p>
-              </div>
-            )}
+              )}
 
             {activeTab === "posts"
               ? posts?.map((post, index) => (

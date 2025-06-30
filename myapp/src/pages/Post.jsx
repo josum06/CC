@@ -1,8 +1,18 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { 
-  UploadCloud, Send, ArrowLeft, X, Image, Video, Link, Smile,
-  Loader2, FileText, Calendar, Briefcase
+import {
+  UploadCloud,
+  Send,
+  ArrowLeft,
+  X,
+  Image,
+  Video,
+  Link,
+  Smile,
+  Loader2,
+  FileText,
+  Calendar,
+  Briefcase,
 } from "lucide-react";
 import axios from "axios";
 import { toast } from "react-toastify";
@@ -45,7 +55,7 @@ const PostPage = () => {
     setIsSubmitting(true);
     try {
       const response = await axios.get(
-        `http://localhost:3000/api/user/profile/${user.id}`
+        `${import.meta.env.VITE_BACKEND_URL}/api/user/profile/${user.id}`
       );
 
       const data = response.data;
@@ -54,9 +64,13 @@ const PostPage = () => {
       form.append("file", formData.file);
       form.append("author", data._id);
 
-      await axios.post("http://localhost:3000/api/post/create-post", form, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      await axios.post(
+        "${import.meta.env.VITE_BACKEND_URL}/api/post/create-post",
+        form,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      );
       toast.success("Post created successfully!");
       navigate("/");
     } catch (err) {
@@ -72,7 +86,6 @@ const PostPage = () => {
       {/* Header Section */}
       <div className="border-b border-gray-500/50 px-4 py-6 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
-         
           <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-100">
             Create Post
           </h1>
@@ -94,7 +107,9 @@ const PostPage = () => {
                 className="w-12 h-12 sm:w-14 sm:h-14 rounded-full object-cover ring-2 ring-blue-500/30 shadow-lg"
               />
               <div>
-                <h2 className="font-semibold text-gray-100 text-lg">{user?.fullName}</h2>
+                <h2 className="font-semibold text-gray-100 text-lg">
+                  {user?.fullName}
+                </h2>
                 <p className="text-sm text-gray-400">Posting to your feed</p>
               </div>
             </div>
@@ -103,17 +118,21 @@ const PostPage = () => {
           <form onSubmit={handleSubmit} className="p-6 space-y-6">
             {/* Post Type Selection */}
             <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-300">Post Type</label>
+              <label className="text-sm font-medium text-gray-300">
+                Post Type
+              </label>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 {Object.entries(postTypeIcons).map(([type, icon]) => (
                   <button
                     key={type}
                     type="button"
-                    onClick={() => setFormData(prev => ({ ...prev, postType: type }))}
+                    onClick={() =>
+                      setFormData((prev) => ({ ...prev, postType: type }))
+                    }
                     className={`flex items-center justify-center space-x-3 p-4 rounded-xl border-2 transition-all duration-300 ${
                       formData.postType === type
-                        ? 'border-blue-500 bg-gradient-to-br from-blue-500/20 via-blue-600/10 to-blue-700/5 text-blue-400 shadow-lg shadow-blue-500/20'
-                        : 'border-gray-500/50 hover:border-gray-400/50 text-gray-400 hover:text-gray-300 bg-gradient-to-br from-gray-500/10 via-gray-600/5 to-gray-700/5 hover:from-gray-400/10 hover:via-gray-500/5 hover:to-gray-600/5'
+                        ? "border-blue-500 bg-gradient-to-br from-blue-500/20 via-blue-600/10 to-blue-700/5 text-blue-400 shadow-lg shadow-blue-500/20"
+                        : "border-gray-500/50 hover:border-gray-400/50 text-gray-400 hover:text-gray-300 bg-gradient-to-br from-gray-500/10 via-gray-600/5 to-gray-700/5 hover:from-gray-400/10 hover:via-gray-500/5 hover:to-gray-600/5"
                     }`}
                   >
                     {icon}
@@ -125,7 +144,9 @@ const PostPage = () => {
 
             {/* Caption Input */}
             <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-300">What's on your mind?</label>
+              <label className="text-sm font-medium text-gray-300">
+                What's on your mind?
+              </label>
               <textarea
                 name="description"
                 value={formData.description}
@@ -139,7 +160,9 @@ const PostPage = () => {
 
             {/* Media Upload */}
             <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-300">Media Upload (Optional)</label>
+              <label className="text-sm font-medium text-gray-300">
+                Media Upload (Optional)
+              </label>
               <div className="relative w-full aspect-video rounded-xl overflow-hidden bg-gradient-to-br from-gray-500/10 via-gray-600/5 to-gray-700/5 border-2 border-dashed border-gray-500/50 hover:border-blue-500/50 transition-all duration-300 group">
                 {formData.file ? (
                   <div className="relative w-full h-full group">
@@ -167,8 +190,12 @@ const PostPage = () => {
                 ) : (
                   <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-500 group-hover:text-blue-400 transition-colors">
                     <UploadCloud size={48} className="mb-3" />
-                    <p className="text-sm font-medium">Click or drag files to upload</p>
-                    <p className="text-xs text-gray-600 mt-1">Supports images and videos</p>
+                    <p className="text-sm font-medium">
+                      Click or drag files to upload
+                    </p>
+                    <p className="text-xs text-gray-600 mt-1">
+                      Supports images and videos
+                    </p>
                   </div>
                 )}
                 <input
@@ -232,7 +259,9 @@ const PostPage = () => {
 
         {/* Additional Info Card */}
         <div className="mt-6 bg-gradient-to-br from-[#232526] via-[#1a1b1c] to-[#000000] rounded-2xl border border-gray-500/30 p-6">
-          <h3 className="text-lg font-semibold text-gray-100 mb-3">Posting Tips</h3>
+          <h3 className="text-lg font-semibold text-gray-100 mb-3">
+            Posting Tips
+          </h3>
           <div className="space-y-2 text-sm text-gray-400">
             <div className="flex items-start gap-2">
               <div className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
@@ -248,7 +277,10 @@ const PostPage = () => {
             </div>
             <div className="flex items-start gap-2">
               <div className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
-              <p>Choose the appropriate post type to help others understand your content</p>
+              <p>
+                Choose the appropriate post type to help others understand your
+                content
+              </p>
             </div>
           </div>
         </div>
