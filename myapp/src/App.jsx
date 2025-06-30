@@ -12,7 +12,7 @@ import Network from "./pages/Network";
 import Chats from "./pages/Chats";
 import SignUpPage from "./pages/SignUp";
 import Login from "./pages/Login";
-import Home from "./pages/Home";
+
 import YourAccount from "./pages/YourAccount";
 import PostProject from "./pages/PostProject";
 import ClassRoom from "./pages/ClassRoom";
