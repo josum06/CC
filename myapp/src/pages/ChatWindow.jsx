@@ -5,11 +5,12 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { BsFileEarmark, BsThreeDotsVertical, BsX } from "react-icons/bs";
 import { FaMicrophone, FaRegPaperPlane, FaRegSmile } from "react-icons/fa";
-import { IoClose } from "react-icons/io5";
-import { Send, Smile, Paperclip, Mic, MoreVertical, Phone, Video, Info } from "lucide-react";
+import { Send, Smile, Paperclip, Mic, User } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import socket from "../utils/socket";
 
 const ChatWindow = ({ user, recipient }) => {
+  const navigate = useNavigate();
   const [message, setMessage] = useState("");
   const [chat, setChat] = useState([]);
   const messagesEndRef = useRef(null);
@@ -17,10 +18,10 @@ const ChatWindow = ({ user, recipient }) => {
   const [shouldScroll, setShouldScroll] = useState(true);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const emojiPickerRef = useRef(null);
-  const [showProfilePhoto, setShowProfilePhoto] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
   const [showReactions, setShowReactions] = useState(null);
   const [reactions, setReactions] = useState({});
+  const [showProfilePhotoModal, setShowProfilePhotoModal] = useState(false);
 
   const roomId = useMemo(() => {
     return user && recipient ? [user._id, recipient._id].sort().join("_") : "";
@@ -132,6 +133,12 @@ const ChatWindow = ({ user, recipient }) => {
     }
   };
 
+  const handleProfileClick = () => {
+    if (recipient && recipient._id) {
+      navigate('/NetworkProfile', { state: { userData: { userId: recipient._id } } });
+    }
+  };
+
   const handleScroll = () => {
     const container = chatContainerRef.current;
     if (!container) return;
@@ -191,15 +198,13 @@ const ChatWindow = ({ user, recipient }) => {
     }
   };
 
-  
-
   return (
     <div className="flex flex-col h-full bg-transparent relative">
       {/* Header */}
-      <div className="bg-[#000000] backdrop-blur-xl border-b border-gray-700/50 px-4 py-3 md:px-6 md:py-4 shadow-lg">
+      <div className="bg-[#000000] backdrop-blur-xl border-b border-gray-700/50 px-4 py-3 md:px-6 md:py-4 shadow-lg relative">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3 md:gap-4">
-            <div className="relative group cursor-pointer" onClick={() => setShowProfilePhoto(true)}>
+            <div className="relative group cursor-pointer" onClick={() => setShowProfilePhotoModal(true)}>
               <img
                 src={recipient.profileImage || "default-user.jpg"}
                 alt={recipient.fullName}
@@ -208,7 +213,10 @@ const ChatWindow = ({ user, recipient }) => {
               <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-gray-900 shadow-lg animate-pulse"></div>
             </div>
             <div className="flex-1 min-w-0">
-              <h2 className="font-semibold text-white text-base md:text-lg truncate">
+              <h2
+                className="font-semibold text-white text-base md:text-lg truncate cursor-pointer hover:text-blue-400 transition-colors"
+                onClick={handleProfileClick}
+              >
                 {recipient.fullName}
               </h2>
               <p className="text-xs md:text-sm text-green-400 flex items-center">
@@ -227,21 +235,44 @@ const ChatWindow = ({ user, recipient }) => {
             </div>
           </div>
           <div className="flex items-center gap-1 md:gap-2">
-            {/* <button className="p-2 hover:bg-white/10 rounded-xl transition-all duration-300 group hover:scale-105">
-              <Phone className="w-4 h-4 md:w-5 md:h-5 text-gray-400 group-hover:text-white transition-colors" />
-            </button>
-            <button className="p-2 hover:bg-white/10 rounded-xl transition-all duration-300 group hover:scale-105">
-              <Video className="w-4 h-4 md:w-5 md:h-5 text-gray-400 group-hover:text-white transition-colors" />
-            </button> */}
-            {/* <button className="p-2 hover:bg-white/10 rounded-xl transition-all duration-300 group hover:scale-105">
-              <Info className="w-4 h-4 md:w-5 md:h-5 text-gray-400 group-hover:text-white transition-colors" />
-            </button> */}
-            <button className="p-2 hover:bg-white/10 rounded-xl transition-all duration-300 group hover:scale-105">
-              <MoreVertical className="w-4 h-4 md:w-5 md:h-5 text-gray-400 group-hover:text-white transition-colors" />
+            <button
+              className="p-2 hover:bg-white/10 rounded-xl transition-all duration-300 group hover:scale-105 cursor-pointer"
+              onClick={handleProfileClick}
+              aria-label="View Profile"
+            >
+              <User className="w-5 h-5 md:w-6 md:h-6 text-gray-400 group-hover:text-white transition-colors" />
             </button>
           </div>
         </div>
       </div>
+
+      {/* Profile Photo Modal */}
+      {showProfilePhotoModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4" onClick={() => setShowProfilePhotoModal(false)}>
+          <div
+            className="relative max-w-lg w-full mx-auto bg-gradient-to-br from-gray-900/95 via-gray-800/90 to-gray-900/95 rounded-3xl shadow-2xl border border-gray-700/50 flex flex-col items-center p-6 animate-fadeIn"
+            onClick={e => e.stopPropagation()}
+          >
+            <button
+              className="absolute top-4 right-4 text-white hover:text-gray-300 transition-colors p-2 bg-black/40 rounded-full cursor-pointer"
+              onClick={() => setShowProfilePhotoModal(false)}
+              aria-label="Close"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+            <img
+              src={recipient.profileImage || "default-user.jpg"}
+              alt={recipient.fullName}
+              className="w-48 h-48 md:w-64 md:h-64 rounded-2xl object-cover border-4 border-gray-900 shadow-2xl mx-auto"
+              style={{ maxWidth: '90vw', maxHeight: '60vh' }}
+            />
+            <div className="mt-6 text-center">
+              <h3 className="text-xl font-semibold text-white mb-1">{recipient.fullName}</h3>
+              <p className="text-sm text-gray-400">{recipient.designation || "Student"}</p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Chat Messages */}
       <div
@@ -323,144 +354,12 @@ const ChatWindow = ({ user, recipient }) => {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Profile Photo Modal */}
-      <AnimatePresence>
-        {showProfilePhoto && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-50 p-4"
-            onClick={() => setShowProfilePhoto(false)}
-          >
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              className="relative max-w-md w-full mx-4"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <button
-                className="absolute -top-12 right-0 text-white hover:text-gray-300 transition-colors p-2"
-                onClick={() => setShowProfilePhoto(false)}
-              >
-                <IoClose className="w-6 h-6" />
-              </button>
-              <div className="bg-gradient-to-br from-gray-900/95 via-gray-800/90 to-gray-900/95 backdrop-blur-xl rounded-3xl overflow-hidden shadow-2xl border border-gray-700/50">
-                <div className="relative">
-                  <div className="h-24 bg-gradient-to-r from-blue-500/20 to-purple-500/20"></div>
-                  <div className="absolute -bottom-12 left-1/2 transform -translate-x-1/2">
-                    <div className="relative">
-                      <img
-                        src={recipient.profileImage || "default-user.jpg"}
-                        alt={recipient.fullName}
-                        className="w-24 h-24 rounded-full object-cover border-4 border-gray-900 shadow-2xl"
-                      />
-                      <div className="absolute bottom-0 right-0 w-6 h-6 bg-green-500 rounded-full border-2 border-gray-900 shadow-lg"></div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="pt-16 pb-6 px-6 text-center">
-                  <h3 className="text-xl font-semibold text-white">
-                    {recipient.fullName}
-                  </h3>
-                  <p className="text-sm text-gray-400">
-                    {recipient.designation || "Student"}
-                  </p>
-
-                  <div className="mt-6 flex justify-center space-x-6">
-                    <button className="flex flex-col items-center text-gray-400 hover:text-blue-400 transition-colors">
-                      <div className="w-10 h-10 rounded-full bg-gray-800/50 flex items-center justify-center mb-1">
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                        </svg>
-                      </div>
-                      <span className="text-xs">Message</span>
-                    </button>
-
-                    <button className="flex flex-col items-center text-gray-400 hover:text-blue-400 transition-colors">
-                      <div className="w-10 h-10 rounded-full bg-gray-800/50 flex items-center justify-center mb-1">
-                        <Video className="w-5 h-5" />
-                      </div>
-                      <span className="text-xs">Video</span>
-                    </button>
-
-                    <button className="flex flex-col items-center text-gray-400 hover:text-blue-400 transition-colors">
-                      <div className="w-10 h-10 rounded-full bg-gray-800/50 flex items-center justify-center mb-1">
-                        <Phone className="w-5 h-5" />
-                      </div>
-                      <span className="text-xs">Call</span>
-                    </button>
-                  </div>
-                </div>
-
-                <div className="border-t border-gray-700/50">
-                  <div className="p-4">
-                    <h4 className="text-sm font-medium text-gray-300 mb-2">About</h4>
-                    <p className="text-sm text-gray-400">
-                      {recipient.bio || "No bio available"}
-                    </p>
-                  </div>
-
-                  <div className="p-4 border-t border-gray-700/50">
-                    <h4 className="text-sm font-medium text-gray-300 mb-3">Contact Info</h4>
-                    <div className="space-y-3">
-                      <div className="flex items-start">
-                        <div className="w-8 h-8 rounded-full bg-gray-800/50 flex items-center justify-center mr-3">
-                          <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                          </svg>
-                        </div>
-                        <div>
-                          <p className="text-xs text-gray-500">Email</p>
-                          <p className="text-sm text-gray-300">
-                            {recipient.email || "Not available"}
-                          </p>
-                        </div>
-                      </div>
-
-                      <div className="flex items-start">
-                        <div className="w-8 h-8 rounded-full bg-gray-800/50 flex items-center justify-center mr-3">
-                          <Phone className="w-4 h-4 text-gray-400" />
-                        </div>
-                        <div>
-                          <p className="text-xs text-gray-500">Phone</p>
-                          <p className="text-sm text-gray-300">
-                            {recipient.phone || "Not available"}
-                          </p>
-                        </div>
-                      </div>
-
-                      <div className="flex items-start">
-                        <div className="w-8 h-8 rounded-full bg-gray-800/50 flex items-center justify-center mr-3">
-                          <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                          </svg>
-                        </div>
-                        <div>
-                          <p className="text-xs text-gray-500">Location</p>
-                          <p className="text-sm text-gray-300">
-                            {recipient.location || "Not available"}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
       {/* Chat Input */}
       <div className="p-3 md:p-4 bg-gradient-to-r from-gray-800/50 via-gray-700/30 to-gray-800/50 border-t border-gray-700/30 backdrop-blur-sm">
         <div className="flex items-center gap-2 md:gap-3 bg-gray-800/50 rounded-2xl px-3 md:px-4 py-2 md:py-3 border border-gray-700/50 shadow-lg hover:border-gray-600/50 transition-all duration-300">
           <div className="relative" ref={emojiPickerRef}>
             <button
-              className="text-gray-400 hover:text-blue-400 transition-all duration-300 p-1 md:p-2 hover:bg-white/10 rounded-xl hover:scale-105"
+              className="text-gray-400 hover:text-blue-400 transition-all duration-300 p-1 md:p-2 hover:bg-white/10 rounded-xl hover:scale-105 cursor-pointer"
               onClick={() => setShowEmojiPicker(!showEmojiPicker)}
             >
               <Smile className="w-5 h-5" />
@@ -484,7 +383,7 @@ const ChatWindow = ({ user, recipient }) => {
             )}
           </div>
 
-          <button className="text-gray-400 hover:text-blue-400 transition-all duration-300 p-1 md:p-2 hover:bg-white/10 rounded-xl hover:scale-105">
+          <button className="text-gray-400 hover:text-blue-400 transition-all duration-300 p-1 md:p-2 hover:bg-white/10 rounded-xl hover:scale-105 cursor-pointer">
             <Paperclip className="w-5 h-5" />
           </button>
 
@@ -506,17 +405,13 @@ const ChatWindow = ({ user, recipient }) => {
           {message.trim() ? (
             <motion.button
               onClick={sendMessage}
-              className="bg-gradient-to-r from-blue-500 to-purple-500 text-white p-2 md:p-3 rounded-full hover:from-blue-600 hover:to-purple-600 transition-all duration-300 shadow-lg"
+              className="bg-gradient-to-r from-blue-500 to-purple-500 text-white p-2 md:p-3 rounded-full hover:from-blue-600 hover:to-purple-600 transition-all duration-300 shadow-lg cursor-pointer"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
               <Send className="w-4 h-4 md:w-5 md:h-5" />
             </motion.button>
-          ) : (
-            <button className="text-gray-400 hover:text-blue-400 transition-all duration-300 p-1 md:p-2 hover:bg-white/10 rounded-xl hover:scale-105">
-              <Mic className="w-5 h-5" />
-            </button>
-          )}
+          ) : null}
         </div>
       </div>
 
@@ -537,6 +432,13 @@ const ChatWindow = ({ user, recipient }) => {
         
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
           background: linear-gradient(to bottom, rgba(59, 130, 246, 0.7), rgba(147, 51, 234, 0.7));
+        }
+        @keyframes fadeIn {
+          from { opacity: 0; transform: scale(0.95); }
+          to { opacity: 1; transform: scale(1); }
+        }
+        .animate-fadeIn {
+          animation: fadeIn 0.3s ease;
         }
       `}</style>
     </div>
