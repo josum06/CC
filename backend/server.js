@@ -21,8 +21,8 @@ const port = process.env.PORT || 3000;
 
 // Rate limiting configurations
 const generalLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // Limit each IP to 100 requests per windowMs
+  windowMs: 1 * 60 * 1000, // 1 minute
+  max: 200, // Limit each IP to 100 requests per windowMs
   message: {
     error: "Too many requests from this IP, please try again later.",
   },
@@ -34,15 +34,6 @@ const webhookLimiter = rateLimit({
   max: 50, // Allow more requests for webhooks as they come from trusted sources
   message: {
     error: "Too many webhook requests, please try again later.",
-  },
-});
-
-// Rate limiting for chat/messaging
-const chatLimiter = rateLimit({
-  windowMs: 1 * 60 * 1000, // 1 minute
-  max: 30, // Limit chat messages to prevent spam
-  message: {
-    error: "Too many messages sent, please slow down.",
   },
 });
 
@@ -77,7 +68,7 @@ app.use("/api/user", userRouter);
 app.use("/api/admin-post", adminRouter);
 app.use("/api/post", postRouter);
 app.use("/api/project", projectRouter);
-app.use("/api/chat", chatLimiter, chatRouter);
+app.use("/api/chat", chatRouter);
 
 app.post(
   "/api/webhooks",
