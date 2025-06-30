@@ -39,7 +39,10 @@ const webhookLimiter = rateLimit({
 
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:5173", // your frontend origin
+    origin: [
+      "http://localhost:5173",
+      "https://campus-connect-chi-ten.vercel.app",
+    ], // your frontend origin
     methods: ["GET", "POST"],
   },
 });
@@ -57,7 +60,10 @@ app.use(express.json()); // ✅ Use express.json() to parse JSON bodies
 
 app.use(
   cors({
-    origin: "*", // Allow frontend to access backend
+    origin: [
+      "http://localhost:5173",
+      "https://campus-connect-chi-ten.vercel.app",
+    ], // Allow frontend to access backend
     methods: "GET,POST,PUT,DELETE,PATCH",
     allowedHeaders: "Content-Type,Authorization",
   })
