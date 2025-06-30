@@ -2,9 +2,10 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import ChatWindow from "./ChatWindow";
 import { useUser } from "@clerk/clerk-react";
-import { Search, MessageCircle, Users, ArrowLeft, MoreVertical, Plus } from "lucide-react";
+import { Search, MessageCircle, Users, ArrowLeft, MoreVertical, Plus, Bell } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import ConnectionRequestsModal from "../components/ConnectionRequestsModal";
 
 const ChatApp = () => {
   const { user: clerkUser } = useUser();
@@ -16,6 +17,8 @@ const ChatApp = () => {
   const [showChat, setShowChat] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(true);
+  const [showRequestsModal, setShowRequestsModal] = useState(false);
+  const [pendingCount, setPendingCount] = useState(0);
 
   useEffect(() => {
     if (clerkUser) fetchCurrentUser();
@@ -37,6 +40,7 @@ const ChatApp = () => {
       );
       setUser(res.data);
       await fetchAllUsers(res.data._id);
+      await fetchPendingRequestsCount(res.data._id);
     } catch (error) {
       console.error("Error fetching user:", error);
     } finally {
@@ -53,6 +57,18 @@ const ChatApp = () => {
       setUsers(res.data);
     } catch (error) {
       console.error("Error fetching users:", error);
+    }
+  };
+
+  const fetchPendingRequestsCount = async (userId) => {
+    try {
+      const res = await axios.get(`http://localhost:3000/api/user/pendingRequests/${userId}`);
+      // If the API returns an array of requests:
+      setPendingCount(res.data.length);
+      // If the API returns a count directly:
+      // setPendingCount(res.data.count);
+    } catch (error) {
+      console.error("Error fetching pending requests count:", error);
     }
   };
 
@@ -98,24 +114,31 @@ const ChatApp = () => {
             </button>
             <div className="relative group">
               <img
-                src={user?.profileImage || "default-user.jpg"}
+                src={clerkUser?.imageUrl || "default-user.jpg"}
                 alt="user"
                 className="w-10 h-10 md:w-12 md:h-12 rounded-full object-cover ring-2 ring-blue-500/30 shadow-lg group-hover:ring-blue-500/60 transition-all duration-300"
               />
               <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-gray-900 shadow-lg animate-pulse"></div>
             </div>
             <div className="flex-1 min-w-0">
-              <h2 className="text-lg md:text-xl font-bold text-white truncate">Messages</h2>
+              <h2 className="text-lg md:text-xl font-bold text-white truncate">
+                {clerkUser?.fullName}
+              </h2>
               <p className="text-xs md:text-sm text-gray-400 truncate">
                 {isLoading ? "Loading..." : `${users.length} connections`}
               </p>
             </div>
-            <button className="p-2 hover:bg-white/10 rounded-xl transition-all duration-300 group hover:scale-105 cursor-pointer">
-              <Plus className="w-5 h-5 text-gray-400 group-hover:text-white transition-colors" />
+            <button
+              className="p-2 hover:bg-white/10 rounded-xl transition-all duration-300 group hover:scale-105 cursor-pointer relative"
+              onClick={() => setShowRequestsModal(true)}
+            >
+              <Bell className="w-5 h-5 text-gray-400 group-hover:text-white transition-colors" />
+              {pendingCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full px-1.5 py-0.5 shadow-lg">
+                  {pendingCount}
+                </span>
+              )}
             </button>
-            {/* <button className="p-2 hover:bg-white/10 rounded-xl transition-all duration-300 group hover:scale-105">
-              <MoreVertical className="w-5 h-5 text-gray-400 group-hover:text-white transition-colors" />
-            </button> */}
           </div>
         </div>
 
@@ -239,7 +262,19 @@ const ChatApp = () => {
                 </div>
               </div>
             )}
-            <ChatWindow user={user} recipient={recipient} />
+            {/* User Info Bar */}
+            <div className="flex items-center gap-3 p-4 border-b border-gray-700/50 bg-black/70">
+              <img
+                src={clerkUser?.imageUrl || "default-user.jpg"}
+                alt="Your profile"
+                className="w-10 h-10 rounded-full object-cover border-2 border-blue-500/30"
+              />
+              <div>
+                <div className="text-white font-semibold">{clerkUser?.fullName || "You"}</div>
+                <div className="text-xs text-gray-400">You</div>
+              </div>
+            </div>
+            <ChatWindow user={user} recipient={recipient} clerkUser={clerkUser} />
           </>
         ) : (
           <div className="flex-1 flex flex-col items-center justify-center text-gray-400 bg-transparent relative">
@@ -266,6 +301,13 @@ const ChatApp = () => {
           </div>
         )}
       </div>
+
+      <ConnectionRequestsModal
+        isOpen={showRequestsModal}
+        onClose={() => setShowRequestsModal(false)}
+        userId={user?._id}
+        navigate={navigate}
+      />
 
       <style jsx>{`
         .custom-scrollbar::-webkit-scrollbar {
