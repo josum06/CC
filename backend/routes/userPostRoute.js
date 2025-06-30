@@ -20,8 +20,6 @@ const postLimiter = rateLimit({
   message: {
     error: "Too many posts created/updated, please try again later.",
   },
-  standardHeaders: true,
-  legacyHeaders: false,
 });
 
 // Configure storage for videos and images
