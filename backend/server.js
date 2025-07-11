@@ -19,6 +19,9 @@ const server = require("http").createServer(app);
 connectDb();
 const port = process.env.PORT || 3000;
 
+// Middleware to trust the first proxy (for render hosted environment)
+app.set("trust proxy", 1);
+
 // Rate limiting configurations
 const generalLimiter = rateLimit({
   windowMs: 1 * 60 * 1000, // 1 minute
