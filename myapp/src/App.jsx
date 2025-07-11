@@ -53,15 +53,9 @@ function App() {
         <Routes>
           {/* Public Routes */}
           <Route element={<NoNavFooterLayout />}>
-            <Route path="/Signup" element={<SignUpPage />} />
+            <Route path="/SignUp" element={<SignUpPage />} />
             <Route path="/Login" element={<Login />} />
-           
-            
-           
-            
-           
-            
-           
+
             <Route
               path="/Chats"
               element={
@@ -95,7 +89,7 @@ function App() {
                 </ProtectedRoute>
               }
             />
-             <Route
+            <Route
               path="/FacultyRole"
               element={
                 <ProtectedRoute>
@@ -111,7 +105,7 @@ function App() {
                 </ProtectedRoute>
               }
             />
-             <Route
+            <Route
               path="/NetworkProfile"
               element={
                 <ProtectedRoute>
@@ -137,14 +131,14 @@ function App() {
             />
           </Route>
           <Route
-              path="/YourAccount"
-              element={
-                <ProtectedRoute>
-                  <YourAccount />
-                </ProtectedRoute>
-              }
-            />
-             <Route path="/ClassRoom" element={<ClassRoom />} />
+            path="/YourAccount"
+            element={
+              <ProtectedRoute>
+                <YourAccount />
+              </ProtectedRoute>
+            }
+          />
+          <Route path="/ClassRoom" element={<ClassRoom />} />
 
           {/* Fallback Route */}
           <Route path="*" element={<Navigate to="/Login" />} />

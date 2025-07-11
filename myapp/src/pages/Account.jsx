@@ -256,7 +256,7 @@ const Account = () => {
 
           {/* Sign Out Section */}
           <div className="mt-8 pt-6 border-t border-gray-700/50">
-            <SignOutButton redirectUrl="/Signup">
+            <SignOutButton redirectUrl="/SignUp">
               <button className="w-full group cursor-pointer p-4 rounded-2xl bg-gradient-to-r from-red-600/20 to-red-700/20 border border-red-500/50 hover:border-red-400/50 transition-all duration-300 hover:scale-[1.02] hover:shadow-xl relative overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
                 <div className="relative flex items-center justify-center gap-3">
