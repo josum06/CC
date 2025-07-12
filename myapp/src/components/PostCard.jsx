@@ -113,7 +113,7 @@ const PostCard = ({
       formData.append("postId", postId);
       formData.append("userId", currUserId);
       await axios.post(
-        "${import.meta.env.VITE_BACKEND_URL}/api/post/create-comment",
+        `${import.meta.env.VITE_BACKEND_URL}/api/post/create-comment`,
         formData,
         {
           headers: { "Content-Type": "application/json" },

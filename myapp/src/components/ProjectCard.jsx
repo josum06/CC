@@ -123,7 +123,9 @@ const ProjectCard = ({
       formData.append("projectId", projectId);
       formData.append("userId", user?._id);
       await axios.post(
-        "${import.meta.env.VITE_BACKEND_URL}/api/project/create-project-comment",
+        `${
+          import.meta.env.VITE_BACKEND_URL
+        }/api/project/create-project-comment`,
         formData,
         {
           headers: { "Content-Type": "application/json" },

@@ -104,7 +104,7 @@ const PostProject = () => {
       formData.skills.forEach((skill) => form.append("TechStack", skill));
       form.append("userId", userId);
       await axios.post(
-        "${import.meta.env.VITE_BACKEND_URL}/api/project/create-project",
+        `${import.meta.env.VITE_BACKEND_URL}/api/project/create-project`,
         form,
         {
           headers: { "Content-Type": "multipart/form-data" },

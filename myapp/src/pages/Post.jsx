@@ -65,7 +65,7 @@ const PostPage = () => {
       form.append("author", data._id);
 
       await axios.post(
-        "${import.meta.env.VITE_BACKEND_URL}/api/post/create-post",
+        `${import.meta.env.VITE_BACKEND_URL}/api/post/create-post`,
         form,
         {
           headers: { "Content-Type": "multipart/form-data" },

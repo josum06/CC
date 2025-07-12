@@ -173,7 +173,7 @@ function NetworkProfile() {
       formData.append("postId", selectedPost._id);
       formData.append("userId", currUserId);
       await axios.post(
-        "${import.meta.env.VITE_BACKEND_URL}/api/post/create-comment",
+        `${import.meta.env.VITE_BACKEND_URL}/api/post/create-comment`,
         formData,
         {
           headers: { "Content-Type": "application/json" },

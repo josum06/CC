@@ -64,7 +64,7 @@ const FacultyPost = () => {
       }
 
       await axios.post(
-        "${import.meta.env.VITE_BACKEND_URL}/api/admin-post/create-post",
+        `${import.meta.env.VITE_BACKEND_URL}/api/admin-post/create-post`,
         form,
         {
           headers: { "Content-Type": "multipart/form-data" },
