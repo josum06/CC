@@ -146,7 +146,7 @@ const CompleteYourProfile = () => {
         formData.append("idCardPhoto", idCardPhoto);
 
       const response = await axios.patch(
-        "${import.meta.env.VITE_BACKEND_URL}/api/user/upload-profile",
+        `${import.meta.env.VITE_BACKEND_URL}/api/user/upload-profile`,
         formData,
         {
           headers: { "Content-Type": "multipart/form-data" },
