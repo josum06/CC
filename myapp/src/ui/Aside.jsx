@@ -149,16 +149,20 @@ const Aside = () => {
                   <span className="text-xl text-gray-100">📝</span>
                   <span className="text-sm text-gray-100">Anything</span>
                 </button>
-                <button
-                  className="flex items-center gap-3 py-2 px-3 rounded-lg hover:bg-[#232526] text-left text-gray-100"
-                  onClick={() => {
-                    navigate("/FacultyPost");
-                    setExpanded(null);
-                  }}
-                >
-                  <span className="text-xl text-gray-100">👨‍🏫</span>
-                  <span className="text-sm text-gray-100">Faculty</span>
-                </button>
+                {mainUser?.role == "student" ? (
+                  ""
+                ) : (
+                  <button
+                    className="flex items-center gap-3 py-2 px-3 rounded-lg hover:bg-[#232526] text-left text-gray-100"
+                    onClick={() => {
+                      navigate("/FacultyPost");
+                      setExpanded(null);
+                    }}
+                  >
+                    <span className="text-xl text-gray-100">👨‍🏫</span>
+                    <span className="text-sm text-gray-100">Faculty</span>
+                  </button>
+                )}
                 <button
                   className="flex items-center gap-3 py-2 px-3 rounded-lg hover:bg-[#232526] text-left text-gray-100"
                   onClick={() => {
@@ -263,16 +267,20 @@ const Aside = () => {
                   <span className="text-xl">📝</span>
                   <span className="text-base">Anything</span>
                 </button>
-                <button
-                  className="flex items-center gap-3 py-3 px-4 rounded-lg hover:bg-[#232526] text-left text-gray-100 transition-colors"
-                  onClick={() => {
-                    navigate("/FacultyPost");
-                    setExpanded(null);
-                  }}
-                >
-                  <span className="text-xl">👨‍🏫</span>
-                  <span className="text-base">Faculty</span>
-                </button>
+                {mainUser?.role == "student" ? (
+                  ""
+                ) : (
+                  <button
+                    className="flex items-center gap-3 py-3 px-4 rounded-lg hover:bg-[#232526] text-left text-gray-100 transition-colors"
+                    onClick={() => {
+                      navigate("/FacultyPost");
+                      setExpanded(null);
+                    }}
+                  >
+                    <span className="text-xl">👨‍🏫</span>
+                    <span className="text-base">Faculty</span>
+                  </button>
+                )}
                 <button
                   className="flex items-center gap-3 py-3 px-4 rounded-lg hover:bg-[#232526] text-left text-gray-100 transition-colors"
                   onClick={() => {
@@ -340,12 +348,16 @@ const Aside = () => {
                 >
                   Anything
                 </button>
-                <button
-                  className="py-1 px-2 rounded hover:bg-[#232526] text-left text-sm cursor-pointer"
-                  onClick={() => navigate("/FacultyPost")}
-                >
-                  Faculty
-                </button>
+                {mainUser?.role === "student" ? (
+                  ""
+                ) : (
+                  <button
+                    className="py-1 px-2 rounded hover:bg-[#232526] text-left text-sm cursor-pointer"
+                    onClick={() => navigate("/FacultyPost")}
+                  >
+                    Faculty
+                  </button>
+                )}
                 <button
                   className="py-1 px-2 rounded hover:bg-[#232526] text-left text-sm cursor-pointer"
                   onClick={() => navigate("/PostProject")}

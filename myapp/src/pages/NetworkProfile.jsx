@@ -277,8 +277,10 @@ function NetworkProfile() {
                   <div className="flex items-center gap-2 text-blue-400">
                     {/* <LinkIcon size={16} /> */}
                     <a
-                      href={user?.website ? user.website : "/NetworkProfile"}
-                      target="_self"
+                      href={
+                        user?.linkedinUrl ? user.linkedinUrl : "/NetworkProfile"
+                      }
+                      target="_blank"
                       rel="noopener noreferrer"
                       className="hover:underline transition-colors"
                     >
