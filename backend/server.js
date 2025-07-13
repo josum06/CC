@@ -76,8 +76,6 @@ app.post(
         return res.status(400).json({ error: "Webhook verification failed" });
       }
 
-      console.log("Webhook Event Received:", evt);
-
       const eventType = evt.type;
 
       const { id, first_name, last_name, email_addresses, image_url } =

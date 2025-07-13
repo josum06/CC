@@ -15,6 +15,7 @@ import {
   Github,
   ExternalLink,
   ArrowLeft,
+  Linkedin,
 } from "lucide-react";
 import Comments from "../components/Comments";
 import axios from "axios";
@@ -274,14 +275,21 @@ function NetworkProfile() {
                   </p>
 
                   <div className="flex items-center gap-2 text-blue-400">
-                    <LinkIcon size={16} />
+                    {/* <LinkIcon size={16} /> */}
                     <a
                       href={user?.website ? user.website : "/NetworkProfile"}
                       target="_self"
                       rel="noopener noreferrer"
                       className="hover:underline transition-colors"
                     >
-                      {user?.website || "No website to show"}
+                      {user?.linkedinUrl ? (
+                        <span className="flex items-center gap-1">
+                          <Linkedin className="text-blue-200 w-3 h-3" /> Connect
+                          Me
+                        </span>
+                      ) : (
+                        <span>No Websites to show</span>
+                      )}
                     </a>
                   </div>
                 </div>

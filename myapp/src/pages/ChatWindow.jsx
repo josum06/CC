@@ -358,7 +358,8 @@ const ChatWindow = ({ user, recipient }) => {
                     </p>
                     <div className="flex items-center justify-end mt-2 gap-2">
                       <p className="text-xs text-gray-400">
-                        {dayjs(msg.timestamp).format("hh:mm A")}
+                        {dayjs(msg.createdAt).format("hh:mm A") ||
+                          dayjs(msg.timestamp).format("hh:mm A")}
                       </p>
                     </div>
                   </motion.div>

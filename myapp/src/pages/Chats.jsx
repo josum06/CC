@@ -225,18 +225,12 @@ const ChatApp = () => {
                       <h3 className="font-semibold text-white text-sm md:text-base truncate group-hover:text-blue-400 transition-colors duration-300">
                         {u.fullName}
                       </h3>
-                      <span className="text-xs text-gray-500 flex-shrink-0 ml-2">
-                        12:30 PM
-                      </span>
                     </div>
                     <div className="flex justify-between items-center">
                       <p className="text-xs md:text-sm text-gray-400 truncate max-w-[120px] md:max-w-[150px]">
                         {u.designation?.slice(0, 1).toUpperCase() +
                           u.designation?.slice(1) || "Student"}
                       </p>
-                      <div className="flex items-center gap-1">
-                        <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
-                      </div>
                     </div>
                   </div>
                 </motion.div>

@@ -139,7 +139,7 @@ const ProjectCard = ({
     }
   };
 
-  const handleClick = () => {
+  const handleClickProfile = () => {
     navigate("/NetworkProfile", {
       state: { userData: { userId } },
     });
@@ -184,20 +184,20 @@ const ProjectCard = ({
             </button>
 
             {showDropdown && (
-              <div className="absolute right-0 mt-3 w-56 bg-gradient-to-br from-gray-900/95 to-gray-800/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-700/50 py-3 z-99">
-                <button
+              <div className="absolute right-1.5  w-56 bg-gradient-to-br from-gray-900/95 to-gray-800/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-700/50 py-3 z-99">
+                <div
                   onClick={() => {
-                    handleClick();
+                    handleClickProfile();
                     setShowDropdown(false);
                   }}
-                  className="flex items-center space-x-3 px-4 py-3 text-sm text-gray-300 hover:text-gray-100 hover:bg-gray-700/50 w-full text-left transition-all duration-300 group"
+                  className="flex items-center space-x-3 px-4 py-3 text-sm text-gray-300 hover:text-gray-100 hover:bg-gray-700/50 w-full text-left transition-all duration-300 group cursor-pointer select-none"
                 >
                   <User
                     size={16}
                     className="text-blue-400 group-hover:text-blue-300"
                   />
                   <span>View Profile</span>
-                </button>
+                </div>
               </div>
             )}
           </div>

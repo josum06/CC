@@ -214,7 +214,10 @@ const Network = () => {
                     userId={project?.userId?._id}
                     avatar={project?.userId?.profileImage}
                     username={project?.userId?.fullName}
-                    time={project?.createdAt}
+                    time={format(
+                      parseISO(project?.createdAt),
+                      "dd MMM yyyy, hh:mm a"
+                    )}
                     content={project?.description}
                     projectUrl={project?.projectUrl}
                     githubUrl={project?.githubUrl}
@@ -224,6 +227,7 @@ const Network = () => {
                     comments={project?.comments}
                     contributors={project?.contributors}
                     projectName={project?.title}
+                    description={project?.description}
                   />
                 ))}
           </div>
