@@ -3,13 +3,17 @@ import dayjs from "dayjs";
 import EmojiPicker from "emoji-picker-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { BsFileEarmark, BsThreeDotsVertical, BsX } from "react-icons/bs";
-import { FaMicrophone, FaRegPaperPlane, FaRegSmile } from "react-icons/fa";
-import { Send, Smile, Paperclip, Mic, User } from "lucide-react";
+import { Send, Smile, User, Phone, Video } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import socket from "../utils/socket";
 
-const ChatWindow = ({ user, recipient }) => {
+// Theme colors aligned with theme.txt
+const CC_YELLOW = "#ece239";
+const CC_BLUE = "#4790fd";
+const CC_PINK = "#c76191";
+const CC_GREEN = "#27dc66";
+
+const ChatWindow = ({ user, recipient, onMobileBack }) => {
   const navigate = useNavigate();
   const [message, setMessage] = useState("");
   const [chat, setChat] = useState([]);
@@ -203,11 +207,52 @@ const ChatWindow = ({ user, recipient }) => {
   };
 
   return (
-    <div className="flex flex-col h-full bg-transparent relative">
+    <div className="flex flex-col h-full relative overflow-hidden bg-black/80 backdrop-blur-2xl transition-colors duration-300">
+      {/* Ambient background glows */}
+      <div className="pointer-events-none absolute inset-0">
+        <div
+          className="absolute -top-16 right-0 w-56 h-56 rounded-full blur-3xl opacity-40"
+          style={{ background: CC_BLUE }}
+        />
+        <div
+          className="absolute top-1/3 -left-10 w-64 h-64 rounded-full blur-3xl opacity-30"
+          style={{ background: CC_PINK }}
+        />
+        <div
+          className="absolute bottom-0 left-1/3 w-72 h-72 rounded-full blur-[90px] opacity-25"
+          style={{ background: CC_GREEN }}
+        />
+      </div>
+
       {/* Header */}
-      <div className="bg-[#000000] backdrop-blur-xl border-b border-gray-700/50 px-4 py-3 md:px-6 md:py-4 shadow-lg relative">
-        <div className="flex items-center justify-between">
+      <div className="relative z-20 px-4 py-3 md:px-6 md:py-3 border-b border-white/10 bg-gradient-to-r from-black via-black/90 to-black/80">
+          <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-3 md:gap-4">
+            <button
+              type="button"
+              className="md:hidden mr-1 p-1.5 rounded-full hover:bg-white/10 text-white/70 transition-all duration-300"
+              onClick={() => {
+                if (onMobileBack) {
+                  onMobileBack();
+                } else {
+                  navigate(-1);
+                }
+              }}
+            >
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15 19l-7-7 7-7"
+                />
+              </svg>
+            </button>
             <div
               className="relative group cursor-pointer"
               onClick={() => setShowProfilePhotoModal(true)}
@@ -215,26 +260,43 @@ const ChatWindow = ({ user, recipient }) => {
               <img
                 src={recipient.profileImage || "default-user.jpg"}
                 alt={recipient.fullName}
-                className="w-10 h-10 md:w-12 md:h-12 rounded-full object-cover ring-2 ring-blue-500/30 shadow-lg group-hover:ring-blue-500/60 transition-all duration-300 hover:scale-105"
+                className="w-10 h-10 md:w-11 md:h-11 rounded-full object-cover border border-white/10 shadow-lg shadow-black/70 group-hover:border-[#4790fd]/70 transition-all duration-300 group-hover:scale-105"
               />
-              <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-gray-900 shadow-lg animate-pulse"></div>
+              <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-[#27dc66] rounded-full border border-black shadow-[0_0_10px_rgba(39,220,102,0.9)]"></div>
             </div>
             <div className="flex-1 min-w-0">
               <h2
-                className="font-semibold text-white text-base md:text-lg truncate cursor-pointer hover:text-blue-400 transition-colors"
+                className="font-semibold text-white text-sm md:text-base truncate cursor-pointer hover:text-[#4790fd] transition-colors"
                 onClick={handleProfileClick}
               >
                 {recipient.fullName}
               </h2>
+              <p className="text-[11px] md:text-xs text-[#27dc66]">
+                Online
+              </p>
             </div>
           </div>
-          <div className="flex items-center gap-1 md:gap-2">
+          <div className="flex items-center gap-1.5 md:gap-2">
             <button
-              className="p-2 hover:bg-white/10 rounded-xl transition-all duration-300 group hover:scale-105 cursor-pointer"
-              onClick={handleProfileClick}
-              aria-label="View Profile"
+              type="button"
+              className="p-1.5 md:p-2 rounded-full hover:bg-white/10 text-white/70 hover:text-white transition-all duration-300"
+              aria-label="Voice call"
             >
-              <User className="w-5 h-5 md:w-6 md:h-6 text-gray-400 group-hover:text-white transition-colors" />
+              <Phone className="w-4 h-4 md:w-5 md:h-5" />
+            </button>
+            <button
+              type="button"
+              className="p-1.5 md:p-2 rounded-full hover:bg-white/10 text-white/70 hover:text-white transition-all duration-300"
+              aria-label="Video call"
+            >
+              <Video className="w-4 h-4 md:w-5 md:h-5" />
+            </button>
+            <button
+              className="p-1.5 md:p-2 rounded-full border border-white/10 hover:border-white/40 hover:bg-white/5 text-white/70 hover:text-white transition-all duration-300"
+              onClick={handleProfileClick}
+              aria-label="View profile"
+            >
+              <User className="w-4 h-4 md:w-5 md:h-5" />
             </button>
           </div>
         </div>
@@ -243,15 +305,15 @@ const ChatWindow = ({ user, recipient }) => {
       {/* Profile Photo Modal */}
       {showProfilePhotoModal && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
           onClick={() => setShowProfilePhotoModal(false)}
         >
-          <div
-            className="relative max-w-lg w-full mx-auto bg-gradient-to-br from-gray-900/95 via-gray-800/90 to-gray-900/95 rounded-3xl shadow-2xl border border-gray-700/50 flex flex-col items-center p-6 animate-fadeIn"
+        <div
+          className="relative max-w-lg w-full mx-auto bg-black/90 rounded-3xl shadow-[0_0_40px_rgba(0,0,0,0.9)] border border-white/10 flex flex-col items-center p-6 animate-fadeIn transition-colors duration-300"
             onClick={(e) => e.stopPropagation()}
           >
             <button
-              className="absolute top-4 right-4 text-white hover:text-gray-300 transition-colors p-2 bg-black/40 rounded-full cursor-pointer"
+              className="absolute top-4 right-4 text-white/60 hover:text-white transition-colors p-1.5 bg-white/10 hover:bg-white/20 rounded-full cursor-pointer"
               onClick={() => setShowProfilePhotoModal(false)}
               aria-label="Close"
             >
@@ -269,17 +331,20 @@ const ChatWindow = ({ user, recipient }) => {
                 />
               </svg>
             </button>
-            <img
-              src={recipient.profileImage || "default-user.jpg"}
-              alt={recipient.fullName}
-              className="w-48 h-48 md:w-64 md:h-64 rounded-2xl object-cover border-4 border-gray-900 shadow-2xl mx-auto"
-              style={{ maxWidth: "90vw", maxHeight: "60vh" }}
-            />
+            <div className="relative">
+              <img
+                src={recipient.profileImage || "default-user.jpg"}
+                alt={recipient.fullName}
+                className="w-48 h-48 md:w-64 md:h-64 rounded-2xl object-cover border-4 border-white/10 shadow-[0_0_40px_rgba(0,0,0,0.9)] mx-auto"
+                style={{ maxWidth: "90vw", maxHeight: "60vh" }}
+              />
+              <div className="absolute inset-0 rounded-2xl border border-white/20 pointer-events-none" />
+            </div>
             <div className="mt-6 text-center">
               <h3 className="text-xl font-semibold text-white mb-1">
                 {recipient.fullName}
               </h3>
-              <p className="text-sm text-gray-400">
+              <p className="text-sm text-white/60">
                 {recipient.designation || "Student"}
               </p>
             </div>
@@ -289,7 +354,7 @@ const ChatWindow = ({ user, recipient }) => {
 
       {/* Chat Messages */}
       <div
-        className="flex-1 overflow-y-auto p-3 md:p-4 space-y-3 bg-gradient-to-br from-gray-900/50 via-gray-800/30 to-gray-900/50 custom-scrollbar"
+        className="relative z-10 flex-1 overflow-y-auto p-3 md:p-4 space-y-3 bg-[#020308]/80 custom-scrollbar transition-colors duration-300"
         ref={chatContainerRef}
         onScroll={handleScroll}
       >
@@ -301,67 +366,50 @@ const ChatWindow = ({ user, recipient }) => {
 
             return (
               <motion.div
-                key={messageId}
-                initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                key={i}
+                initial={{ opacity: 0, y: 10, scale: 0.95 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: -20, scale: 0.95 }}
-                transition={{ duration: 0.4, ease: "easeOut" }}
-                className={`flex ${
-                  isMe ? "justify-end" : "justify-start"
-                } group`}
+                exit={{ opacity: 0, scale: 0.95 }}
+                transition={{ duration: 0.2 }}
+                className={`flex w-full ${isMe ? "justify-end" : "justify-start"}`}
               >
-                <div className="relative max-w-[75%] md:max-w-[60%] lg:max-w-[50%]">
-                  <motion.div
-                    className={`relative px-4 py-3 rounded-2xl shadow-lg backdrop-blur-sm ${
-                      isMe
-                        ? "bg-gradient-to-br from-blue-500/20 to-purple-500/20 text-white border border-blue-500/30 rounded-br-md"
-                        : "bg-gradient-to-br from-gray-800/80 to-gray-700/80 text-white border border-gray-600/50 rounded-bl-md"
+                <div
+                  className={`max-w-[85%] md:max-w-[70%] lg:max-w-[60%] flex flex-col ${
+                    isMe ? "items-end" : "items-start"
+                  }`}
+                >
+                  <div
+                    className={`relative px-3 py-2.5 md:px-4 md:py-3 rounded-2xl text-xs md:text-sm leading-relaxed break-words transition-all duration-300 shadow-md shadow-black/60 ${
+                      isMe ? "rounded-br-md" : "rounded-bl-md"
                     }`}
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    onContextMenu={(e) => {
-                      e.preventDefault();
-                      setShowReactions(messageId);
+                    style={{
+                      background: isMe
+                        ? `linear-gradient(135deg, ${CC_BLUE}, ${CC_GREEN})`
+                        : `linear-gradient(135deg, rgba(15,23,42,0.95), rgba(71,144,253,0.35))`,
+                      border: isMe
+                        ? "none"
+                        : "1px solid rgba(148, 163, 184, 0.35)",
+                      color: "#f9fafb",
                     }}
                   >
-                    {msg.file && (
-                      <div className="mb-3 p-3 bg-black/20 rounded-xl flex items-center gap-3">
-                        {msg.file.type && msg.file.type.startsWith("audio/") ? (
-                          <div className="flex items-center gap-3 w-full">
-                            <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center shadow-lg">
-                              <FaMicrophone className="w-4 h-4 text-white" />
-                            </div>
-                            <div className="flex-1">
-                              <p className="text-sm font-medium">
-                                Voice Message
-                              </p>
-                              <div className="w-full bg-gray-600/50 rounded-full h-1.5 mt-1">
-                                <div
-                                  className="bg-gradient-to-r from-blue-500 to-purple-500 h-1.5 rounded-full transition-all duration-300"
-                                  style={{ width: "70%" }}
-                                ></div>
-                              </div>
-                            </div>
-                          </div>
-                        ) : (
-                          <>
-                            <BsFileEarmark className="w-5 h-5 text-gray-400" />
-                            <span className="text-sm truncate">
-                              {msg.file.name}
-                            </span>
-                          </>
-                        )}
+                    <p className="whitespace-pre-wrap">{msg.content}</p>
+                    <div className="flex justify-end items-center gap-1 mt-1 opacity-70">
+                      <span className="text-[10px] md:text-[11px] text-slate-200/80">
+                        {dayjs(msg.timestamp).format("h:mm A")}
+                      </span>
+                    </div>
+
+                    {/* Reactions Display */}
+                    {messageReactions.length > 0 && (
+                      <div className="absolute -bottom-3 right-3 flex bg-black/80 rounded-full px-1.5 py-0.5 shadow-md border border-white/20 scale-75 md:scale-90">
+                        {messageReactions.map((r, idx) => (
+                          <span key={idx} className="text-sm">
+                            {r.reaction}
+                          </span>
+                        ))}
                       </div>
                     )}
-                    <p className="text-sm md:text-base leading-relaxed">
-                      {msg.content}
-                    </p>
-                    <div className="flex items-center justify-end mt-2 gap-2">
-                      <p className="text-xs text-gray-400">
-                        {dayjs(msg.timestamp).format("hh:mm A")}
-                      </p>
-                    </div>
-                  </motion.div>
+                  </div>
                 </div>
               </motion.div>
             );
@@ -370,103 +418,76 @@ const ChatWindow = ({ user, recipient }) => {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Chat Input */}
-      <div className="p-3 md:p-4 bg-gradient-to-r from-gray-800/50 via-gray-700/30 to-gray-800/50 border-t border-gray-700/30 backdrop-blur-sm">
-        <div className="flex items-center gap-2 md:gap-3 bg-gray-800/50 rounded-2xl px-3 md:px-4 py-2 md:py-3 border border-gray-700/50 shadow-lg hover:border-gray-600/50 transition-all duration-300">
-          <div className="relative" ref={emojiPickerRef}>
-            <button
-              className="text-gray-400 hover:text-blue-400 transition-all duration-300 p-1 md:p-2 hover:bg-white/10 rounded-xl hover:scale-105 cursor-pointer"
-              onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+      {/* Input Area */}
+      <div className="relative z-20 border-t border-white/10 bg-black/90 px-3 py-2.5 md:px-4 md:py-3 transition-colors duration-300">
+        <div className="flex items-end gap-2 relative max-w-4xl mx-auto w-full">
+          <button
+            className="p-2 md:p-2.5 text-white/60 hover:text-white bg-white/5 hover:bg-white/10 rounded-full border border-white/10 transition-all duration-300"
+            onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+          >
+            <Smile className="w-5 h-5 md:w-6 md:h-6" />
+          </button>
+
+          {showEmojiPicker && (
+            <div
+              className="absolute bottom-16 left-0 z-50 shadow-[0_0_30px_rgba(0,0,0,0.8)] rounded-2xl overflow-hidden border border-white/10 bg-black/95 animate-fadeIn"
+              ref={emojiPickerRef}
             >
-              <Smile className="w-5 h-5" />
-            </button>
-            {showEmojiPicker && (
-              <motion.div
-                className="absolute bottom-full left-0 mb-2 z-50"
-                initial={{ opacity: 0, y: 10, scale: 0.9 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: 10, scale: 0.9 }}
-                transition={{ duration: 0.3, ease: "easeOut" }}
-              >
-                <EmojiPicker
-                  onEmojiClick={onEmojiClick}
-                  width={300}
-                  height={400}
-                  theme="dark"
-                  searchPlaceholder="Search emoji..."
-                />
-              </motion.div>
-            )}
+              <EmojiPicker
+                onEmojiClick={onEmojiClick}
+                theme="auto"
+                lazyLoadEmojis={true}
+                searchPlaceHolder="Search emoji..."
+                width={300}
+                height={400}
+              />
+            </div>
+          )}
+
+          <div className="flex-1 bg-white/5 rounded-3xl flex items-center border border-white/10 focus-within:border-[#4790fd]/70 focus-within:ring-2 focus-within:ring-[#4790fd]/30 transition-all duration-300">
+            <textarea
+              value={message}
+              onChange={(e) => {
+                setMessage(e.target.value);
+                if (!isTyping) {
+                  setIsTyping(true);
+                  socket.emit("typing", { roomId, isTyping: true });
+                }
+                if (e.target.value === "") {
+                  setIsTyping(false);
+                  socket.emit("typing", { roomId, isTyping: false });
+                }
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  sendMessage();
+                }
+              }}
+              placeholder="Type a message..."
+              className="w-full bg-transparent text-white p-2.5 md:p-3.5 max-h-32 min-h-[44px] focus:outline-none resize-none custom-scrollbar text-sm md:text-base placeholder:text-white/40"
+              rows={1}
+            />
           </div>
 
-          <input
-            className="flex-1 bg-transparent border-none focus:outline-none text-white placeholder-gray-400 text-sm md:text-base"
-            placeholder="Type a message..."
-            value={message}
-            onChange={(e) => {
-              setMessage(e.target.value);
+          <button
+            className={`p-2.5 md:p-3 rounded-full transition-all duration-300 shadow-lg ${
+              message.trim()
+                ? "text-white hover:scale-105 active:scale-95"
+                : "text-white/30 cursor-not-allowed"
+            }`}
+            onClick={sendMessage}
+            disabled={!message.trim()}
+            style={{
+              background: message.trim()
+                ? `linear-gradient(135deg, ${CC_BLUE}, ${CC_GREEN})`
+                : "rgba(15,23,42,0.9)",
             }}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" && !e.shiftKey) {
-                e.preventDefault();
-                sendMessage();
-              }
-            }}
-          />
-
-          {message.trim() ? (
-            <motion.button
-              onClick={sendMessage}
-              className="bg-gradient-to-r from-blue-500 to-purple-500 text-white p-2 md:p-3 rounded-full hover:from-blue-600 hover:to-purple-600 transition-all duration-300 shadow-lg cursor-pointer"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <Send className="w-4 h-4 md:w-5 md:h-5" />
-            </motion.button>
-          ) : null}
+          >
+            <Send className="w-5 h-5 md:w-6 md:h-6" />
+          </button>
         </div>
       </div>
-
-      <style jsx>{`
-        .custom-scrollbar::-webkit-scrollbar {
-          width: 6px;
-        }
-
-        .custom-scrollbar::-webkit-scrollbar-track {
-          background: rgba(55, 65, 81, 0.3);
-          border-radius: 3px;
-        }
-
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: linear-gradient(
-            to bottom,
-            rgba(59, 130, 246, 0.5),
-            rgba(147, 51, 234, 0.5)
-          );
-          border-radius: 3px;
-        }
-
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-          background: linear-gradient(
-            to bottom,
-            rgba(59, 130, 246, 0.7),
-            rgba(147, 51, 234, 0.7)
-          );
-        }
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-            transform: scale(0.95);
-          }
-          to {
-            opacity: 1;
-            transform: scale(1);
-          }
-        }
-        .animate-fadeIn {
-          animation: fadeIn 0.3s ease;
-        }
-      `}</style>
     </div>
   );
 };

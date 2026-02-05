@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import VideoPlayer from './VideoPlayer';
 import {
   Heart,
   MessageCircle,
@@ -123,7 +124,7 @@ const ProjectCard = ({
       formData.append("projectId", projectId);
       formData.append("userId", user?._id);
       await axios.post(
-        "${import.meta.env.VITE_BACKEND_URL}/api/project/create-project-comment",
+        `${import.meta.env.VITE_BACKEND_URL}/api/project/create-project-comment`,
         formData,
         {
           headers: { "Content-Type": "application/json" },
@@ -144,218 +145,233 @@ const ProjectCard = ({
   };
 
   return (
-    <div className="bg-gradient-to-br from-gray-900/80 via-gray-800/60 to-gray-900/80 backdrop-blur-xl rounded-3xl border border-gray-700/50 shadow-2xl overflow-hidden hover:shadow-3xl transition-all duration-500 group relative">
-      {/* Shimmer effect on hover */}
-      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+    <div className="relative group mb-6">
+      {/* Gradient blur background */}
+      <div className="absolute inset-0 bg-gradient-to-br from-[#27dc66]/10 via-[#4790fd]/5 to-[#c76191]/10 rounded-3xl blur-2xl opacity-50 group-hover:opacity-70 transition-opacity duration-500"></div>
+      
+      {/* Main card */}
+      <div className="relative bg-[#040404]/80 backdrop-blur-2xl rounded-3xl border border-[#27dc66]/20 overflow-hidden shadow-2xl hover:shadow-[#27dc66]/20 hover:border-[#27dc66]/30 transition-all duration-500">
+        {/* Shimmer effect */}
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#27dc66]/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
 
-      {/* Header */}
-      <div className="relative z-10 flex items-center justify-between px-6 py-5 border-b border-gray-700/50 bg-gradient-to-r from-gray-800/30 via-gray-700/20 to-gray-800/30">
-        <div className="flex items-center space-x-4">
-          <div className="relative group/avatar">
-            <div className="w-14 h-14 rounded-full overflow-hidden ring-2 ring-purple-500/40 hover:ring-purple-500/60 transition-all duration-300 shadow-lg group-hover/avatar:shadow-purple-500/25">
-              <img
-                src={avatar}
-                alt={username}
-                className="w-full h-full object-cover group-hover/avatar:scale-110 transition-transform duration-300"
-              />
+        {/* Header */}
+        <div className="relative z-10 flex items-center justify-between px-5 py-4 border-b border-[#27dc66]/10 bg-gradient-to-r from-[#040404]/50 via-[#070707]/30 to-[#040404]/50">
+          <div className="flex items-center gap-3">
+            <div className="relative group/avatar">
+              <div className="w-12 h-12 rounded-full overflow-hidden ring-2 ring-[#27dc66]/40 hover:ring-[#27dc66]/60 transition-all duration-300 shadow-lg shadow-[#27dc66]/20">
+                <img
+                  src={avatar}
+                  alt={username}
+                  className="w-full h-full object-cover group-hover/avatar:scale-110 transition-transform duration-300"
+                />
+              </div>
+              <div className="absolute -bottom-1 -right-1 w-3.5 h-3.5 bg-[#27dc66] rounded-full border-2 border-[#040404] shadow-lg"></div>
             </div>
-            <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-gray-900 shadow-lg"></div>
-          </div>
-          <div>
-            <h3 className="font-semibold text-gray-100 text-base hover:text-purple-400 cursor-pointer transition-colors duration-300">
-              {username}
-            </h3>
-            <div className="flex items-center space-x-2 text-sm text-gray-500">
-              <Clock size={14} className="text-gray-600" />
-              <span>{time}</span>
+            <div>
+              <h3 className="font-semibold text-[#f5f5f5] text-sm hover:text-[#27dc66] cursor-pointer transition-colors duration-300">
+                {username}
+              </h3>
+              <div className="flex items-center gap-1.5 text-xs text-[#a0a0a0]">
+                <Clock size={12} className="text-[#27dc66]/60" />
+                <span>{time}</span>
+              </div>
             </div>
           </div>
-        </div>
 
-        <div className="flex items-center space-x-2">
           <div className="relative">
             <button
-              className="p-2 hover:bg-gray-700/50 rounded-full transition-all duration-300 group/options"
+              className="p-2 hover:bg-[#27dc66]/10 rounded-full transition-all duration-300"
               onClick={() => setShowDropdown(!showDropdown)}
             >
-              <MoreHorizontal className="w-5 h-5 text-gray-400 group-hover/options:text-gray-200 transition-colors duration-300" />
+              <MoreHorizontal size={18} className="text-[#a0a0a0] hover:text-[#f5f5f5]" />
             </button>
 
             {showDropdown && (
-              <div className="absolute right-0 mt-3 w-56 bg-gradient-to-br from-gray-900/95 to-gray-800/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-700/50 py-3 z-99">
-                <button
-                  onClick={() => {
-                    handleClick();
-                    setShowDropdown(false);
-                  }}
-                  className="flex items-center space-x-3 px-4 py-3 text-sm text-gray-300 hover:text-gray-100 hover:bg-gray-700/50 w-full text-left transition-all duration-300 group"
-                >
-                  <User
-                    size={16}
-                    className="text-blue-400 group-hover:text-blue-300"
-                  />
-                  <span>View Profile</span>
-                </button>
-              </div>
+              <>
+                <div
+                  className="fixed inset-0 z-10"
+                  onClick={() => setShowDropdown(false)}
+                />
+                <div className="absolute right-0 mt-2 w-48 bg-[#040404]/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-[#27dc66]/20 py-2 z-20">
+                  <button
+                    onClick={() => {
+                      handleClick();
+                      setShowDropdown(false);
+                    }}
+                    className="flex items-center gap-3 px-4 py-2.5 text-sm text-[#f5f5f5] hover:text-[#27dc66] hover:bg-[#27dc66]/10 w-full text-left transition-all duration-300"
+                  >
+                    <User size={16} className="text-[#27dc66]" />
+                    <span>View Profile</span>
+                  </button>
+                </div>
+              </>
             )}
           </div>
         </div>
-      </div>
 
-      {/* Project Content */}
-      <div className="relative z-10 px-6 py-5">
-        <h2 className="text-2xl font-bold text-gray-100 mb-3 hover:text-purple-400 cursor-pointer transition-colors duration-300 flex items-center gap-2">
-          <Code className="w-6 h-6 text-purple-400" />
-          {projectName}
-        </h2>
-        <p className="text-gray-300 text-base leading-relaxed mb-6">
-          {description}
-        </p>
+        {/* Project Content */}
+        <div className="relative z-10 px-5 py-5">
+          <h2 className="text-xl font-bold text-[#f5f5f5] mb-3 hover:text-[#27dc66] cursor-pointer transition-colors duration-300 flex items-center gap-2">
+            <Code className="w-5 h-5 text-[#27dc66]" />
+            {projectName}
+          </h2>
+          <p className="text-[#a0a0a0] text-sm leading-relaxed mb-5">
+            {description}
+          </p>
 
-        {/* Tech Stack Tags */}
-        <div className="flex flex-wrap gap-3 mb-6">
-          {skills &&
-            skills.length > 0 &&
-            skills.map((tech, index) => (
-              <span
-                key={index}
-                className="px-4 py-2 bg-gradient-to-r from-purple-600/20 to-purple-700/20 text-purple-300 rounded-xl text-sm font-medium border border-purple-500/30 hover:border-purple-400/50 transition-all duration-300 backdrop-blur-sm"
-              >
-                {tech}
-              </span>
-            ))}
-        </div>
-
-        {/* Project Links */}
-        <div className="flex flex-wrap gap-4 mb-6">
-          <a
-            href={projectUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-3 px-5 py-3 bg-gradient-to-r from-blue-600/20 to-blue-700/20 text-blue-400 rounded-xl hover:from-blue-600/30 hover:to-blue-700/30 border border-blue-500/50 hover:border-blue-400/50 transition-all duration-300 text-sm font-medium group/link"
-          >
-            <Globe className="w-4 h-4 group-hover/link:scale-110 transition-transform duration-300" />
-            Live Demo
-            <ExternalLink className="w-3 h-3 group-hover/link:scale-110 transition-transform duration-300" />
-          </a>
-          <a
-            href={githubUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-3 px-5 py-3 bg-gradient-to-r from-gray-700/50 to-gray-600/50 text-gray-300 rounded-xl hover:from-gray-600/50 hover:to-gray-500/50 border border-gray-600/50 hover:border-gray-500/50 transition-all duration-300 text-sm font-medium group/github"
-          >
-            <Github className="w-4 h-4 group-hover/github:scale-110 transition-transform duration-300" />
-            Source Code
-            <ExternalLink className="w-3 h-3 group-hover/github:scale-110 transition-transform duration-300" />
-          </a>
-        </div>
-
-        {/* Contributors */}
-        <div className="mb-6">
-          <div className="flex items-center gap-2 mb-3">
-            <Users className="w-5 h-5 text-purple-400" />
-            <span className="text-sm font-medium text-gray-300">
-              Contributors
-            </span>
-          </div>
-          <div className="flex -space-x-3">
-            {contributors &&
-              contributors.map((contributor, index) => (
-                <div key={index} className="relative group/contributor">
-                  <img
-                    src={contributor}
-                    alt={`Contributor ${index + 1}`}
-                    className="w-10 h-10 rounded-full border-2 border-gray-900 hover:z-10 transition-all duration-300 hover:scale-110 shadow-lg"
-                    title={contributor.name}
-                  />
-                  <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 rounded-full border border-gray-900"></div>
-                </div>
+          {/* Tech Stack Tags */}
+          {skills && skills.length > 0 && (
+            <div className="flex flex-wrap gap-2 mb-5">
+              {skills.map((tech, index) => (
+                <span
+                  key={index}
+                  className="px-3 py-1.5 bg-gradient-to-r from-[#27dc66]/20 to-[#27dc66]/10 text-[#27dc66] rounded-xl text-xs font-medium border border-[#27dc66]/30 hover:border-[#27dc66]/50 transition-all duration-300 backdrop-blur-sm"
+                >
+                  {tech}
+                </span>
               ))}
-            <button className="w-10 h-10 rounded-full bg-gradient-to-r from-gray-700/50 to-gray-600/50 border-2 border-gray-900 text-gray-400 text-xs font-medium flex items-center justify-center hover:bg-gray-600/50 transition-all duration-300 shadow-lg">
-              +2
-            </button>
+            </div>
+          )}
+
+          {/* Project Links */}
+          <div className="flex flex-wrap gap-3 mb-5">
+            {projectUrl && (
+              <a
+                href={projectUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-[#4790fd]/20 to-[#4790fd]/10 text-[#4790fd] rounded-xl hover:from-[#4790fd]/30 hover:to-[#4790fd]/20 border border-[#4790fd]/30 hover:border-[#4790fd]/50 transition-all duration-300 text-sm font-medium group/link"
+              >
+                <Globe className="w-4 h-4 group-hover/link:scale-110 transition-transform" />
+                <span>Live Demo</span>
+                <ExternalLink className="w-3 h-3" />
+              </a>
+            )}
+            {githubUrl && (
+              <a
+                href={githubUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-[#070707]/50 to-[#040404]/50 text-[#a0a0a0] rounded-xl hover:bg-[#070707] border border-[#4790fd]/20 hover:border-[#4790fd]/40 transition-all duration-300 text-sm font-medium group/github"
+              >
+                <Github className="w-4 h-4 group-hover/github:scale-110 transition-transform" />
+                <span>Source Code</span>
+                <ExternalLink className="w-3 h-3" />
+              </a>
+            )}
+          </div>
+
+          {/* Contributors */}
+          {contributors && contributors.length > 0 && (
+            <div className="mb-5">
+              <div className="flex items-center gap-2 mb-3">
+                <Users className="w-4 h-4 text-[#c76191]" />
+                <span className="text-xs font-medium text-[#a0a0a0]">
+                  Contributors
+                </span>
+              </div>
+              <div className="flex -space-x-2">
+                {contributors.slice(0, 4).map((contributor, index) => (
+                  <div key={index} className="relative group/contributor">
+                    <img
+                      src={contributor}
+                      alt={`Contributor ${index + 1}`}
+                      className="w-9 h-9 rounded-full border-2 border-[#040404] hover:z-10 transition-all duration-300 hover:scale-110 shadow-lg"
+                    />
+                    <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-[#27dc66] rounded-full border border-[#040404]"></div>
+                  </div>
+                ))}
+                {contributors.length > 4 && (
+                  <div className="w-9 h-9 rounded-full bg-gradient-to-r from-[#070707] to-[#040404] border-2 border-[#040404] text-[#a0a0a0] text-xs font-medium flex items-center justify-center shadow-lg">
+                    +{contributors.length - 4}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Project Media */}
+          {imageUrl && (
+            <div className="relative rounded-2xl overflow-hidden bg-gradient-to-br from-[#040404]/50 to-[#070707]/50 mb-5 group/media">
+              {imageUrl.match(/\.(mp4|webm|ogg|mov|avi|wmv|flv|mkv)$/i) ? (
+                <VideoPlayer
+                  src={imageUrl}
+                  className="w-full object-cover group-hover/media:scale-[1.02] transition-transform duration-700"
+                  style={{ maxHeight: "400px" }}
+                  preload="metadata"
+                />
+              ) : (
+                <img
+                  src={imageUrl}
+                  alt="Project preview"
+                  className="w-full object-cover group-hover/media:scale-[1.02] transition-transform duration-700"
+                  style={{ maxHeight: "400px" }}
+                />
+              )}
+              <div className="absolute inset-0 bg-gradient-to-t from-[#040404]/40 via-transparent to-transparent opacity-0 group-hover/media:opacity-100 transition-opacity duration-300"></div>
+            </div>
+          )}
+
+          {/* Action Buttons */}
+          <div className="flex items-center justify-between pt-4 border-t border-[#27dc66]/10">
+            <div className="flex items-center gap-4">
+              <button
+                onClick={handleLike}
+                disabled={isLiking}
+                className="flex items-center gap-2 text-sm font-medium text-[#a0a0a0] hover:text-[#c76191] transition-colors duration-300 group/like disabled:opacity-50"
+              >
+                <Heart
+                  className={`w-5 h-5 group-hover/like:scale-110 transition-all duration-300 ${
+                    likedByCurrentUser
+                      ? "fill-[#c76191] stroke-[#c76191] animate-pulse"
+                      : "stroke-current"
+                  }`}
+                />
+                <span>{likesCount}</span>
+              </button>
+              <button
+                onClick={inputComment}
+                className="flex items-center gap-2 text-sm font-medium text-[#a0a0a0] hover:text-[#4790fd] transition-colors duration-300 group/comment"
+              >
+                <MessageCircle className="w-5 h-5 group-hover/comment:scale-110 transition-all duration-300" />
+                <span>{comments?.length || 0}</span>
+              </button>
+            </div>
           </div>
         </div>
 
-        {/* Project Media */}
-        <div className="relative rounded-2xl overflow-hidden bg-gradient-to-br from-gray-800/20 via-gray-700/10 to-gray-800/20 mb-6 group/media">
-          <img
-            src={imageUrl}
-            alt="Project preview"
-            className="w-full object-cover group-hover/media:scale-105 transition-transform duration-700"
-            style={{ maxHeight: "400px" }}
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover/media:opacity-100 transition-opacity duration-300"></div>
-        </div>
-
-        {/* Action Buttons */}
-        <div className="flex items-center justify-between pt-5 border-t border-gray-700/50">
-          <div className="flex items-center space-x-6">
-            <button
-              onClick={handleLike}
-              disabled={isLiking}
-              className="flex items-center gap-2 text-sm font-medium text-gray-400 hover:text-red-400 transition-colors duration-300 group/like disabled:opacity-50"
-            >
-              <Heart
-                className={`w-5 h-5 group-hover/like:scale-110 transition-all duration-300 ${
-                  likedByCurrentUser
-                    ? "fill-red-500 stroke-red-500 animate-pulse"
-                    : "stroke-current"
-                }`}
-              />
-              <span>{likesCount}</span>
-            </button>
-            <button
-              onClick={inputComment}
-              className="flex items-center gap-2 text-sm font-medium text-gray-400 hover:text-blue-400 transition-colors duration-300 group/comment"
-            >
-              <MessageCircle className="w-5 h-5 group-hover/comment:scale-110 transition-all duration-300" />
-              <span>{comments?.length || 0}</span>
-            </button>
-            {/* <button className="flex items-center gap-2 text-sm font-medium text-gray-400 hover:text-green-400 transition-colors duration-300 group/share">
-              <Share2 className="w-5 h-5 group-hover/share:scale-110 transition-all duration-300" />
-              <span>Share</span>
-            </button> */}
-          </div>
-          {/* <button className="p-2 hover:bg-purple-500/20 rounded-full transition-all duration-300 transform hover:scale-110 group/bookmark">
-            <Bookmark
-              size={20}
-              className="stroke-gray-400 group-hover/bookmark:stroke-purple-500 transition-all duration-300"
-            />
-          </button> */}
-        </div>
-      </div>
-
-      {/* Comment Input */}
-      <form
-        onSubmit={handleSubmit}
-        className="relative z-10 flex items-center py-4 px-6 border-t border-gray-700/50 bg-gradient-to-r from-gray-800/20 via-gray-700/10 to-gray-800/20"
-      >
-        <input
-          type="text"
-          value={commentText}
-          onChange={(e) => setCommentText(e.target.value)}
-          placeholder="Add a comment..."
-          className="flex-1 text-sm p-3 rounded-2xl border border-gray-600/50 bg-gradient-to-r from-gray-800/50 via-gray-700/30 to-gray-800/50 text-gray-200 placeholder-gray-500 focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 transition-all duration-300 backdrop-blur-sm"
-        />
-        <button
-          type="submit"
-          disabled={!commentText.trim()}
-          className={`ml-3 p-3 rounded-2xl transition-all duration-300 ${
-            commentText.trim()
-              ? "bg-gradient-to-r from-purple-600/20 to-purple-700/20 text-purple-400 border border-purple-500/50 hover:from-purple-600/30 hover:to-purple-700/30 hover:border-purple-400/50 hover:scale-105"
-              : "bg-gray-700/30 text-gray-600 cursor-not-allowed"
-          }`}
+        {/* Comment Input */}
+        <form
+          onSubmit={handleSubmit}
+          className="relative z-10 flex items-center gap-2 py-4 px-5 border-t border-[#27dc66]/10 bg-gradient-to-r from-[#040404]/30 via-[#070707]/20 to-[#040404]/30"
         >
-          <Send size={18} />
-        </button>
-      </form>
+          <input
+            type="text"
+            value={commentText}
+            onChange={(e) => setCommentText(e.target.value)}
+            placeholder="Add a comment..."
+            className="flex-1 text-sm px-4 py-2.5 rounded-2xl border border-[#27dc66]/20 bg-[#070707]/50 backdrop-blur-sm text-[#f5f5f5] placeholder-[#a0a0a0] focus:ring-2 focus:ring-[#27dc66]/50 focus:border-[#27dc66]/50 transition-all duration-300"
+          />
+          <button
+            type="submit"
+            disabled={!commentText.trim()}
+            className={`p-2.5 rounded-2xl transition-all duration-300 ${
+              commentText.trim()
+                ? "bg-gradient-to-r from-[#27dc66]/20 to-[#27dc66]/30 text-[#27dc66] border border-[#27dc66]/50 hover:from-[#27dc66]/30 hover:to-[#27dc66]/40 hover:scale-105"
+                : "bg-[#070707]/50 text-[#4a4a4a] cursor-not-allowed"
+            }`}
+          >
+            <Send size={18} />
+          </button>
+        </form>
 
-      {commentModal && (
-        <div className="border-t border-gray-700/50 bg-gradient-to-r from-gray-800/20 via-gray-700/10 to-gray-800/20">
-          <CommentProject projectId={projectId} />
-        </div>
-      )}
+        {/* Comments Section */}
+        {commentModal && (
+          <div className="border-t border-[#27dc66]/10 bg-gradient-to-r from-[#040404]/30 via-[#070707]/20 to-[#040404]/30">
+            <CommentProject projectId={projectId} />
+          </div>
+        )}
+      </div>
     </div>
   );
 };

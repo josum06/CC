@@ -52,7 +52,7 @@ function Comments({ postId }) {
       {comments.map((comment) => (
         <div
           key={comment._id}
-          className="mb-3 sm:mb-4 group hover:bg-gradient-to-r hover:from-gray-800/30 hover:to-gray-700/20 rounded-2xl p-3 sm:p-4 transition-all duration-300 border border-transparent hover:border-gray-600/30"
+          className="mb-3 sm:mb-4 group hover:bg-gradient-to-r hover:from-gray-100 hover:to-gray-50 dark:hover:from-gray-800/30 dark:hover:to-gray-700/20 rounded-2xl p-3 sm:p-4 transition-all duration-300 border border-transparent hover:border-gray-200 dark:hover:border-gray-600/30"
         >
           <div className="flex items-start space-x-3 sm:space-x-4">
             {/* User Avatar */}
@@ -67,7 +67,7 @@ function Comments({ postId }) {
                   }}
                 />
               </div>
-              <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 sm:w-3 sm:h-3 bg-green-500 rounded-full border-2 border-gray-900"></div>
+              <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 sm:w-3 sm:h-3 bg-green-500 rounded-full border-2 border-white dark:border-gray-900"></div>
             </div>
 
             {/* Comment Content */}
@@ -75,20 +75,20 @@ function Comments({ postId }) {
               <div className="flex items-start justify-between">
                 <div className="flex-1">
                   <div className="flex items-baseline space-x-2 sm:space-x-3 mb-1 sm:mb-2">
-                    <span className="font-semibold text-xs sm:text-sm text-gray-200 hover:text-blue-400 cursor-pointer transition-colors duration-300">
+                    <span className="font-semibold text-xs sm:text-sm text-gray-900 dark:text-gray-200 hover:text-blue-500 dark:hover:text-blue-400 cursor-pointer transition-colors duration-300">
                       {comment?.userId?.fullName}
                     </span>
-                    <div className="flex items-center space-x-1 text-xs text-gray-500">
+                    <div className="flex items-center space-x-1 text-xs text-gray-500 dark:text-gray-500">
                       <Clock
                         size={10}
-                        className="sm:w-3 sm:h-3 text-gray-600"
+                        className="sm:w-3 sm:h-3 text-gray-400 dark:text-gray-600"
                       />
                       <span className="text-xs">
                         {getTimeAgo(comment.createdAt)}
                       </span>
                     </div>
                   </div>
-                  <p className="text-xs sm:text-sm text-gray-300 mt-1 break-words leading-relaxed">
+                  <p className="text-xs sm:text-sm text-gray-700 dark:text-gray-300 mt-1 break-words leading-relaxed">
                     {comment.text}
                   </p>
                 </div>
@@ -129,11 +129,11 @@ function Comments({ postId }) {
       ))}
 
       {comments.length === 0 && (
-        <div className="flex flex-col items-center justify-center py-8 sm:py-12 text-gray-500">
-          <div className="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-3 sm:mb-4 bg-gradient-to-br from-gray-800/50 to-gray-700/50 rounded-full flex items-center justify-center border border-gray-600/30">
-            <MessageCircle className="w-8 h-8 sm:w-10 sm:h-10 text-gray-600" />
+        <div className="flex flex-col items-center justify-center py-8 sm:py-12 text-gray-500 dark:text-gray-500">
+          <div className="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-3 sm:mb-4 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800/50 dark:to-gray-700/50 rounded-full flex items-center justify-center border border-gray-200 dark:border-gray-600/30">
+            <MessageCircle className="w-8 h-8 sm:w-10 sm:h-10 text-gray-400 dark:text-gray-600" />
           </div>
-          <h3 className="text-base sm:text-lg font-semibold text-gray-300 mb-1 sm:mb-2">
+          <h3 className="text-base sm:text-lg font-semibold text-gray-700 dark:text-gray-300 mb-1 sm:mb-2">
             No comments yet
           </h3>
           <p className="text-xs sm:text-sm text-gray-500 text-center">

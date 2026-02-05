@@ -4,6 +4,10 @@ import { ClerkProvider, useAuth } from "@clerk/clerk-react";
 import AppLayout from "./ui/AppLayout";
 import NoNavFooterLayout from "./ui/NoNavFooterLayout";
 import Loader from "./components/Loader";
+import Preloader from "./components/Preloader"; // Import Preloader
+import { ThemeProvider } from "./context/ThemeContext"; // Import ThemeProvider
+import { useState, useEffect } from "react"; // Import React hooks
+
 import Notice from "./pages/Notice";
 import Post from "./pages/Post";
 import FacultyPost from "./pages/FacultyPost";
@@ -21,8 +25,9 @@ import YourProfile from "./pages/YourProfile";
 import NetworkProfile from "./pages/NetworkProfile";
 import { ToastContainer } from "react-toastify";
 import FacultyRole from "./pages/FacultyRole";
-import Account from "./pages/Account";
-import Search from "./pages/Search";
+import Account from './pages/Account';
+import Search from './pages/Search';
+import HelpSupport from './pages/HelpSupport';
 
 const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 
@@ -46,11 +51,26 @@ function ProtectedRoute({ children }) {
 }
 
 function App() {
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Simulate loading time
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 2500);
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (loading) {
+    return <Preloader />;
+  }
+
   return (
     <ClerkProvider publishableKey={clerkPubKey}>
-      <BrowserRouter>
-        <ToastContainer position="top-right" autoClose={3000} />
-        <Routes>
+      <ThemeProvider>
+        <BrowserRouter>
+          <ToastContainer position="top-right" autoClose={3000} />
+          <Routes>
           {/* Public Routes */}
           <Route element={<NoNavFooterLayout />}>
             <Route path="/Signup" element={<SignUpPage />} />
@@ -145,11 +165,13 @@ function App() {
               }
             />
              <Route path="/ClassRoom" element={<ClassRoom />} />
+            <Route path="/help-support" element={<HelpSupport />} />
 
           {/* Fallback Route */}
           <Route path="*" element={<Navigate to="/Login" />} />
         </Routes>
       </BrowserRouter>
+      </ThemeProvider>
     </ClerkProvider>
   );
 }

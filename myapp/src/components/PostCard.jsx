@@ -3,6 +3,7 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import Comments from "./Comments";
+import VideoPlayer from './VideoPlayer';
 import {
   Heart,
   MessageCircle,
@@ -52,7 +53,7 @@ const PostCard = ({
       if (!currUserId) return;
       try {
         const response = await axios.get(
-          `${import.meta.env.VITE_BACKEND_URL}/api/post/like/${postId}`
+          `${import.meta.env.VITE_BACKEND_URL}/api/post/like/${postId}`,
         );
         const likedUsers = response.data.likedByUsers;
         setLikedByCurrentUser(likedUsers.some((user) => user === currUserId));
@@ -69,7 +70,7 @@ const PostCard = ({
   const fetchUserProfile = async () => {
     try {
       const response = await axios.get(
-        `${import.meta.env.VITE_BACKEND_URL}/api/user/profile/${user.id}`
+        `${import.meta.env.VITE_BACKEND_URL}/api/user/profile/${user.id}`,
       );
       const data = response.data;
       setCurrUserId(data._id);
@@ -91,7 +92,7 @@ const PostCard = ({
         `${
           import.meta.env.VITE_BACKEND_URL
         }/api/post/like/${postId}/like-toggle`,
-        { userId: currUserId }
+        { userId: currUserId },
       );
       setLikes(response.data.post.likes);
       setLikedByCurrentUser(response.data.hasLiked);
@@ -113,11 +114,11 @@ const PostCard = ({
       formData.append("postId", postId);
       formData.append("userId", currUserId);
       await axios.post(
-        "${import.meta.env.VITE_BACKEND_URL}/api/post/create-comment",
+        `${import.meta.env.VITE_BACKEND_URL}/api/post/create-comment`,
         formData,
         {
           headers: { "Content-Type": "application/json" },
-        }
+        },
       );
       setCommentText("");
       toast.success(`Comment posted successfully!`);
@@ -146,210 +147,192 @@ const PostCard = ({
   };
 
   return (
-    <div className="bg-gradient-to-br from-gray-900/80 via-gray-800/60 to-gray-900/80 backdrop-blur-xl rounded-3xl border border-gray-700/50 shadow-2xl max-w-md w-full mx-auto mb-6 overflow-hidden hover:shadow-3xl transition-all duration-500 group relative">
-      {/* Shimmer effect on hover */}
-      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+    <div className="relative group mb-6">
+      {/* Gradient blur background */}
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-purple-500/5 to-green-500/5 dark:from-[#4790fd]/10 dark:via-[#c76191]/5 dark:to-[#27dc66]/10 rounded-3xl blur-2xl opacity-50 group-hover:opacity-70 transition-opacity duration-500"></div>
 
-      {/* Header */}
-      <div className="relative z-10 flex items-center justify-between px-4 sm:px-6 py-4 sm:py-5 border-b border-gray-700/50 bg-gradient-to-r from-gray-800/30 via-gray-700/20 to-gray-800/30">
-        <div className="flex items-center space-x-3 sm:space-x-4">
-          <div className="relative group/avatar">
-            <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full overflow-hidden ring-2 ring-blue-500/40 hover:ring-blue-500/60 transition-all duration-300 shadow-lg group-hover/avatar:shadow-blue-500/25">
-              <img
-                src={avatar}
-                alt={username}
-                className="w-full h-full object-cover group-hover/avatar:scale-110 transition-transform duration-300"
-              />
-            </div>
-            <div className="absolute -bottom-1 -right-1 w-3 h-3 sm:w-4 sm:h-4 bg-green-500 rounded-full border-2 border-gray-900 shadow-lg"></div>
-          </div>
-          <div>
-            <p className="font-semibold text-gray-100 text-sm sm:text-base hover:text-blue-400 cursor-pointer transition-colors duration-300">
-              {username}
-            </p>
-            <div className="flex items-center space-x-2 text-xs sm:text-sm text-gray-500">
-              <Clock
-                size={12}
-                className="sm:w-[14px] sm:h-[14px] text-gray-600"
-              />
-              <span>{time}</span>
-            </div>
-          </div>
-        </div>
+      {/* Main card */}
+      <div className="relative bg-white/80 dark:bg-[#040404]/80 backdrop-blur-2xl rounded-3xl border border-gray-200 dark:border-[#4790fd]/20 overflow-hidden shadow-2xl dark:shadow-none hover:shadow-blue-500/10 dark:hover:shadow-[#4790fd]/20 hover:border-blue-500/30 dark:hover:border-[#4790fd]/30 transition-all duration-500">
+        {/* Shimmer effect */}
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#ece239]/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
 
-        {/* Three Dots Menu */}
-        <div className="relative">
-          <button
-            className="p-2 hover:bg-gray-700/50 rounded-full transition-all duration-300 group/options"
-            onClick={() => setShowOptions(!showOptions)}
-          >
-            <MoreHorizontal
-              size={16}
-              className="sm:w-[18px] sm:h-[18px] text-gray-400 group-hover/options:text-gray-200 transition-colors duration-300"
-            />
-          </button>
-
-          {/* Dropdown Menu */}
-          {showOptions && (
-            <>
-              <div
-                className="fixed inset-0 z-10"
-                onClick={() => setShowOptions(false)}
-              />
-
-              <div className="absolute right-0 mt-3 w-48 sm:w-56 bg-gradient-to-br from-gray-900/95 to-gray-800/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-700/50 py-3 z-20">
-                <button
-                  onClick={() => handleOptionClick("profile")}
-                  className="flex items-center space-x-3 px-4 py-3 text-xs sm:text-sm text-gray-300 hover:text-gray-100 hover:bg-gray-700/50 w-full text-left transition-all duration-300 group"
-                >
-                  <User
-                    size={14}
-                    className="sm:w-4 sm:h-4 text-blue-400 group-hover:text-blue-300"
-                  />
-                  <span>View Profile</span>
-                </button>
+        {/* Header */}
+        <div className="relative z-10 flex items-center justify-between px-5 py-4 border-b border-gray-100 dark:border-[#4790fd]/10 bg-gradient-to-r from-gray-50/50 via-white/30 to-gray-50/50 dark:from-[#040404]/50 dark:via-[#070707]/30 dark:to-[#040404]/50">
+          <div className="flex items-center gap-3">
+            <div className="relative group/avatar">
+              <div className="w-12 h-12 rounded-full overflow-hidden ring-2 ring-blue-500/20 dark:ring-[#4790fd]/40 hover:ring-blue-500/40 dark:hover:ring-[#4790fd]/60 transition-all duration-300 shadow-lg shadow-blue-500/10 dark:shadow-[#4790fd]/20">
+                <img
+                  src={avatar}
+                  alt={username}
+                  className="w-full h-full object-cover group-hover/avatar:scale-110 transition-transform duration-300"
+                />
               </div>
-            </>
-          )}
-        </div>
-      </div>
+              <div className="absolute -bottom-1 -right-1 w-3.5 h-3.5 bg-[#27dc66] rounded-full border-2 border-white dark:border-[#040404] shadow-lg"></div>
+            </div>
+            <div>
+              <p className="font-semibold text-gray-900 dark:text-[#f5f5f5] text-sm hover:text-blue-500 dark:hover:text-[#4790fd] cursor-pointer transition-colors duration-300">
+                {username}
+              </p>
+              <div className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-[#a0a0a0]">
+                <Clock size={12} className="text-blue-500/60 dark:text-[#4790fd]/60" />
+                <span>{time}</span>
+              </div>
+            </div>
+          </div>
 
-      {/* Image/Video Section */}
-      <div className="relative group/media">
-        {imageUrl ? (
-          imageUrl.endsWith(".mp4") ? (
-            <video
-              controls
-              className="w-full max-h-[24rem] sm:max-h-[32rem] object-contain bg-gradient-to-br from-gray-800/20 via-gray-700/10 to-gray-800/20"
+          {/* Options Menu */}
+          <div className="relative">
+            <button
+              className="p-2 hover:bg-blue-500/10 dark:hover:bg-[#4790fd]/10 rounded-full transition-all duration-300"
+              onClick={() => setShowOptions(!showOptions)}
             >
-              <source src={imageUrl} type="video/mp4" />
-              Your browser does not support the video tag.
-            </video>
-          ) : (
-            <>
+              <MoreHorizontal
+                size={18}
+                className="text-gray-400 dark:text-[#a0a0a0] hover:text-gray-900 dark:hover:text-[#f5f5f5]"
+              />
+            </button>
+
+            {showOptions && (
+              <>
+                <div
+                  className="fixed inset-0 z-10"
+                  onClick={() => setShowOptions(false)}
+                />
+                <div className="absolute right-0 mt-2 w-48 bg-white/95 dark:bg-[#040404]/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-200 dark:border-[#4790fd]/20 py-2 z-20">
+                  <button
+                    onClick={() => handleOptionClick("profile")}
+                    className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-[#f5f5f5] hover:text-blue-500 dark:hover:text-[#4790fd] hover:bg-blue-50 dark:hover:bg-[#4790fd]/10 w-full text-left transition-all duration-300"
+                  >
+                    <User size={16} className="text-blue-500 dark:text-[#4790fd]" />
+                    <span>View Profile</span>
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+
+        {/* Media Section */}
+        {imageUrl && (
+          <div className="relative group/media overflow-hidden">
+            {imageUrl.match(/\.(mp4|webm|ogg|mov|avi|wmv|flv|mkv)$/i) ? (
+              <VideoPlayer
+                src={imageUrl}
+                className="w-full max-h-96 object-contain bg-gradient-to-br from-gray-50/50 to-gray-100/50 dark:from-[#040404]/50 dark:to-[#070707]/50"
+                preload="metadata"
+              />
+            ) : (
               <img
                 src={imageUrl}
                 alt="Post content"
-                className="w-full max-h-[24rem] sm:max-h-[32rem] object-contain bg-gradient-to-br from-gray-800/20 via-gray-700/10 to-gray-800/20 group-hover/media:scale-105 transition-transform duration-700"
+                className="w-full max-h-96 object-contain bg-gradient-to-br from-gray-50/50 to-gray-100/50 dark:from-[#040404]/50 dark:to-[#070707]/50 group-hover/media:scale-[1.02] transition-transform duration-700"
                 loading="lazy"
               />
-              <div
-                className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover/media:opacity-100 transition-opacity duration-300"
-                style={{ height: "100%" }}
-              />
-            </>
-          )
-        ) : (
-          <div className="w-full h-48 sm:h-64 flex items-center justify-center bg-gradient-to-br from-gray-800/20 via-gray-700/10 to-gray-800/20">
-            <div className="text-center">
-              <Smile className="w-8 h-8 sm:w-12 sm:h-12 text-gray-600 mx-auto mb-2" />
-              <span className="text-xs sm:text-sm text-gray-500">
-                No media available
-              </span>
+            )}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover/media:opacity-100 transition-opacity duration-300"></div>
+          </div>
+        )}
+
+        {/* Content Section */}
+        <div className="relative z-10 px-5 py-4">
+          {/* Action Buttons */}
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-1">
+              <button
+                onClick={handleLike}
+                disabled={isLiking}
+                className="p-2.5 hover:bg-pink-500/10 dark:hover:bg-[#c76191]/10 rounded-xl transition-all duration-300 transform hover:scale-110 group/like disabled:opacity-50"
+              >
+                <Heart
+                  size={22}
+                  className={`${
+                    likedByCurrentUser
+                      ? "fill-pink-500 stroke-pink-500 dark:fill-[#c76191] dark:stroke-[#c76191] animate-pulse"
+                      : "stroke-gray-400 dark:stroke-[#a0a0a0] group-hover/like:stroke-pink-500 dark:group-hover/like:stroke-[#c76191]"
+                  } transition-all duration-300`}
+                />
+              </button>
+              <button
+                onClick={inputComment}
+                className="p-2.5 hover:bg-blue-500/10 dark:hover:bg-[#4790fd]/10 rounded-xl transition-all duration-300 transform hover:scale-110 group/comment"
+              >
+                <MessageCircle
+                  size={22}
+                  className="stroke-gray-400 dark:stroke-[#a0a0a0] group-hover/comment:stroke-blue-500 dark:group-hover/comment:stroke-[#4790fd] transition-all duration-300"
+                />
+              </button>
             </div>
           </div>
-        )}
-      </div>
 
-      {/* Action Buttons */}
-      <div className="relative z-10 px-4 sm:px-6 pt-4 sm:pt-5">
-        <div className="flex justify-between items-center mb-3 sm:mb-4">
-          <div className="flex items-center space-x-2 sm:space-x-3">
-            <button
-              onClick={handleLike}
-              disabled={isLiking}
-              className="p-2 sm:p-3 hover:bg-red-500/20 rounded-full transition-all duration-300 transform hover:scale-110 group/like disabled:opacity-50"
-            >
-              <Heart
-                size={20}
-                className={`sm:w-6 sm:h-6 ${
-                  likedByCurrentUser
-                    ? "fill-red-500 stroke-red-500 animate-pulse"
-                    : "stroke-gray-400 group-hover/like:stroke-red-500"
-                } transition-all duration-300`}
-              />
-            </button>
+          {/* Likes Count */}
+          {likes > 0 && (
+            <p className="font-semibold text-gray-900 dark:text-[#f5f5f5] text-sm mb-3 flex items-center gap-2">
+              <ThumbsUp size={16} className="text-blue-500 dark:text-[#4790fd]" />
+              <span>
+                {likes} {likes === 1 ? "like" : "likes"}
+              </span>
+            </p>
+          )}
+
+          {/* Caption */}
+          {content && (
+            <div className="mb-3">
+              <span className="font-semibold text-gray-900 dark:text-[#f5f5f5] text-sm mr-2 hover:text-blue-500 dark:hover:text-[#4790fd] cursor-pointer transition-colors duration-300">
+                {username}
+              </span>
+              <span className="text-sm text-gray-600 dark:text-[#a0a0a0] leading-relaxed">
+                {content}
+              </span>
+            </div>
+          )}
+
+          {/* Comments Count */}
+          {comments?.length > 0 && (
             <button
               onClick={inputComment}
-              className="p-2 sm:p-3 hover:bg-blue-500/20 rounded-full transition-all duration-300 transform hover:scale-110 group/comment"
+              className="text-gray-500 dark:text-[#a0a0a0] text-xs mb-3 hover:text-blue-500 dark:hover:text-[#4790fd] transition-colors duration-300 flex items-center gap-1.5"
             >
-              <MessageCircle
-                size={20}
-                className="sm:w-6 sm:h-6 stroke-gray-400 group-hover/comment:stroke-blue-500 transition-all duration-300"
-              />
+              <Eye size={12} />
+              <span>
+                View all {comments.length}{" "}
+                {comments.length === 1 ? "comment" : "comments"}
+              </span>
             </button>
-            {/* <button className="p-2 sm:p-3 hover:bg-green-500/20 rounded-full transition-all duration-300 transform hover:scale-110 group/share">
-              <Share2
-                size={20}
-                className="sm:w-6 sm:h-6 stroke-gray-400 group-hover/share:stroke-green-500 transition-all duration-300"
-              />
-            </button> */}
-          </div>
-          {/* <button className="p-2 sm:p-3 hover:bg-purple-500/20 rounded-full transition-all duration-300 transform hover:scale-110 group/bookmark">
-            <Bookmark
-              size={20}
-              className="sm:w-6 sm:h-6 stroke-gray-400 group-hover/bookmark:stroke-purple-500 transition-all duration-300"
+          )}
+
+          {/* Comment Input */}
+          <form
+            onSubmit={handleSubmit}
+            className="flex items-center gap-2 pt-3 border-t border-gray-100 dark:border-[#4790fd]/10"
+          >
+            <input
+              type="text"
+              value={commentText}
+              onChange={(e) => setCommentText(e.target.value)}
+              placeholder="Add a comment..."
+              className="flex-1 text-sm px-4 py-2.5 rounded-2xl border border-gray-200 dark:border-[#4790fd]/20 bg-gray-50/50 dark:bg-[#070707]/50 backdrop-blur-sm text-gray-900 dark:text-[#f5f5f5] placeholder-gray-400 dark:placeholder-[#a0a0a0] focus:ring-2 focus:ring-blue-500/50 dark:focus:ring-[#4790fd]/50 focus:border-blue-500/50 dark:focus:border-[#4790fd]/50 transition-all duration-300"
             />
-          </button> */}
+            <button
+              type="submit"
+              disabled={!commentText.trim()}
+              className={`p-2.5 rounded-2xl transition-all duration-300 ${
+                commentText.trim()
+                  ? "bg-gradient-to-r from-blue-500/20 to-blue-500/30 dark:from-[#4790fd]/20 dark:to-[#4790fd]/30 text-blue-500 dark:text-[#4790fd] border border-blue-500/50 dark:border-[#4790fd]/50 hover:from-blue-500/30 hover:to-blue-500/40 dark:hover:from-[#4790fd]/30 dark:hover:to-[#4790fd]/40 hover:scale-105"
+                  : "bg-gray-100 dark:bg-[#070707]/50 text-gray-400 dark:text-[#4a4a4a] cursor-not-allowed"
+              }`}
+            >
+              <Send size={18} />
+            </button>
+          </form>
         </div>
 
-        {/* Likes Count */}
-        <p className="font-semibold text-gray-200 text-xs sm:text-sm mb-3 flex items-center gap-2">
-          <ThumbsUp size={14} className="sm:w-4 sm:h-4 text-blue-400" />
-          {likes} likes
-        </p>
-
-        {/* Caption */}
-        {content && (
-          <div className="mb-3">
-            <span className="font-semibold text-gray-200 text-xs sm:text-sm mr-2 hover:text-blue-400 cursor-pointer transition-colors duration-300">
-              {username}
-            </span>
-            <span className="text-xs sm:text-sm text-gray-300">{content}</span>
+        {/* Comments Section */}
+        {commentModal && (
+          <div className="border-t border-gray-100 dark:border-[#4790fd]/10 bg-gradient-to-r from-gray-50/30 via-white/20 to-gray-50/30 dark:from-[#040404]/30 dark:via-[#070707]/20 dark:to-[#040404]/30">
+            <Comments postId={postId} />
           </div>
         )}
-
-        {/* Comments Count */}
-        <button
-          onClick={inputComment}
-          className="text-gray-500 text-xs mb-3 hover:text-gray-300 transition-colors duration-300 flex items-center gap-1"
-        >
-          <Eye size={12} className="sm:w-[14px] sm:h-[14px]" />
-          View all {comments?.length || 0} comments
-        </button>
-
-        {/* Comment Input */}
-        <form
-          onSubmit={handleSubmit}
-          className="flex items-center py-3 sm:py-4 border-t border-gray-700/50"
-        >
-          <input
-            type="text"
-            value={commentText}
-            onChange={(e) => setCommentText(e.target.value)}
-            placeholder="Add a comment..."
-            className="flex-1 text-xs sm:text-sm p-2 sm:p-3 rounded-2xl border border-gray-600/50 bg-gradient-to-r from-gray-800/50 via-gray-700/30 to-gray-800/50 text-gray-200 placeholder-gray-500 focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all duration-300 backdrop-blur-sm"
-          />
-          <button
-            type="submit"
-            disabled={!commentText.trim()}
-            className={`ml-2 sm:ml-3 p-2 sm:p-3 rounded-2xl transition-all duration-300 ${
-              commentText.trim()
-                ? "bg-gradient-to-r from-blue-600/20 to-blue-700/20 text-blue-400 border border-blue-500/50 hover:from-blue-600/30 hover:to-blue-700/30 hover:border-blue-400/50 hover:scale-105"
-                : "bg-gray-700/30 text-gray-600 cursor-not-allowed"
-            }`}
-          >
-            <Send size={16} className="sm:w-[18px] sm:h-[18px]" />
-          </button>
-        </form>
       </div>
-
-      {/* Comments Section */}
-      {commentModal && (
-        <div className="border-t border-gray-700/50 bg-gradient-to-r from-gray-800/20 via-gray-700/10 to-gray-800/20">
-          <Comments postId={postId} />
-        </div>
-      )}
     </div>
   );
 };
