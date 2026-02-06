@@ -199,3 +199,74 @@ exports.getLikes = async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 };
+
+exports.updateProject = async (req, res) => {
+  try {
+    const { projectId } = req.params;
+    const { title, description, githubUrl, projectUrl, TechStack, category } = req.body;
+    
+    // Find the project by ID
+    const project = await Project.findById(projectId);
+    
+    if (!project) {
+      return res.status(404).json({ message: "Project not found" });
+    }
+    
+    // Check if the user owns this project
+    if (project.userId.toString() !== req.body.userId) {
+      return res.status(403).json({ message: "Unauthorized: You can only update your own projects" });
+    }
+    
+    // Update project fields if provided
+    if (title) project.title = title;
+    if (description) project.description = description;
+    if (githubUrl) project.githubUrl = githubUrl;
+    if (projectUrl) project.projectUrl = projectUrl;
+    if (TechStack) project.TechStack = JSON.parse(TechStack);
+    if (category) project.category = category;
+    
+    // Handle media update if a new file is provided
+    if (req.file) {
+      const uploadedImage = await imagekit.upload({
+        file: req.file.buffer,
+        fileName: req.file.originalname,
+        folder: "/user-project",
+      });
+      project.mediaUrl = uploadedImage.url;
+    }
+    
+    await project.save();
+    
+    res.status(200).json({ message: "Project updated successfully", project });
+  } catch (error) {
+    console.error("Error updating project:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+exports.deleteProject = async (req, res) => {
+  try {
+    const { projectId } = req.params;
+    const { userId } = req.body;
+    
+    // Find the project by ID
+    const project = await Project.findById(projectId);
+    
+    if (!project) {
+      return res.status(404).json({ message: "Project not found" });
+    }
+    
+    // Check if the user owns this project
+    if (project.userId.toString() !== userId) {
+      return res.status(403).json({ message: "Unauthorized: You can only delete your own projects" });
+    }
+    
+    // Delete the project
+    await Project.findByIdAndDelete(projectId);
+    
+    res.status(200).json({ message: "Project deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting project:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};

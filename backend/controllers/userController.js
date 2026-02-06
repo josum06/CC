@@ -14,6 +14,7 @@ const uploadProfile = async (req, res) => {
       aboutMe,
       designation,
       collegeId,
+      personalUrl,
     } = req.body;
 
     let updateData = {}; // Store only provided fields
@@ -24,6 +25,7 @@ const uploadProfile = async (req, res) => {
     if (skills) updateData.skills = JSON.parse(skills);
     if (designation) updateData.designation = designation;
     if (collegeId) updateData.collegeId = collegeId;
+    if (personalUrl) updateData.personalUrl = personalUrl;
 
     // Assign role based on designation
     if (designation) {
@@ -86,7 +88,41 @@ const getUserProfile = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    res.status(200).json(user);
+    // Calculate department from enrollment number
+    let department = null;
+    if (user.enrollmentNumber) {
+      const branchCode = user.enrollmentNumber.substring(6, 9);
+      switch (branchCode) {
+        case "027":
+          department = "Computer Science Engineering";
+          break;
+        case "031":
+          department = "Information Technology";
+          break;
+        case "119":
+          department = "Artificial Intelligence and Data Science";
+          break;
+        case "049":
+          department = "Electrical Engineering";
+          break;
+        case "028":
+          department = "Electronics and Communication Engineering";
+          break;
+        case "157":
+          department = "Computer Science Engineering in Data Science";
+          break;
+        default:
+          department = "Unknown Department";
+      }
+    }
+
+    // Add department to the user object
+    const userWithDepartment = {
+      ...user.toObject(),
+      department: department
+    };
+
+    res.status(200).json(userWithDepartment);
   } catch (error) {
     console.error("Error fetching user profile:", error);
     res.status(500).json({ message: "Internal Server Error" });
@@ -103,7 +139,41 @@ const getUserProfileById = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    res.status(200).json(user);
+    // Calculate department from enrollment number
+    let department = null;
+    if (user.enrollmentNumber) {
+      const branchCode = user.enrollmentNumber.substring(6, 9);
+      switch (branchCode) {
+        case "027":
+          department = "Computer Science Engineering";
+          break;
+        case "031":
+          department = "Information Technology";
+          break;
+        case "119":
+          department = "Artificial Intelligence and Data Science";
+          break;
+        case "049":
+          department = "Electrical Engineering";
+          break;
+        case "028":
+          department = "Electronics and Communication Engineering";
+          break;
+        case "157":
+          department = "Computer Science Engineering in Data Science";
+          break;
+        default:
+          department = "Unknown Department";
+      }
+    }
+
+    // Add department to the user object
+    const userWithDepartment = {
+      ...user.toObject(),
+      department: department
+    };
+
+    res.status(200).json(userWithDepartment);
   } catch (error) {
     console.error("Error fetching user profile:", error);
     res.status(500).json({ message: "Internal Server Error" });

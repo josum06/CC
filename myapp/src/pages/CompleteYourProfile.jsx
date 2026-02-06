@@ -1,22 +1,38 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useUser } from "@clerk/clerk-react";
-import { toast, ToastContainer } from "react-toastify";
+// import { showToast } from "../components/CustomToast"; // Component not found
 import axios from "axios";
-import { X, UploadCloud, ArrowLeft, Camera, Github, Linkedin, BookOpen, Building, GraduationCap, User, Mail, CheckCircle, AlertCircle } from 'lucide-react';
+import { useTheme } from "../context/ThemeContext";
+import {
+  X,
+  UploadCloud,
+  ArrowLeft,
+  Github,
+  Linkedin,
+  BookOpen,
+  Building,
+  GraduationCap,
+  User,
+  Mail,
+  CheckCircle,
+  AlertCircle,
+  Sparkles,
+  Loader2,
+  Link as LinkIcon,
+} from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import "react-toastify/dist/ReactToastify.css";
+
 
 const CompleteYourProfile = () => {
   const { user } = useUser();
   const navigate = useNavigate();
+  const { isDarkMode } = useTheme();
 
   const [skillsInput, setSkillsInput] = useState("");
   const [enrollmentNumber, setEnrollmentNumber] = useState("");
-  const [rollNumber, setRollNumber] = useState("");
-  const [branchCode, setBranchCode] = useState("");
-  const [batchYear, setBatchYear] = useState("");
   const [githubUrl, setGithubUrl] = useState("");
   const [linkedinUrl, setLinkedinUrl] = useState("");
+  const [personalUrl, setPersonalUrl] = useState("");
   const [skills, setSkills] = useState([]);
   const [aboutMe, setAboutMe] = useState("");
   const [idCardPhoto, setIdCardPhoto] = useState(null);
@@ -26,10 +42,10 @@ const CompleteYourProfile = () => {
   const allowedBranchCodes = {
     "027": "Computer Science Engineering",
     "031": "Information Technology",
-    "119": "Artificial Intelligence and Data Science",
+    119: "Artificial Intelligence and Data Science",
     "049": "Electrical Engineering",
     "028": "Electronics and Communication Engineering",
-    "157": "Computer Science Engineering in Data Science",
+    157: "Computer Science Engineering in Data Science",
   };
 
   const VALID_COLLEGE_CODE = "208";
@@ -40,10 +56,8 @@ const CompleteYourProfile = () => {
     if (/^\d*$/.test(value)) {
       setEnrollmentNumber(value);
       if (value.length === 11) {
-        const roll = value.substring(0, 3);
         const college = value.substring(3, 6);
         const branch = value.substring(6, 9);
-        const batch = value.substring(9, 11);
 
         if (college !== VALID_COLLEGE_CODE) {
           toast.error("Your college is not registered.");
@@ -56,38 +70,25 @@ const CompleteYourProfile = () => {
           resetFields();
           return;
         }
-
-        setRollNumber(roll);
-        setBranchCode(branch);
-        setBatchYear(`20${batch}`);
-      } else {
-        resetFields();
       }
     }
   };
 
   const resetFields = () => {
-    setRollNumber("");
-    setBranchCode("");
-    setBatchYear("");
+    setEnrollmentNumber("");
   };
 
-  useEffect(() => {
-    if (user) {
-      fetchUserProfile();
-    }
-  }, [user]);
-
-  const fetchUserProfile = async () => {
+  const fetchUserProfile = useCallback(async () => {
+    if (!user?.id) return;
     try {
       const response = await axios.get(
-        `http://localhost:3000/api/user/profile/${user.id}`
+        `${import.meta.env.VITE_BACKEND_URL}/api/user/profile/${user.id}`,
       );
       const data = response.data;
-      console.log(data);
       setEnrollmentNumber(data.enrollmentNumber || "");
       setGithubUrl(data.githubUrl || "");
       setLinkedinUrl(data.linkedinUrl || "");
+      setPersonalUrl(data.personalUrl || "");
       setSkills(data.skills || []);
       setAboutMe(data.aboutMe || "");
       if (data.collegeIDCard) {
@@ -98,7 +99,13 @@ const CompleteYourProfile = () => {
       console.error("Error fetching profile:", error);
       toast.error("Failed to load profile.");
     }
-  };
+  }, [user?.id]);
+
+  useEffect(() => {
+    if (user) {
+      fetchUserProfile();
+    }
+  }, [user, fetchUserProfile]);
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -127,22 +134,24 @@ const CompleteYourProfile = () => {
         formData.append("enrollmentNumber", enrollmentNumber);
       if (githubUrl) formData.append("githubUrl", githubUrl);
       if (linkedinUrl) formData.append("linkedinUrl", linkedinUrl);
+      if (personalUrl) formData.append("personalUrl", personalUrl);
       if (aboutMe) formData.append("aboutMe", aboutMe);
       if (skills.length) formData.append("skills", JSON.stringify(skills));
       if (idCardPhoto && typeof idCardPhoto !== "string")
         formData.append("idCardPhoto", idCardPhoto);
 
-      const response = await axios.patch(
-        "http://localhost:3000/api/user/upload-profile",
+      await axios.patch(
+        `${import.meta.env.VITE_BACKEND_URL}/api/user/upload-profile`,
         formData,
         {
           headers: { "Content-Type": "multipart/form-data" },
-        }
+        },
       );
 
       toast.success("Profile updated successfully!");
+      
+      // Navigate to home after profile update
       navigate("/");
-      console.log("Updated User:", response.data.user);
     } catch (error) {
       console.error("Error updating profile:", error);
       toast.error("Failed to update profile. Please try again.");
@@ -153,7 +162,7 @@ const CompleteYourProfile = () => {
 
   const calculateProgress = () => {
     let completed = 0;
-    let total = 5; // Total number of required fields
+    let total = 5;
 
     if (enrollmentNumber) completed++;
     if (githubUrl) completed++;
@@ -165,116 +174,136 @@ const CompleteYourProfile = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#000000] text-gray-100 relative overflow-hidden">
-      {/* Background decorative elements */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-20 -right-20 sm:-top-40 sm:-right-40 w-40 h-40 sm:w-80 sm:h-80 bg-blue-500/10 rounded-full blur-3xl"></div>
-        <div className="absolute -bottom-20 -left-20 sm:-bottom-40 sm:-left-40 w-40 h-40 sm:w-80 sm:h-80 bg-purple-500/10 rounded-full blur-3xl"></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-48 h-48 sm:w-96 sm:h-96 bg-gradient-to-r from-blue-500/5 to-purple-500/5 rounded-full blur-3xl"></div>
+    <div className="min-h-screen bg-gray-50 dark:bg-[#070707] py-6 px-3 sm:py-8 sm:px-4 md:px-6 relative overflow-hidden transition-colors duration-300">
+      {/* Background gradients */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-[#4790fd]/5 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-0 left-0 w-96 h-96 bg-[#c76191]/5 rounded-full blur-3xl"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#ece239]/3 rounded-full blur-3xl"></div>
       </div>
 
-      {/* Header */}
-      <div className="relative z-10 border-b border-gray-500/50 px-3 py-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6">
-            <div className="relative group">
-              <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-xl sm:rounded-2xl overflow-hidden bg-gradient-to-br from-gray-800/50 to-gray-900/50 ring-2 sm:ring-4 ring-blue-500/30 shadow-xl sm:shadow-2xl group-hover:shadow-blue-500/20 transition-all duration-300">
-                <img
-                  src={user?.imageUrl}
-                  alt="profile"
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300" />
-                <button className="absolute bottom-1 right-1 sm:bottom-2 sm:right-2 p-1.5 sm:p-2 bg-gray-800/90 backdrop-blur-sm rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-300">
-                  <Camera size={12} className="sm:w-4 sm:h-4 text-gray-300" />
-                </button>
+      <div className="max-w-5xl mx-auto relative z-10">
+        {/* Header */}
+        <div className="mb-8">
+          <div className="flex items-center gap-4 mb-4">
+            <button
+              onClick={() => navigate(-1)}
+              className="p-2.5 rounded-xl bg-white/80 dark:bg-[#040404]/80 backdrop-blur-xl border border-gray-200 dark:border-[#4790fd]/20 hover:border-[#4790fd]/50 dark:hover:border-[#4790fd]/30 transition-all duration-300 text-gray-700 dark:text-[#4790fd] shadow-sm dark:shadow-none"
+            >
+              <ArrowLeft className="w-5 h-5" />
+            </button>
+            <div className="flex items-center gap-4 flex-1">
+              <div className="relative">
+                <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl overflow-hidden ring-2 ring-gray-200 dark:ring-[#4790fd]/30 shadow-lg shadow-gray-200/50 dark:shadow-[#4790fd]/20">
+                  <img
+                    src={user?.imageUrl}
+                    alt="profile"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-[#27dc66] rounded-full border-2 border-white dark:border-[#040404]"></div>
               </div>
-            </div>
-            
-            <div className="flex-1 min-w-0">
-              <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-2 leading-tight">
-                Complete Your Profile
-              </h1>
-              <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-400 max-w-2xl leading-relaxed">
-                Take a moment to set up your professional profile. This information helps us personalize your experience and connect you with opportunities.
-              </p>
+              <div>
+                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-[#f5f5f5]">
+                  Complete Your Profile
+                </h1>
+                <p className="text-sm text-gray-500 dark:text-[#a0a0a0]">
+                  Set up your professional profile
+                </p>
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <div className="max-w-7xl mx-auto px-3 py-6 sm:px-6 sm:py-8 lg:px-8 relative z-10">
-        <div className="bg-gradient-to-br from-[#232526] via-[#1a1b1c] to-[#000000] rounded-2xl sm:rounded-3xl border border-gray-500/30 shadow-2xl overflow-hidden">
-          {/* Progress Bar */}
-          <div className="px-4 sm:px-6 lg:px-8 py-4 sm:py-6 border-b border-gray-500/30 bg-gradient-to-r from-gray-700/20 via-gray-600/10 to-gray-700/20">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
-              <div className="flex-1 h-2 sm:h-3 bg-gray-700/50 rounded-full overflow-hidden backdrop-blur-sm">
-                <div 
-                  className="h-full bg-gradient-to-r from-blue-500 to-purple-500 transition-all duration-700 ease-out shadow-lg"
+        {/* Main Card */}
+        <div className="relative group">
+          {/* Gradient blur background */}
+          <div className="absolute inset-0 bg-gradient-to-br from-[#4790fd]/10 via-[#c76191]/5 to-[#27dc66]/10 rounded-3xl blur-xl opacity-50"></div>
+
+          {/* Card */}
+          <div className="relative bg-white/80 dark:bg-[#040404]/80 backdrop-blur-2xl rounded-3xl border border-gray-200 dark:border-[#4790fd]/20 shadow-xl overflow-hidden transition-colors duration-300">
+            {/* Progress Bar */}
+            <div className="px-6 py-5 border-b border-gray-100 dark:border-[#4790fd]/10 bg-gray-50/50 dark:bg-[#070707]/50">
+              <div className="flex items-center justify-between gap-4 mb-2">
+                <span className="text-sm font-medium text-gray-700 dark:text-[#f5f5f5]">
+                  Profile Completion
+                </span>
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-semibold text-[#4790fd]">
+                    {calculateProgress()}%
+                  </span>
+                  {calculateProgress() === 100 && (
+                    <CheckCircle className="w-5 h-5 text-[#27dc66]" />
+                  )}
+                </div>
+              </div>
+              <div className="h-2.5 bg-gray-200 dark:bg-[#070707] rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-gradient-to-r from-[#4790fd] via-[#c76191] to-[#27dc66] transition-all duration-700 ease-out shadow-lg"
                   style={{ width: `${calculateProgress()}%` }}
                 />
               </div>
-              <div className="flex items-center gap-2">
-                <span className="text-xs sm:text-sm font-medium text-gray-300">
-                  {calculateProgress()}% Complete
-                </span>
-                {calculateProgress() === 100 && (
-                  <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-400" />
-                )}
-              </div>
             </div>
-          </div>
 
-          <form onSubmit={handleSubmit}>
-            <div className="p-4 sm:p-6 lg:p-8">
-              <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 sm:gap-8 xl:gap-12">
-                {/* Left Column */}
-                <div className="space-y-6 sm:space-y-8">
-                  {/* Personal Information */}
-                  <div className="space-y-4 sm:space-y-6">
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
-                      <h2 className="text-lg sm:text-xl lg:text-2xl font-semibold text-white flex items-center gap-2 sm:gap-3">
-                        <User className="w-5 h-5 sm:w-6 sm:h-6 text-blue-400" />
-                        <span className="text-base sm:text-lg lg:text-xl">Personal Information</span>
-                      </h2>
-                      <span className="px-2 sm:px-3 py-1 bg-gradient-to-r from-blue-600/20 to-blue-700/20 text-blue-300 text-xs sm:text-sm font-medium rounded-full border border-blue-500/30 self-start sm:self-auto">
-                        Required
-                      </span>
-                    </div>
-
-                    {/* Name and Email Card */}
-                    <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 rounded-xl sm:rounded-2xl border border-gray-700/50 p-4 sm:p-6 backdrop-blur-sm">
-                      <div className="space-y-4">
-                        <div className="flex items-start sm:items-center gap-3">
-                          <div className="p-1.5 sm:p-2 bg-blue-500/20 rounded-lg flex-shrink-0">
-                            <User className="w-4 h-4 sm:w-5 sm:h-5 text-blue-400" />
+            <form onSubmit={handleSubmit}>
+              <div className="p-6">
+                <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+                  {/* Left Column */}
+                  <div className="space-y-6">
+                    {/* Personal Information */}
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="p-2 rounded-xl bg-[#4790fd]/10 border border-[#4790fd]/20">
+                            <User className="w-5 h-5 text-[#4790fd]" />
                           </div>
-                          <div className="min-w-0 flex-1">
-                            <label className="text-xs sm:text-sm font-medium text-gray-400">Full Name</label>
-                            <p className="text-sm sm:text-base lg:text-lg font-medium text-white mt-1 break-words">{user?.fullName}</p>
-                          </div>
+                          <h2 className="text-lg font-semibold text-gray-900 dark:text-[#f5f5f5]">
+                            Personal Information
+                          </h2>
                         </div>
-                        <div className="flex items-start sm:items-center gap-3">
-                          <div className="p-1.5 sm:p-2 bg-green-500/20 rounded-lg flex-shrink-0">
-                            <Mail className="w-4 h-4 sm:w-5 sm:h-5 text-green-400" />
+                        <span className="px-2.5 py-1 bg-[#ece239]/10 text-[#ece239] text-xs font-medium rounded-full border border-[#ece239]/20">
+                          Required
+                        </span>
+                      </div>
+
+                      {/* Name and Email Card */}
+                      <div className="bg-gray-50 dark:bg-[#070707]/50 backdrop-blur-xl rounded-2xl border border-gray-200 dark:border-[#4790fd]/10 p-5 transition-colors duration-300">
+                        <div className="space-y-4">
+                          <div className="flex items-center gap-3">
+                            <div className="p-2 bg-[#4790fd]/10 rounded-lg">
+                              <User className="w-4 h-4 text-[#4790fd]" />
+                            </div>
+                            <div className="flex-1">
+                              <label className="text-xs font-medium text-gray-500 dark:text-[#a0a0a0]">
+                                Full Name
+                              </label>
+                              <p className="text-sm font-medium text-gray-900 dark:text-[#f5f5f5] mt-1">
+                                {user?.fullName}
+                              </p>
+                            </div>
                           </div>
-                          <div className="min-w-0 flex-1">
-                            <label className="text-xs sm:text-sm font-medium text-gray-400">Email Address</label>
-                            <p className="text-sm sm:text-base lg:text-lg font-medium text-white mt-1 break-all">
-                              {user?.primaryEmailAddress?.emailAddress}
-                            </p>
+                          <div className="flex items-center gap-3">
+                            <div className="p-2 bg-[#27dc66]/10 rounded-lg">
+                              <Mail className="w-4 h-4 text-[#27dc66]" />
+                            </div>
+                            <div className="flex-1">
+                              <label className="text-xs font-medium text-gray-500 dark:text-[#a0a0a0]">
+                                Email Address
+                              </label>
+                              <p className="text-sm font-medium text-gray-900 dark:text-[#f5f5f5] mt-1 break-all">
+                                {user?.primaryEmailAddress?.emailAddress}
+                              </p>
+                            </div>
                           </div>
                         </div>
                       </div>
-                    </div>
 
-                    {/* Enrollment Section */}
-                    <div className="space-y-3 sm:space-y-4">
-                      <div className="relative">
-                        <label className="block text-xs sm:text-sm font-medium text-gray-300 mb-2">
+                      {/* Enrollment Section */}
+                      <div className="space-y-3">
+                        <label className="block text-sm font-medium text-gray-700 dark:text-[#f5f5f5]">
                           Enrollment Number
                         </label>
-                        <div className="relative group">
+                        <div className="relative">
                           <input
                             type="text"
                             disabled={status}
@@ -285,256 +314,311 @@ const CompleteYourProfile = () => {
                                 handleEnrollmentChange(e);
                               }
                             }}
-                            className={`w-full p-3 sm:p-4 text-sm sm:text-base border rounded-lg sm:rounded-xl bg-gray-800/50 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 text-white placeholder-gray-400 ${
-                              status ? "bg-gray-700/50 cursor-not-allowed" : "hover:border-gray-600"
+                            className={`w-full px-4 py-3 text-sm border rounded-xl bg-gray-50 dark:bg-[#070707]/50 backdrop-blur-xl border-gray-200 dark:border-[#4790fd]/20 focus:ring-2 focus:ring-[#4790fd]/50 focus:border-[#4790fd] transition-all duration-300 text-gray-900 dark:text-[#f5f5f5] placeholder-gray-400 dark:placeholder-[#a0a0a0] ${
+                              status
+                                ? "opacity-50 cursor-not-allowed"
+                                : "hover:border-[#4790fd]/30"
                             }`}
                             placeholder="Enter your 11-digit enrollment number"
                           />
                           {enrollmentNumber && (
                             <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                              <div className="w-2 h-2 sm:w-3 sm:h-3 rounded-full bg-green-500 shadow-lg shadow-green-500/50" />
+                              <div className="w-2.5 h-2.5 rounded-full bg-[#27dc66] shadow-lg shadow-[#27dc66]/50"></div>
                             </div>
                           )}
                         </div>
                       </div>
 
                       {enrollmentNumber && (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                          <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 p-3 sm:p-4 rounded-lg sm:rounded-xl border border-gray-700/50 hover:border-gray-600/50 transition-colors duration-300">
-                            <div className="flex items-center space-x-2 text-gray-400 mb-2">
-                              <BookOpen size={14} className="sm:w-4 sm:h-4" />
-                              <span className="text-xs sm:text-sm font-medium">Roll Number</span>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          <div className="bg-gray-50 dark:bg-[#070707]/50 backdrop-blur-xl p-4 rounded-xl border border-gray-200 dark:border-[#4790fd]/10 hover:border-[#4790fd]/30 dark:hover:border-[#4790fd]/20 transition-colors">
+                            <div className="flex items-center gap-2 text-gray-500 dark:text-[#a0a0a0] mb-2">
+                              <BookOpen size={14} />
+                              <span className="text-xs font-medium">
+                                Roll Number
+                              </span>
                             </div>
-                            <p className="text-sm sm:text-base lg:text-lg font-semibold text-white">
+                            <p className="text-base font-semibold text-gray-900 dark:text-[#f5f5f5]">
                               {enrollmentNumber.substring(0, 3)}
                             </p>
                           </div>
 
-                          <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 p-3 sm:p-4 rounded-lg sm:rounded-xl border border-gray-700/50 hover:border-gray-600/50 transition-colors duration-300">
-                            <div className="flex items-center space-x-2 text-gray-400 mb-2">
-                              <Building size={14} className="sm:w-4 sm:h-4" />
-                              <span className="text-xs sm:text-sm font-medium">Batch Year</span>
+                          <div className="bg-gray-50 dark:bg-[#070707]/50 backdrop-blur-xl p-4 rounded-xl border border-gray-200 dark:border-[#27dc66]/10 hover:border-[#27dc66]/30 dark:hover:border-[#27dc66]/20 transition-colors">
+                            <div className="flex items-center gap-2 text-gray-500 dark:text-[#a0a0a0] mb-2">
+                              <Building size={14} />
+                              <span className="text-xs font-medium">
+                                Batch Year
+                              </span>
                             </div>
-                            <p className="text-sm sm:text-base lg:text-lg font-semibold text-white">
+                            <p className="text-base font-semibold text-gray-900 dark:text-[#f5f5f5]">
                               {"20" + enrollmentNumber.substring(9, 11)}
                             </p>
                           </div>
 
-                          <div className="col-span-1 sm:col-span-2 bg-gradient-to-br from-gray-800/50 to-gray-900/50 p-3 sm:p-4 rounded-lg sm:rounded-xl border border-gray-700/50 hover:border-gray-600/50 transition-colors duration-300">
-                            <div className="flex items-center space-x-2 text-gray-400 mb-2">
-                              <GraduationCap size={14} className="sm:w-4 sm:h-4" />
-                              <span className="text-xs sm:text-sm font-medium">Branch</span>
+                          <div className="col-span-1 sm:col-span-2 bg-gray-50 dark:bg-[#070707]/50 backdrop-blur-xl p-4 rounded-xl border border-gray-200 dark:border-[#c76191]/10 hover:border-[#c76191]/30 dark:hover:border-[#c76191]/20 transition-colors">
+                            <div className="flex items-center gap-2 text-gray-500 dark:text-[#a0a0a0] mb-2">
+                              <GraduationCap size={14} />
+                              <span className="text-xs font-medium">
+                                Branch
+                              </span>
                             </div>
-                            <p className="text-sm sm:text-base lg:text-lg font-semibold text-white">
-                              {allowedBranchCodes[enrollmentNumber.substring(6,9)] || ""}
+                            <p className="text-base font-semibold text-gray-900 dark:text-[#f5f5f5]">
+                              {allowedBranchCodes[
+                                enrollmentNumber.substring(6, 9)
+                              ] || ""}
                             </p>
                           </div>
                         </div>
                       )}
                     </div>
-                  </div>
 
-                  {/* Social Links */}
-                  <div className="space-y-4 sm:space-y-6">
-                    <h3 className="text-lg sm:text-xl lg:text-2xl font-semibold text-white flex items-center gap-2 sm:gap-3">
-                      <div className="p-1.5 sm:p-2 bg-purple-500/20 rounded-lg">
-                        <Linkedin className="w-4 h-4 sm:w-5 sm:h-5 text-purple-400" />
+                    {/* Social Links */}
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 rounded-xl bg-[#c76191]/10 border border-[#c76191]/20">
+                          <Linkedin className="w-5 h-5 text-[#c76191]" />
+                        </div>
+                        <h3 className="text-lg font-semibold text-gray-900 dark:text-[#f5f5f5]">
+                          Social Presence
+                        </h3>
                       </div>
-                      <span className="text-base sm:text-lg lg:text-xl">Social Presence</span>
-                    </h3>
-                    <div className="space-y-3 sm:space-y-4">
-                      <div className="group">
+                      <div className="space-y-3">
                         <div className="relative">
-                          <div className="absolute inset-y-0 left-0 pl-3 sm:pl-4 flex items-center pointer-events-none">
-                            <Github className="text-gray-400 group-hover:text-gray-300 transition-colors w-4 h-4 sm:w-5 sm:h-5" />
+                          <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                            <LinkIcon className="w-5 h-5 text-gray-400 dark:text-[#a0a0a0]" />
+                          </div>
+                          <input
+                            type="url"
+                            disabled={status}
+                            value={personalUrl}
+                            onChange={(e) => setPersonalUrl(e.target.value)}
+                            className="w-full pl-12 pr-4 py-3 text-sm border rounded-xl bg-gray-50 dark:bg-[#070707]/50 backdrop-blur-xl border-gray-200 dark:border-[#4790fd]/20 focus:ring-2 focus:ring-[#4790fd]/50 focus:border-[#4790fd] transition-all duration-300 hover:border-[#4790fd]/30 text-gray-900 dark:text-[#f5f5f5] placeholder-gray-400 dark:placeholder-[#a0a0a0]"
+                            placeholder="Your personal portfolio URL"
+                          />
+                        </div>
+
+                        <div className="relative">
+                          <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                            <Github className="w-5 h-5 text-gray-400 dark:text-[#a0a0a0]" />
                           </div>
                           <input
                             type="url"
                             disabled={status}
                             value={githubUrl}
                             onChange={(e) => setGithubUrl(e.target.value)}
-                            className="w-full pl-10 sm:pl-12 pr-3 sm:pr-4 py-3 sm:py-4 text-sm sm:text-base border rounded-lg sm:rounded-xl bg-gray-800/50 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 hover:border-gray-600 text-white placeholder-gray-400"
+                            className="w-full pl-12 pr-4 py-3 text-sm border rounded-xl bg-gray-50 dark:bg-[#070707]/50 backdrop-blur-xl border-gray-200 dark:border-[#4790fd]/20 focus:ring-2 focus:ring-[#4790fd]/50 focus:border-[#4790fd] transition-all duration-300 hover:border-[#4790fd]/30 text-gray-900 dark:text-[#f5f5f5] placeholder-gray-400 dark:placeholder-[#a0a0a0]"
                             placeholder="Your GitHub profile URL"
                           />
                         </div>
-                      </div>
 
-                      <div className="group">
                         <div className="relative">
-                          <div className="absolute inset-y-0 left-0 pl-3 sm:pl-4 flex items-center pointer-events-none">
-                            <Linkedin className="text-gray-400 group-hover:text-gray-300 transition-colors w-4 h-4 sm:w-5 sm:h-5" />
+                          <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                            <Linkedin className="w-5 h-5 text-gray-400 dark:text-[#a0a0a0]" />
                           </div>
                           <input
                             type="url"
                             disabled={status}
                             value={linkedinUrl}
                             onChange={(e) => setLinkedinUrl(e.target.value)}
-                            className="w-full pl-10 sm:pl-12 pr-3 sm:pr-4 py-3 sm:py-4 text-sm sm:text-base border rounded-lg sm:rounded-xl bg-gray-800/50 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 hover:border-gray-600 text-white placeholder-gray-400"
+                            className="w-full pl-12 pr-4 py-3 text-sm border rounded-xl bg-gray-50 dark:bg-[#070707]/50 backdrop-blur-xl border-gray-200 dark:border-[#4790fd]/20 focus:ring-2 focus:ring-[#4790fd]/50 focus:border-[#4790fd] transition-all duration-300 hover:border-[#4790fd]/30 text-gray-900 dark:text-[#f5f5f5] placeholder-gray-400 dark:placeholder-[#a0a0a0]"
                             placeholder="Your LinkedIn profile URL"
                           />
                         </div>
                       </div>
                     </div>
                   </div>
-                </div>
 
-                {/* Right Column */}
-                <div className="space-y-6 sm:space-y-8">
-                  {/* Skills Section */}
-                  <div className="space-y-4 sm:space-y-6">
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
-                      <h3 className="text-lg sm:text-xl lg:text-2xl font-semibold text-white flex items-center gap-2 sm:gap-3">
-                        <div className="p-1.5 sm:p-2 bg-orange-500/20 rounded-lg">
-                          <BookOpen className="w-4 h-4 sm:w-5 sm:h-5 text-orange-400" />
+                  {/* Right Column */}
+                  <div className="space-y-6">
+                    {/* Skills Section */}
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="p-2 rounded-xl bg-[#ece239]/10 border border-[#ece239]/20">
+                            <BookOpen className="w-5 h-5 text-[#ece239]" />
+                          </div>
+                          <h3 className="text-lg font-semibold text-gray-900 dark:text-[#f5f5f5]">
+                            Skills & Expertise
+                          </h3>
                         </div>
-                        <span className="text-base sm:text-lg lg:text-xl">Skills & Expertise</span>
-                      </h3>
-                      <span className="px-2 sm:px-3 py-1 bg-gradient-to-r from-orange-600/20 to-orange-700/20 text-orange-300 text-xs sm:text-sm font-medium rounded-full border border-orange-500/30 self-start sm:self-auto">
-                        {skills.length} Added
-                      </span>
-                    </div>
-                    
-                    <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 rounded-lg sm:rounded-xl border border-gray-700/50 p-4 sm:p-6 backdrop-blur-sm">
-                      <div className="flex flex-wrap gap-2 mb-4">
-                        {skills.map((skill, index) => (
-                          <span 
-                            key={index} 
-                            className="group flex items-center bg-gray-700/50 px-2 sm:px-3 py-1 sm:py-1.5 rounded-md sm:rounded-lg border border-gray-600/50 hover:border-gray-500/50 transition-all duration-300"
-                          >
-                            <span className="text-xs sm:text-sm font-medium text-gray-200">{skill}</span>
-                            <button 
-                              type="button"
-                              onClick={() => setSkills(skills.filter((s) => s !== skill))}
-                              className="ml-1.5 sm:ml-2 text-gray-400 hover:text-red-400 transition-colors"
-                            >
-                              <X size={12} className="sm:w-3.5 sm:h-3.5" />
-                            </button>
-                          </span>
-                        ))}
+                        <span className="px-2.5 py-1 bg-[#4790fd]/10 text-[#4790fd] text-xs font-medium rounded-full border border-[#4790fd]/20">
+                          {skills.length} Added
+                        </span>
                       </div>
-                      
-                      <div className="flex">
-                        <input
-                          type="text"
-                          value={skillsInput}
-                          onChange={(e) => setSkillsInput(e.target.value)}
-                          className="flex-1 p-2.5 sm:p-3 text-sm sm:text-base border rounded-l-lg sm:rounded-l-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 bg-gray-800/50 text-white placeholder-gray-400"
-                          placeholder="Type a skill and press Add"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => {
-                            if (skillsInput.trim() && !skills.includes(skillsInput.trim().toLowerCase())) {
-                              setSkills([...skills, skillsInput.trim().toLowerCase()]);
-                              setSkillsInput("");
+
+                      <div className="bg-gray-50 dark:bg-[#070707]/50 backdrop-blur-xl rounded-2xl border border-gray-200 dark:border-[#4790fd]/10 p-5 transition-colors duration-300">
+                        <div className="flex flex-wrap gap-2 mb-4">
+                          {skills.map((skill, index) => (
+                            <span
+                              key={index}
+                              className="group flex items-center bg-[#4790fd]/10 px-3 py-1.5 rounded-lg border border-[#4790fd]/20 hover:border-[#4790fd]/30 transition-all"
+                            >
+                              <span className="text-xs font-medium text-gray-900 dark:text-[#f5f5f5]">
+                                {skill}
+                              </span>
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  setSkills(skills.filter((s) => s !== skill))
+                                }
+                                className="ml-2 text-gray-400 dark:text-[#a0a0a0] hover:text-[#c76191] transition-colors"
+                              >
+                                <X size={14} />
+                              </button>
+                            </span>
+                          ))}
+                        </div>
+
+                        <div className="flex">
+                          <input
+                            type="text"
+                            value={skillsInput}
+                            onChange={(e) => setSkillsInput(e.target.value)}
+                            className="flex-1 px-4 py-2.5 text-sm border rounded-l-xl bg-gray-50 dark:bg-[#070707]/50 backdrop-blur-xl border-gray-200 dark:border-[#4790fd]/20 focus:ring-2 focus:ring-[#4790fd]/50 focus:border-[#4790fd] transition-all text-gray-900 dark:text-[#f5f5f5] placeholder-gray-400 dark:placeholder-[#a0a0a0]"
+                            placeholder="Type a skill and press Add"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (
+                                skillsInput.trim() &&
+                                !skills.includes(
+                                  skillsInput.trim().toLowerCase(),
+                                )
+                              ) {
+                                setSkills([
+                                  ...skills,
+                                  skillsInput.trim().toLowerCase(),
+                                ]);
+                                setSkillsInput("");
+                              }
+                            }}
+                            className="px-5 py-2.5 text-sm bg-gradient-to-r from-[#4790fd] to-[#4790fd]/80 text-white rounded-r-xl hover:from-[#4790fd]/90 hover:to-[#4790fd]/70 transition-all duration-300 font-medium"
+                          >
+                            Add
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* About Me Section */}
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 rounded-xl bg-[#27dc66]/10 border border-[#27dc66]/20">
+                          <User className="w-5 h-5 text-[#27dc66]" />
+                        </div>
+                        <h3 className="text-lg font-semibold text-gray-900 dark:text-[#f5f5f5]">
+                          About Me
+                        </h3>
+                      </div>
+                      <div className="relative">
+                        <textarea
+                          value={aboutMe}
+                          disabled={status}
+                          onChange={(e) => {
+                            const inputValue = e.target.value;
+                            const wordCount = inputValue.trim() ? inputValue.trim().split(/\s+/).length : 0;
+                            if (wordCount <= 10) {
+                              setAboutMe(inputValue);
                             }
                           }}
-                          className="px-4 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-r-lg sm:rounded-r-xl hover:from-blue-600 hover:to-blue-700 transition-all duration-300 font-medium"
-                        >
-                          Add
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* About Me Section */}
-                  <div className="space-y-4 sm:space-y-6">
-                    <h3 className="text-lg sm:text-xl lg:text-2xl font-semibold text-white flex items-center gap-2 sm:gap-3">
-                      <div className="p-1.5 sm:p-2 bg-green-500/20 rounded-lg">
-                        <User className="w-4 h-4 sm:w-5 sm:h-5 text-green-400" />
-                      </div>
-                      <span className="text-base sm:text-lg lg:text-xl">About Me</span>
-                    </h3>
-                    <div className="relative">
-                      <textarea
-                        value={aboutMe}
-                        disabled={status}
-                        onChange={(e) => setAboutMe(e.target.value)}
-                        className="w-full p-3 sm:p-4 text-sm sm:text-base border rounded-lg sm:rounded-xl bg-gradient-to-br from-gray-800/50 to-gray-900/50 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 h-32 sm:h-40 resize-none text-white placeholder-gray-400"
-                        placeholder="Share your story, interests, and what drives you..."
-                      />
-                      <div className="absolute bottom-3 sm:bottom-4 right-3 sm:right-4 text-xs sm:text-sm text-gray-400">
-                        {aboutMe.length}/500
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* ID Card Upload */}
-                  <div className="space-y-4 sm:space-y-6">
-                    <h3 className="text-lg sm:text-xl lg:text-2xl font-semibold text-white flex items-center gap-2 sm:gap-3">
-                      <div className="p-1.5 sm:p-2 bg-red-500/20 rounded-lg">
-                        <AlertCircle className="w-4 h-4 sm:w-5 sm:h-5 text-red-400" />
-                      </div>
-                      <span className="text-base sm:text-lg lg:text-xl">College ID Card</span>
-                    </h3>
-                    <div className="relative group">
-                      <div className="relative w-full aspect-[16/10] rounded-lg sm:rounded-xl bg-gradient-to-br from-gray-800/50 to-gray-900/50 border-2 border-dashed border-gray-600/50 hover:border-blue-500/50 transition-all duration-300 overflow-hidden backdrop-blur-sm">
-                        <input
-                          type="file"
-                          accept="image/*"
-                          required={!idCardPhoto}
-                          className="absolute inset-0 opacity-0 cursor-pointer z-10"
-                          onChange={handleFileChange}
+                          className="w-full px-4 py-3 text-sm border rounded-xl bg-gray-50 dark:bg-[#070707]/50 backdrop-blur-xl border-gray-200 dark:border-[#4790fd]/20 focus:ring-2 focus:ring-[#4790fd]/50 focus:border-[#4790fd] transition-all duration-300 h-32 resize-none text-gray-900 dark:text-[#f5f5f5] placeholder-gray-400 dark:placeholder-[#a0a0a0]"
+                          placeholder="Share your story, interests, and what drives you... (max 10 words)"
                         />
-                        {idCardPhoto ? (
-                          <div className="relative w-full h-full">
-                            <img
-                              src={typeof idCardPhoto === "string" ? idCardPhoto : URL.createObjectURL(idCardPhoto)}
-                              alt="ID Card"
-                              className="w-full h-full object-contain"
-                            />
-                            <button
-                              onClick={removeImage}
-                              className="absolute top-2 right-2 p-1.5 sm:p-2 bg-gray-800/90 backdrop-blur-sm rounded-full shadow-lg hover:bg-red-500 hover:text-white transition-all duration-300"
-                            >
-                              <X size={14} className="sm:w-4.5 sm:h-4.5" />
-                            </button>
-                          </div>
-                        ) : (
-                          <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-400 hover:text-blue-400 transition-colors duration-300 p-4">
-                            <UploadCloud size={32} className="sm:w-10 sm:h-10" />
-                            <p className="mt-2 text-xs sm:text-sm font-medium text-center">Click or drag to upload your ID card</p>
-                            <p className="text-xs text-gray-500 mt-1 text-center">Supported formats: JPG, PNG</p>
-                          </div>
-                        )}
+                        <div className="absolute bottom-3 right-3 text-xs text-gray-400 dark:text-[#a0a0a0]">
+                          {aboutMe.trim() ? aboutMe.trim().split(/\s+/).length : 0}/10 words
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* ID Card Upload */}
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 rounded-xl bg-[#c76191]/10 border border-[#c76191]/20">
+                          <AlertCircle className="w-5 h-5 text-[#c76191]" />
+                        </div>
+                        <h3 className="text-lg font-semibold text-gray-900 dark:text-[#f5f5f5]">
+                          College ID Card
+                        </h3>
+                      </div>
+                      <div className="relative group">
+                        <div className="relative w-full aspect-[16/10] rounded-xl bg-gray-50 dark:bg-[#070707]/50 backdrop-blur-xl border-2 border-dashed border-gray-200 dark:border-[#4790fd]/20 hover:border-[#4790fd]/30 transition-all duration-300 overflow-hidden">
+                          <input
+                            type="file"
+                            accept="image/*"
+                            required={!idCardPhoto}
+                            className="absolute inset-0 opacity-0 cursor-pointer z-10"
+                            onChange={handleFileChange}
+                          />
+                          {idCardPhoto ? (
+                            <div className="relative w-full h-full">
+                              <img
+                                src={
+                                  typeof idCardPhoto === "string"
+                                    ? idCardPhoto
+                                    : URL.createObjectURL(idCardPhoto)
+                                }
+                                alt="ID Card"
+                                className="w-full h-full object-contain"
+                              />
+                              <button
+                                onClick={removeImage}
+                                className="absolute top-2 right-2 p-2 bg-white/90 dark:bg-[#040404]/90 backdrop-blur-sm rounded-full shadow-lg hover:bg-[#c76191] hover:text-white transition-all duration-300"
+                              >
+                                <X size={16} />
+                              </button>
+                            </div>
+                          ) : (
+                            <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-400 dark:text-[#a0a0a0] hover:text-[#4790fd] transition-colors duration-300 p-4">
+                              <UploadCloud size={40} />
+                              <p className="mt-3 text-sm font-medium text-center">
+                                Click or drag to upload your ID card
+                              </p>
+                              <p className="text-xs text-gray-500 dark:text-[#808080] mt-1 text-center">
+                                Supported formats: JPG, PNG
+                              </p>
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
 
-            {/* Submit Button */}
-            <div className="mt-6 sm:mt-8 lg:mt-12 pb-4 sm:pb-6 px-4 sm:px-6 lg:px-8 border-t border-gray-500/30 pt-4 sm:pt-6 bg-gradient-to-r from-gray-700/20 via-gray-600/10 to-gray-700/20">
-              <div className="flex justify-end">
-                <button
-                  type="submit"
-                  disabled={isLoading}
-                  className="w-full sm:w-auto group relative px-6 sm:px-8 py-3 sm:py-4 text-sm sm:text-base bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg sm:rounded-xl hover:from-blue-600 hover:to-purple-700 transition-all duration-300 font-medium shadow-xl sm:shadow-2xl hover:shadow-blue-500/25 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <span className="flex items-center justify-center space-x-2">
-                    {isLoading ? (
-                      <>
-                        <span className="animate-spin rounded-full h-3 w-3 sm:h-4 sm:w-4 border-2 border-white border-t-transparent" />
-                        <span>Saving Changes...</span>
-                      </>
-                    ) : (
-                      <>
-                        <span>Complete Profile</span>
-                        <span className="group-hover:translate-x-1 transition-transform duration-300">→</span>
-                      </>
-                    )}
-                  </span>
-                </button>
+              {/* Submit Button */}
+              <div className="px-6 py-5 border-t border-gray-100 dark:border-[#4790fd]/10 bg-gray-50/50 dark:bg-[#070707]/50">
+                <div className="flex justify-end">
+                  <button
+                    type="submit"
+                    disabled={isLoading}
+                    className="group relative px-8 py-3.5 text-sm bg-gradient-to-r from-[#4790fd] to-[#c76191] text-white rounded-xl hover:from-[#4790fd]/90 hover:to-[#c76191]/90 transition-all duration-300 font-medium shadow-lg hover:shadow-[#4790fd]/25 disabled:opacity-50 disabled:cursor-not-allowed overflow-hidden"
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+                    <span className="relative flex items-center justify-center gap-2">
+                      {isLoading ? (
+                        <>
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                          <span>Saving Changes...</span>
+                        </>
+                      ) : (
+                        <>
+                          <span>Complete Profile</span>
+                          <Sparkles className="w-4 h-4 group-hover:rotate-12 transition-transform" />
+                        </>
+                      )}
+                    </span>
+                  </button>
+                </div>
               </div>
-            </div>
-          </form>
+            </form>
+          </div>
         </div>
       </div>
 
-      <ToastContainer 
+      <ToastContainer
         position="bottom-right"
-        theme="dark"
+        theme={isDarkMode ? "dark" : "light"}
         className="toast-container"
       />
     </div>

@@ -4,37 +4,72 @@ dotenv.config({ path: "./config.env" });
 const { Webhook } = require("svix");
 const connectDb = require("./db");
 const User = require("./models/User"); // ✅ Import User model
-const ngrok = require("@ngrok/ngrok");
 const cors = require("cors");
 const http = require("http");
 const { Server } = require("socket.io");
+const rateLimit = require("express-rate-limit");
 const userRouter = require("./routes/userRoute");
 const adminRouter = require("./routes/adminPostRoute");
 const postRouter = require("./routes/userPostRoute");
 const projectRouter = require("./routes/projectRoute");
 const chatRouter = require("./routes/chatRoute");
+
 const app = express();
 const server = require("http").createServer(app);
 connectDb();
+const port = process.env.PORT || 3000;
+
+// Rate limiting configurations
+const generalLimiter = rateLimit({
+  windowMs: 1 * 60 * 1000, // 1 minute
+  max: 200, // Limit each IP to 100 requests per windowMs
+  message: {
+    error: "Too many requests from this IP, please try again later.",
+  },
+});
+
+// Rate limiting for webhook endpoints
+const webhookLimiter = rateLimit({
+  windowMs: 1 * 60 * 1000, // 1 minute
+  max: 50, // Allow more requests for webhooks as they come from trusted sources
+  message: {
+    error: "Too many webhook requests, please try again later.",
+  },
+});
 
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:5173", // your frontend origin
+    origin: [
+      "http://localhost:5173",
+      "https://campus-connect-chi-ten.vercel.app",
+    ], // your frontend origin
     methods: ["GET", "POST"],
   },
 });
 
-// ✅ Move webhook route above `express.json()`
-app.use("/api/webhooks", express.raw({ type: "application/json" }));
-app.use(express.json()); // ✅ Move this down
+// Apply general rate limiting to all requests
+app.use(generalLimiter);
+
+// ✅ Move webhook route above `express.json()` and apply webhook rate limiting
+app.use(
+  "/api/webhooks",
+  webhookLimiter,
+  express.raw({ type: "application/json" })
+);
+app.use(express.json()); // ✅ Use express.json() to parse JSON bodies
 
 app.use(
   cors({
-    origin: "*", // Allow frontend to access backend
+    origin: [
+      "http://localhost:5173",
+      "https://campus-connect-chi-ten.vercel.app",
+    ], // Allow frontend to access backend
     methods: "GET,POST,PUT,DELETE,PATCH",
     allowedHeaders: "Content-Type,Authorization",
   })
 );
+
+// Apply specific rate limiters to different routes
 app.use("/api/user", userRouter);
 app.use("/api/admin-post", adminRouter);
 app.use("/api/post", postRouter);
@@ -117,17 +152,33 @@ app.post(
   }
 );
 
+// Socket.IO rate limiting (basic implementation)
+const socketConnections = new Map();
+
 io.on("connection", (socket) => {
-  console.log(`User connected: ${socket.id}`);
+  // Track connection time for basic rate limiting
+  const clientIP = socket.handshake.address;
+  const now = Date.now();
+
+  if (!socketConnections.has(clientIP)) {
+    socketConnections.set(clientIP, { connections: 1, lastConnection: now });
+  } else {
+    const clientData = socketConnections.get(clientIP);
+    if (now - clientData.lastConnection < 1000) {
+      // 1 second cooldown
+      console.log(`Rate limit exceeded for ${clientIP}`);
+      socket.disconnect();
+      return;
+    }
+    clientData.connections++;
+    clientData.lastConnection = now;
+  }
 
   socket.on("join_room", (room) => {
     socket.join(room);
-    console.log(`User joined room: ${room}`);
   });
 
   socket.on("send_message", (data) => {
-    console.log("Sending message:", data);
-
     // Use the roomId from the data directly
     const roomId = data.roomId;
 
@@ -136,20 +187,29 @@ io.on("connection", (socket) => {
   });
 
   socket.on("disconnect", () => {
-    console.log("User disconnected", socket.id);
+    // Clean up old connections periodically
+    if (socketConnections.has(clientIP)) {
+      const clientData = socketConnections.get(clientIP);
+      clientData.connections--;
+      if (clientData.connections <= 0) {
+        socketConnections.delete(clientIP);
+      }
+    }
   });
 });
 
-server.listen(3000, async function () {
-  console.log("Server is running on port 3000");
+// Clean up old socket connection tracking data every 10 minutes
+setInterval(() => {
+  const now = Date.now();
+  const tenMinutesAgo = now - 10 * 60 * 1000;
 
-  try {
-    const listener = await ngrok.connect({
-      addr: 3000,
-      authtoken_from_env: true,
-    });
-    console.log(`Ngrok Tunnel: ${listener.url()}`); // ✅ Correctly extract the URL
-  } catch (error) {
-    console.error("Error starting Ngrok:", error);
+  for (const [ip, data] of socketConnections.entries()) {
+    if (data.lastConnection < tenMinutesAgo) {
+      socketConnections.delete(ip);
+    }
   }
+}, 10 * 60 * 1000);
+
+server.listen(port, async function () {
+  console.log(`Server is running on port ${port}`);
 });

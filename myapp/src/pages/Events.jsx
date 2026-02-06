@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import EventCard from "../components/EventCard";
-import { Loader2, X, Calendar } from "lucide-react";
+import { Loader2, X, Calendar, Sparkles } from "lucide-react";
 import axios from "axios";
+import { useTheme } from "../context/ThemeContext";
 
 const Events = () => {
   const [events, setEvents] = useState([]);
@@ -12,6 +13,7 @@ const Events = () => {
   const observerTarget = useRef(null);
   const observerRef = useRef(null);
   const LIMIT = 10; // same limit as on the server
+  const { isDarkMode } = useTheme();
 
   // Refs to hold the latest values
   const hasMoreRef = useRef(hasMore);
@@ -42,7 +44,9 @@ const Events = () => {
     setLoading(true);
     try {
       const response = await axios.get(
-        `http://localhost:3000/api/admin-post/get-post?page=${currentPage}&category=Event`
+        `${
+          import.meta.env.VITE_BACKEND_URL
+        }/api/admin-post/get-post?page=${currentPage}&category=Event`,
       );
       const newEvents = response.data.post;
 
@@ -77,7 +81,7 @@ const Events = () => {
           fetchEvents();
         }
       },
-      { threshold: 0.5 }
+      { threshold: 0.5 },
     );
     observerRef.current = observer;
 
@@ -96,23 +100,32 @@ const Events = () => {
   const closeModal = () => setModalImage(null);
 
   return (
-    <div className="min-h-screen bg-[#000000] text-gray-100">
+    <div className="min-h-screen bg-gray-50 dark:bg-[#070707] text-gray-900 dark:text-[#f5f5f5] relative overflow-hidden transition-colors duration-300">
+      {/* Background gradients */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-blue-500/5 dark:bg-[#4790fd]/5 rounded-full blur-[120px] translate-x-1/2 -translate-y-1/2"></div>
+        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-pink-500/5 dark:bg-[#c76191]/5 rounded-full blur-[100px] -translate-x-1/3 translate-y-1/3"></div>
+        <div className="absolute top-1/2 left-1/2 w-[400px] h-[400px] bg-yellow-500/5 dark:bg-[#ece239]/5 rounded-full blur-[80px] -translate-x-1/2 -translate-y-1/2"></div>
+      </div>
+
       {/* Header Section */}
-      <div className=" border-b border-gray-500/50 px-4 py-6 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-100">
-            🎉 Events & Activities
-          </h1>
-          <p className="mt-2 text-gray-400 text-sm sm:text-base">
-            Discover what's happening in our community and stay connected
-          </p>
+      <div className="relative z-10 pt-10 pb-8 px-4 sm:px-6 lg:px-8 text-center">
+        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/50 dark:bg-[#1a1a1a]/50 border border-gray-200 dark:border-[#ece239]/20 mb-6 backdrop-blur-md shadow-sm dark:shadow-none">
+          <Sparkles className="w-4 h-4 text-yellow-500 dark:text-[#ece239]" />
+          <span className="text-xs font-medium text-gray-600 dark:text-[#a0a0a0] uppercase tracking-wider">Upcoming Activities</span>
         </div>
+        <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-gray-900 via-yellow-500 to-gray-900 dark:from-[#f5f5f5] dark:via-[#ece239] dark:to-[#f5f5f5] mb-4">
+          Events & Activities
+        </h1>
+        <p className="text-gray-600 dark:text-[#a0a0a0] text-lg max-w-2xl mx-auto font-light leading-relaxed">
+          Discover what's happening in our community. Join workshops, seminars, and cultural fests.
+        </p>
       </div>
 
       {/* Content Section */}
-      <div className="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8 relative z-10">
         {/* Events Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 sm:gap-8">
           {events.map((event, index) => (
             <EventCard
               key={event.id || index}
@@ -125,9 +138,9 @@ const Events = () => {
         {/* Loading State */}
         {loading && (
           <div className="flex justify-center items-center py-12">
-            <div className="flex items-center space-x-3 text-blue-400">
-              <Loader2 className="w-6 h-6 animate-spin" />
-              <span className="text-sm font-medium text-gray-300">
+            <div className="flex items-center gap-3 px-6 py-3 rounded-full bg-white/50 dark:bg-[#1a1a1a]/50 border border-gray-200 dark:border-[#ece239]/20 backdrop-blur-md shadow-sm dark:shadow-none">
+              <Loader2 className="w-5 h-5 animate-spin text-yellow-500 dark:text-[#ece239]" />
+              <span className="text-sm font-medium text-gray-600 dark:text-[#a0a0a0]">
                 Loading more events...
               </span>
             </div>
@@ -140,24 +153,24 @@ const Events = () => {
         {/* End of Content Message */}
         {!hasMore && events.length > 0 && (
           <div className="text-center py-12">
-            <p className="text-gray-500">You've reached the end of the list</p>
+            <div className="inline-block px-4 py-2 rounded-full bg-white/50 dark:bg-[#1a1a1a]/30 border border-gray-200 dark:border-[#ffffff]/5 text-gray-500 dark:text-[#a0a0a0] text-sm shadow-sm dark:shadow-none">
+              You've reached the end
+            </div>
           </div>
         )}
 
         {/* Empty State */}
         {!loading && events.length === 0 && (
-          <div className="text-center py-16">
-            <div className="bg-[#232526] rounded-2xl p-8 border border-gray-500/30 max-w-lg mx-auto">
-              <div className="w-16 h-16 bg-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Calendar className="w-8 h-8 text-blue-400" />
-              </div>
-              <h3 className="text-lg font-medium text-gray-100 mb-2">
-                No Events Yet
-              </h3>
-              <p className="text-gray-400">
-                Check back later for upcoming events and activities
-              </p>
+          <div className="text-center py-20 bg-white/50 dark:bg-[#1a1a1a]/30 rounded-3xl border border-gray-200 dark:border-[#ffffff]/5 backdrop-blur-sm max-w-lg mx-auto">
+            <div className="w-20 h-20 bg-gray-100 dark:bg-[#1a1a1a] rounded-full flex items-center justify-center mx-auto mb-6 border border-gray-200 dark:border-[#ffffff]/10">
+              <Calendar className="w-10 h-10 text-yellow-500 dark:text-[#ece239] opacity-50" />
             </div>
+            <h3 className="text-2xl font-bold text-gray-900 dark:text-[#f5f5f5] mb-2">
+              No Events Yet
+            </h3>
+            <p className="text-gray-500 dark:text-[#a0a0a0]">
+              Check back later for upcoming events and activities
+            </p>
           </div>
         )}
       </div>
@@ -165,22 +178,24 @@ const Events = () => {
       {/* Image Modal */}
       {modalImage && (
         <div
-          className="fixed inset-0 bg-black/90 backdrop-blur-md z-50 flex items-center justify-center p-4"
+          className="fixed inset-0 bg-black/90 dark:bg-[#000000]/90 backdrop-blur-xl z-50 flex items-center justify-center p-4"
           onClick={closeModal}
         >
-          <div className="relative max-w-4xl w-full">
+          <div className="relative max-w-5xl w-full">
             <button
               onClick={closeModal}
-              className="absolute -top-12 right-0 text-white hover:text-gray-300 transition-colors p-2"
+              className="absolute -top-12 right-0 text-gray-400 hover:text-white dark:text-[#a0a0a0] dark:hover:text-[#f5f5f5] transition-colors p-2 bg-white/10 dark:bg-[#ffffff]/10 rounded-full hover:bg-white/20 dark:hover:bg-[#ffffff]/20"
             >
               <X size={24} />
             </button>
-            <img
-              src={modalImage}
-              alt="Event"
-              className="w-full h-auto rounded-xl border border-gray-500/30"
-              onClick={(e) => e.stopPropagation()}
-            />
+            <div className="rounded-3xl overflow-hidden shadow-2xl border border-white/10 dark:border-[#ffffff]/10 bg-black dark:bg-[#000000]">
+              <img
+                src={modalImage}
+                alt="Event"
+                className="w-full h-auto max-h-[85vh] object-contain"
+                onClick={(e) => e.stopPropagation()}
+              />
+            </div>
           </div>
         </div>
       )}

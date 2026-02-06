@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const multer = require("multer");
+const rateLimit = require("express-rate-limit");
 
 const {
   createPost,
@@ -9,8 +10,19 @@ const {
   getComments,
   likePost,
   getLikedUser,
-  replyComment
+  replyComment,
+  updatePost,
+  deletePost,
 } = require("../controllers/userPostController");
+
+// Rate limiting for post creation/updates
+const postLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 10, // Limit post creation/updates
+  message: {
+    error: "Too many posts created/updated, please try again later.",
+  },
+});
 
 // Configure storage for videos and images
 const storage = multer.diskStorage({
@@ -40,13 +52,17 @@ const upload = multer({
   limits: { fileSize: 50 * 1024 * 1024 }, // Limit file size to 50MB
 });
 
-router.post("/create-post", upload.single("file"), createPost);
+router.post("/create-post", upload.single("file"), postLimiter, createPost);
 router.get("/getAll-post", getPosts);
 router.post("/create-comment", createComment);
 router.get("/get-comments/:postId", getComments);
 router.patch("/like/:postId/like-toggle", likePost);
 router.get("/like/:postId", getLikedUser);
-router.post("/reply-comment",replyComment)
+router.post("/reply-comment", replyComment);
+
+// Routes for updating and deleting posts
+router.patch("/update-post/:postId", upload.single("file"), updatePost);
+router.delete("/delete-post/:postId", deletePost);
 // router.get("/get-post", getPosts);
 
 module.exports = router;

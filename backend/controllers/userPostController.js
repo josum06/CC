@@ -65,6 +65,7 @@ exports.getPosts = async (req, res) => {
 exports.createComment = async (req, res) => {
   try {
     const { text, postId, userId } = req.body;
+    console.log(text, postId, userId);
     // Check if post exists
     const post = await Post.findById(postId);
     if (!post) {
@@ -108,7 +109,6 @@ exports.likePost = async (req, res) => {
   try {
     const { postId } = req.params;
     const { userId } = req.body; // Get user ID from request
-
 
     if (!postId || !userId) {
       return res.status(400).json({ message: "Missing postId or userId" });
@@ -175,6 +175,8 @@ exports.replyComment = async (req, res) => {
     }
 
     const userId = user._id;
+
+    console.log("Comment ID:", userId);
     const comment = await Comment.findById(commentId);
     if (!comment) {
       return res.status(404).json({ message: "Comment not found" });
@@ -201,4 +203,76 @@ exports.replyComment = async (req, res) => {
     console.error("Error replying to comment:", error);
     res.status(500).json({ error: "Internal server error" });
   }
-}
+};
+
+exports.updatePost = async (req, res) => {
+  try {
+    const { postId } = req.params;
+    const { caption, author } = req.body;
+    
+    // Find the post by ID
+    const post = await Post.findById(postId);
+    
+    if (!post) {
+      return res.status(404).json({ message: "Post not found" });
+    }
+    
+    // Check if the user owns this post
+    if (post.author.toString() !== author) {
+      return res.status(403).json({ message: "Unauthorized: You can only update your own posts" });
+    }
+    
+    // Update post fields if provided
+    if (caption) post.caption = caption;
+    
+    // Handle media update if a new file is provided
+    if (req.file) {
+      // Upload new image to ImageKit
+      const filePath = req.file.path; // Get the file path
+      const fileBuffer = fs.readFileSync(filePath);
+      
+      const uploadedImage = await imagekit.upload({
+        file: fileBuffer, // File buffer from multer
+        fileName: req.file.originalname, // Use the original file name
+        folder: "/user-posts", // Optional: Store images in a specific folder
+      });
+      
+      // Update media URL and delete old image if needed
+      post.mediaUrl = uploadedImage.url;
+    }
+    
+    await post.save();
+    
+    res.status(200).json({ message: "Post updated successfully", post });
+  } catch (error) {
+    console.error("Error updating post:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+exports.deletePost = async (req, res) => {
+  try {
+    const { postId } = req.params;
+    const { author } = req.body;
+    
+    // Find the post by ID
+    const post = await Post.findById(postId);
+    
+    if (!post) {
+      return res.status(404).json({ message: "Post not found" });
+    }
+    
+    // Check if the user owns this post
+    if (post.author.toString() !== author) {
+      return res.status(403).json({ message: "Unauthorized: You can only delete your own posts" });
+    }
+    
+    // Delete the post
+    await Post.findByIdAndDelete(postId);
+    
+    res.status(200).json({ message: "Post deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting post:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
