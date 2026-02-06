@@ -75,15 +75,9 @@ function App() {
           <Routes>
           {/* Public Routes */}
           <Route element={<NoNavFooterLayout />}>
-            <Route path="/Signup" element={<SignUpPage />} />
+            <Route path="/SignUp" element={<SignUpPage />} />
             <Route path="/Login" element={<Login />} />
-           
-            
-           
-            
-           
-            
-           
+
             <Route
               path="/Chats"
               element={
@@ -117,7 +111,7 @@ function App() {
                 </ProtectedRoute>
               }
             />
-             <Route
+            <Route
               path="/FacultyRole"
               element={
                 <ProtectedRoute>

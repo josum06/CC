@@ -34,7 +34,7 @@ const Navbar = () => {
     }
     // Perform search logic here, e.g., API call to fetch search results
     const res = await axios.get(
-      "${import.meta.env.VITE_BACKEND_URL}/api/user/searchUser",
+      `${import.meta.env.VITE_BACKEND_URL}/api/user/searchUser`,
       {
         params: {
           query: searchQuery,

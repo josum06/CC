@@ -19,21 +19,15 @@ const server = require("http").createServer(app);
 connectDb();
 const port = process.env.PORT || 3000;
 
+// Middleware to trust the first proxy (for render hosted environment)
+app.set("trust proxy", 1);
+
 // Rate limiting configurations
 const generalLimiter = rateLimit({
   windowMs: 1 * 60 * 1000, // 1 minute
   max: 200, // Limit each IP to 100 requests per windowMs
   message: {
     error: "Too many requests from this IP, please try again later.",
-  },
-});
-
-// Rate limiting for webhook endpoints
-const webhookLimiter = rateLimit({
-  windowMs: 1 * 60 * 1000, // 1 minute
-  max: 50, // Allow more requests for webhooks as they come from trusted sources
-  message: {
-    error: "Too many webhook requests, please try again later.",
   },
 });
 
@@ -48,36 +42,17 @@ const io = new Server(server, {
 });
 
 // Apply general rate limiting to all requests
+const webhookLimiter = rateLimit({
+  windowMs: 1 * 60 * 1000, // 1 minute
+  max: 100, // Increased from 50 to 100 for webhooks
+  message: {
+    error: "Too many webhook requests, please try again later.",
+  },
+});
 app.use(generalLimiter);
-
-// ✅ Move webhook route above `express.json()` and apply webhook rate limiting
-app.use(
-  "/api/webhooks",
-  webhookLimiter,
-  express.raw({ type: "application/json" })
-);
-app.use(express.json()); // ✅ Use express.json() to parse JSON bodies
-
-app.use(
-  cors({
-    origin: [
-      "http://localhost:5173",
-      "https://campus-connect-chi-ten.vercel.app",
-    ], // Allow frontend to access backend
-    methods: "GET,POST,PUT,DELETE,PATCH",
-    allowedHeaders: "Content-Type,Authorization",
-  })
-);
-
-// Apply specific rate limiters to different routes
-app.use("/api/user", userRouter);
-app.use("/api/admin-post", adminRouter);
-app.use("/api/post", postRouter);
-app.use("/api/project", projectRouter);
-app.use("/api/chat", chatRouter);
-
 app.post(
   "/api/webhooks",
+  webhookLimiter,
   express.raw({ type: "application/json" }),
   async (req, res) => {
     try {
@@ -100,8 +75,6 @@ app.post(
         console.error("Webhook verification failed:", err.message);
         return res.status(400).json({ error: "Webhook verification failed" });
       }
-
-      console.log("Webhook Event Received:", evt);
 
       const eventType = evt.type;
 
@@ -151,6 +124,25 @@ app.post(
     }
   }
 );
+app.use(express.json()); // ✅ Use express.json() to parse JSON bodies
+
+app.use(
+  cors({
+    origin: [
+      "http://localhost:5173",
+      "https://campus-connect-chi-ten.vercel.app",
+    ], // Allow frontend to access backend
+    methods: "GET,POST,PUT,DELETE,PATCH",
+    allowedHeaders: "Content-Type,Authorization",
+  })
+);
+
+// Apply specific rate limiters to different routes
+app.use("/api/user", userRouter);
+app.use("/api/admin-post", adminRouter);
+app.use("/api/post", postRouter);
+app.use("/api/project", projectRouter);
+app.use("/api/chat", chatRouter);
 
 // Socket.IO rate limiting (basic implementation)
 const socketConnections = new Map();

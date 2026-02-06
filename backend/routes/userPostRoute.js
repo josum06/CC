@@ -24,15 +24,7 @@ const postLimiter = rateLimit({
   },
 });
 
-// Configure storage for videos and images
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "uploads/"); // Save files in 'uploads' folder
-  },
-  filename: function (req, file, cb) {
-    cb(null, Date.now() + "-" + file.originalname); // Unique file name
-  },
-});
+const storage = multer.memoryStorage();
 
 // File filter to allow only images and videos
 const fileFilter = (req, file, cb) => {

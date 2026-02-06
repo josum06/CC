@@ -237,7 +237,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
 
           {/* Sign Out Button */}
           <div className=" pt-10">
-            <SignOutButton onClick={toggleSidebar} redirectUrl="/Signup">
+            <SignOutButton onClick={toggleSidebar} redirectUrl="/SignUp">
               <button className="w-full px-4 cursor-pointer py-3 rounded-xl bg-red-50 text-red-700 hover:bg-red-100 transition-colors flex items-center gap-3">
                 <LogOut className="w-5 h-5" />
                 <span className="font-medium">Sign Out</span>
