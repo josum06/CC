@@ -15,25 +15,33 @@ exports.createPost = async (req, res) => {
         .json({ message: "Missing file parameter for upload" });
     }
 
+    // With memory storage, use req.file.buffer directly
     if (req.file) {
-      const filePath = req.file.path; // Get the file path
+      try {
+        // Upload directly to ImageKit using the buffer from memory storage
+        const uploadedImage = await imagekit.upload({
+          file: req.file.buffer, // Use buffer from memory storage
+          fileName: req.file.originalname,
+          folder: "/user-posts",
+          useUniqueFileName: true, // Prevents filename conflicts
+        });
 
-      // Read the file from disk
-      const fileBuffer = fs.readFileSync(filePath);
-
-      // Check if an image file is uploaded
-      const uploadedImage = await imagekit.upload({
-        file: fileBuffer, // File buffer from multer
-        fileName: req.file.originalname, // Use the original file name
-        folder: "/user-posts", // Optional: Store images in a specific folder
-      });
-      mediaUrl = uploadedImage.url;
+        mediaUrl = uploadedImage.url;
+      } catch (uploadError) {
+        console.error("ImageKit upload error:", uploadError);
+        return res.status(500).json({
+          error: "Failed to upload image",
+          details: uploadError.message,
+        });
+      }
     }
+
     const post = new Post({
       caption,
       author,
       mediaUrl,
     });
+
     await post.save();
     res.status(201).json(post);
   } catch (error) {

@@ -350,6 +350,7 @@ function NetworkProfile() {
       formData.append("userId", currUserId);
       await axios.post(
         `${import.meta.env.VITE_BACKEND_URL}/api/post/create-comment`,
+        `${import.meta.env.VITE_BACKEND_URL}/api/post/create-comment`,
         formData,
         {
           headers: { "Content-Type": "application/json" },
@@ -1018,6 +1019,242 @@ function NetworkProfile() {
                     <span>Live Demo</span>
                   </a>
                 )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Post Modal */}
+      {isEditPostModalOpen && (
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-[#070707]/90 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="relative bg-[#040404]/95 backdrop-blur-2xl border border-[#4790fd]/20 rounded-2xl w-full max-w-2xl overflow-hidden shadow-2xl">
+            {/* Close button */}
+            <button
+              onClick={() => {
+                setIsEditPostModalOpen(false);
+                setEditingPost(null);
+                setPostCaption('');
+                setNewPostMedia(null);
+              }}
+              className="absolute top-4 right-4 p-2 bg-[#070707]/50 hover:bg-[#070707]/70 rounded-full cursor-pointer transition-all duration-300 border border-[#4790fd]/20 hover:border-[#4790fd]/30 z-50 text-[#f5f5f5]"
+              aria-label="Close edit post modal"
+            >
+              <X size={20} />
+            </button>
+
+            {/* Modal Header */}
+            <div className="p-6 border-b border-[#4790fd]/10 bg-[#070707]/50">
+              <h2 className="text-2xl font-bold text-[#f5f5f5]">Edit Post</h2>
+            </div>
+
+            {/* Modal Content */}
+            <div className="p-6">
+              <div className="space-y-6">
+                {/* Caption Input */}
+                <div>
+                  <label className="block text-sm font-medium text-[#a0a0a0] mb-2">
+                    Caption
+                  </label>
+                  <textarea
+                    value={postCaption}
+                    onChange={(e) => setPostCaption(e.target.value)}
+                    className="w-full p-3 rounded-xl bg-[#070707]/50 backdrop-blur-xl border border-[#4790fd]/20 focus:border-[#4790fd] focus:outline-none text-[#f5f5f5] placeholder-[#808080] resize-none"
+                    rows="3"
+                    placeholder="Write a caption..."
+                  />
+                </div>
+
+                {/* Media Upload */}
+                <div>
+                  <label className="block text-sm font-medium text-[#a0a0a0] mb-2">
+                    Update Media (Optional)
+                  </label>
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="file"
+                      accept="image/*,video/*"
+                      onChange={(e) => setNewPostMedia(e.target.files[0])}
+                      className="flex-1 p-2 rounded-lg bg-[#070707]/50 backdrop-blur-xl border border-[#4790fd]/20 text-[#f5f5f5] file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-[#4790fd]/10 file:text-[#4790fd] hover:file:bg-[#4790fd]/15"
+                    />
+                    {newPostMedia && (
+                      <span className="text-sm text-[#27dc66]">
+                        {newPostMedia.name}
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex gap-3 pt-4">
+                  <button
+                    onClick={updatePost}
+                    className="flex-1 py-3 px-4 bg-[#4790fd]/10 text-[#4790fd] rounded-xl font-semibold border border-[#4790fd]/20 hover:bg-[#4790fd]/15 transition-all duration-300"
+                  >
+                    Update Post
+                  </button>
+                  <button
+                    onClick={() => {
+                      setIsEditPostModalOpen(false);
+                      setEditingPost(null);
+                      setPostCaption('');
+                      setNewPostMedia(null);
+                    }}
+                    className="py-3 px-6 bg-[#070707]/50 text-[#a0a0a0] rounded-xl font-semibold border border-[#4790fd]/20 hover:border-[#4790fd]/30 hover:text-[#f5f5f5] transition-all duration-300"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Project Modal */}
+      {isEditProjectModalOpen && (
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-[#070707]/90 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="relative bg-[#040404]/95 backdrop-blur-2xl border border-[#27dc66]/20 rounded-2xl w-full max-w-2xl overflow-hidden shadow-2xl">
+            {/* Close button */}
+            <button
+              onClick={() => {
+                setIsEditProjectModalOpen(false);
+                setEditingProject(null);
+                setProjectTitle('');
+                setProjectDescription('');
+                setProjectGithubUrl('');
+                setProjectDemoUrl('');
+                setProjectTechStack('');
+                setNewProjectMedia(null);
+              }}
+              className="absolute top-4 right-4 p-2 bg-[#070707]/50 hover:bg-[#070707]/70 rounded-full cursor-pointer transition-all duration-300 border border-[#27dc66]/20 hover:border-[#27dc66]/30 z-50 text-[#f5f5f5]"
+              aria-label="Close edit project modal"
+            >
+              <X size={20} />
+            </button>
+
+            {/* Modal Header */}
+            <div className="p-6 border-b border-[#27dc66]/10 bg-[#070707]/50">
+              <h2 className="text-2xl font-bold text-[#f5f5f5]">Edit Project</h2>
+            </div>
+
+            {/* Modal Content */}
+            <div className="p-6">
+              <div className="space-y-6">
+                {/* Title Input */}
+                <div>
+                  <label className="block text-sm font-medium text-[#a0a0a0] mb-2">
+                    Project Title
+                  </label>
+                  <input
+                    type="text"
+                    value={projectTitle}
+                    onChange={(e) => setProjectTitle(e.target.value)}
+                    className="w-full p-3 rounded-xl bg-[#070707]/50 backdrop-blur-xl border border-[#27dc66]/20 focus:border-[#27dc66] focus:outline-none text-[#f5f5f5] placeholder-[#808080]"
+                    placeholder="Enter project title"
+                  />
+                </div>
+
+                {/* Description Input */}
+                <div>
+                  <label className="block text-sm font-medium text-[#a0a0a0] mb-2">
+                    Description
+                  </label>
+                  <textarea
+                    value={projectDescription}
+                    onChange={(e) => setProjectDescription(e.target.value)}
+                    className="w-full p-3 rounded-xl bg-[#070707]/50 backdrop-blur-xl border border-[#27dc66]/20 focus:border-[#27dc66] focus:outline-none text-[#f5f5f5] placeholder-[#808080] resize-none"
+                    rows="3"
+                    placeholder="Describe your project..."
+                  />
+                </div>
+
+                {/* Tech Stack Input */}
+                <div>
+                  <label className="block text-sm font-medium text-[#a0a0a0] mb-2">
+                    Tech Stack (comma separated)
+                  </label>
+                  <input
+                    type="text"
+                    value={projectTechStack}
+                    onChange={(e) => setProjectTechStack(e.target.value)}
+                    className="w-full p-3 rounded-xl bg-[#070707]/50 backdrop-blur-xl border border-[#27dc66]/20 focus:border-[#27dc66] focus:outline-none text-[#f5f5f5] placeholder-[#808080]"
+                    placeholder="React, Node.js, MongoDB"
+                  />
+                </div>
+
+                {/* GitHub URL */}
+                <div>
+                  <label className="block text-sm font-medium text-[#a0a0a0] mb-2">
+                    GitHub URL
+                  </label>
+                  <input
+                    type="url"
+                    value={projectGithubUrl}
+                    onChange={(e) => setProjectGithubUrl(e.target.value)}
+                    className="w-full p-3 rounded-xl bg-[#070707]/50 backdrop-blur-xl border border-[#27dc66]/20 focus:border-[#27dc66] focus:outline-none text-[#f5f5f5] placeholder-[#808080]"
+                    placeholder="https://github.com/username/project"
+                  />
+                </div>
+
+                {/* Demo URL */}
+                <div>
+                  <label className="block text-sm font-medium text-[#a0a0a0] mb-2">
+                    Demo URL
+                  </label>
+                  <input
+                    type="url"
+                    value={projectDemoUrl}
+                    onChange={(e) => setProjectDemoUrl(e.target.value)}
+                    className="w-full p-3 rounded-xl bg-[#070707]/50 backdrop-blur-xl border border-[#27dc66]/20 focus:border-[#27dc66] focus:outline-none text-[#f5f5f5] placeholder-[#808080]"
+                    placeholder="https://project-demo.com"
+                  />
+                </div>
+
+                {/* Media Upload */}
+                <div>
+                  <label className="block text-sm font-medium text-[#a0a0a0] mb-2">
+                    Update Project Image (Optional)
+                  </label>
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => setNewProjectMedia(e.target.files[0])}
+                      className="flex-1 p-2 rounded-lg bg-[#070707]/50 backdrop-blur-xl border border-[#27dc66]/20 text-[#f5f5f5] file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-[#27dc66]/10 file:text-[#27dc66] hover:file:bg-[#27dc66]/15"
+                    />
+                    {newProjectMedia && (
+                      <span className="text-sm text-[#27dc66]">
+                        {newProjectMedia.name}
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex gap-3 pt-4">
+                  <button
+                    onClick={updateProject}
+                    className="flex-1 py-3 px-4 bg-[#27dc66]/10 text-[#27dc66] rounded-xl font-semibold border border-[#27dc66]/20 hover:bg-[#27dc66]/15 transition-all duration-300"
+                  >
+                    Update Project
+                  </button>
+                  <button
+                    onClick={() => {
+                      setIsEditProjectModalOpen(false);
+                      setEditingProject(null);
+                      setProjectTitle('');
+                      setProjectDescription('');
+                      setProjectGithubUrl('');
+                      setProjectDemoUrl('');
+                      setProjectTechStack('');
+                      setNewProjectMedia(null);
+                    }}
+                    className="py-3 px-6 bg-[#070707]/50 text-[#a0a0a0] rounded-xl font-semibold border border-[#27dc66]/20 hover:border-[#27dc66]/30 hover:text-[#f5f5f5] transition-all duration-300"
+                  >
+                    Cancel
+                  </button>
+                </div>
               </div>
             </div>
           </div>
