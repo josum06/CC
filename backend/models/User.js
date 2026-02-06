@@ -21,6 +21,7 @@ const UserSchema = new mongoose.Schema(
       type: String,
     },
     collegeId: { type: String },
+    personalUrl: { type: String },
     status: { type: Boolean, default: false },
     profileComplete: { type: Boolean, default: false },
 

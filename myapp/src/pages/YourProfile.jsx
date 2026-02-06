@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { useTheme } from "../context/ThemeContext";
+import { ArrowLeft } from "lucide-react";
 
 const UserProfile = () => {
   const { user } = useUser();
@@ -80,6 +81,8 @@ const UserProfile = () => {
       if (tempUser.githubUrl) formData.append("githubUrl", tempUser.githubUrl);
       if (tempUser.linkedinUrl)
         formData.append("linkedinUrl", tempUser.linkedinUrl);
+      if (tempUser.personalUrl)
+        formData.append("personalUrl", tempUser.personalUrl);
       if (tempUser.collegeIDCard) {
         formData.append("collegeIDCard", tempUser.collegeIDCard);
       }
@@ -168,7 +171,15 @@ const UserProfile = () => {
         }`}
       >
         <div className="flex items-center justify-between h-16 px-6">
-          <h1 className="text-xl font-bold text-gray-900 dark:text-white">My Profile</h1>
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => navigate(-1)}
+              className="p-2 rounded-lg bg-white/80 dark:bg-[#232526]/80 backdrop-blur-sm border border-gray-200 dark:border-gray-500/30 hover:bg-gray-100 dark:hover:bg-[#2d2f30] transition-all duration-200 text-gray-700 dark:text-gray-300"
+            >
+              <ArrowLeft className="w-5 h-5" />
+            </button>
+            <h1 className="text-xl font-bold text-gray-900 dark:text-white">My Profile</h1>
+          </div>
         </div>
       </div>
 
@@ -440,6 +451,55 @@ const UserProfile = () => {
                   )}
                 </div>
 
+                {/* Personal URL */}
+                <div>
+                  <label className="text-sm font-medium text-gray-600 dark:text-gray-300 block mb-2">
+                    Personal URL
+                  </label>
+                  {editMode ? (
+                    <div className="relative">
+                      <span className="absolute inset-y-0 left-0 pl-3 flex items-center">
+                        <svg
+                          className="w-5 h-5 text-gray-400"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                        </svg>
+                      </span>
+                      <input
+                        type="url"
+                        value={tempUser.personalUrl || ""}
+                        onChange={(e) =>
+                          handleInputChange("personalUrl", e.target.value)
+                        }
+                        className="w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-[#1a1a1a] border border-gray-200 dark:border-gray-500/30 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 dark:text-white placeholder-gray-400 transition-colors duration-300"
+                        placeholder="Personal portfolio URL"
+                      />
+                    </div>
+                  ) : (
+                    <a
+                      href={user2?.personalUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center space-x-3 p-3 bg-gray-50 dark:bg-[#1a1a1a] rounded-lg border border-gray-200 dark:border-gray-500/30 hover:bg-gray-100 dark:hover:bg-[#2d2f30] transition-colors text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
+                    >
+                      <svg
+                        className="w-5 h-5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                      </svg>
+                      <span className="truncate">
+                        {user2?.personalUrl || "Not added yet"}
+                      </span>
+                    </a>
+                  )}
+                </div>
+
                 {/* LinkedIn */}
                 <div>
                   <label className="text-sm font-medium text-gray-600 dark:text-gray-300 block mb-2">
@@ -621,7 +681,7 @@ const UserProfile = () => {
                   {user2?.skills?.map((skill, index) => (
                     <span
                       key={index}
-                      className="bg-blue-50 dark:bg-gradient-to-r dark:from-blue-600/20 dark:to-purple-600/20 text-blue-600 dark:text-blue-300 px-3 py-1.5 rounded-lg text-sm font-medium border border-blue-200 dark:border-blue-500/30"
+                      className="bg-blue-50 dark:bg-gray-700 text-blue-600 dark:text-gray-200 px-3 py-1.5 rounded-lg text-sm font-medium border border-blue-200 dark:border-gray-600"
                     >
                       {skill}
                     </span>
@@ -654,14 +714,20 @@ const UserProfile = () => {
               {editMode ? (
                 <textarea
                   value={tempUser.aboutMe || ""}
-                  onChange={(e) => handleInputChange("aboutMe", e.target.value)}
+                  onChange={(e) => {
+                    const inputValue = e.target.value;
+                    const wordCount = inputValue.trim() ? inputValue.trim().split(/\s+/).length : 0;
+                    if (wordCount <= 10) {
+                      handleInputChange("aboutMe", inputValue);
+                    }
+                  }}
                   className="w-full px-4 py-3 bg-gray-50 dark:bg-[#1a1a1a] border border-gray-200 dark:border-gray-500/30 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 dark:text-white placeholder-gray-400 min-h-[150px] resize-none transition-colors duration-300"
-                  placeholder="Tell us about yourself..."
+                  placeholder="Tell us about yourself... (max 10 words)"
                 />
               ) : (
                 <div className="p-4 bg-gray-50 dark:bg-[#1a1a1a] rounded-lg border border-gray-200 dark:border-gray-500/30 min-h-[150px] transition-colors duration-300">
                   <p className="text-gray-700 dark:text-gray-300 whitespace-pre-line">
-                    {user2?.aboutMe || "No description added yet"}
+                    {user2?.aboutMe ? user2.aboutMe.split(' ').slice(0, 10).join(' ') + (user2.aboutMe.split(' ').length > 10 ? '...' : '') : "No description added yet"}
                   </p>
                 </div>
               )}

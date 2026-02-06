@@ -131,9 +131,8 @@ const PostCard = ({
   const handleOptionClick = (action) => {
     switch (action) {
       case "profile":
-        navigate("/NetworkProfile", {
-          state: { userData: { userId } },
-        });
+        // Navigate with ID first, URL will be updated automatically with name
+        navigate(`/NetworkProfile/${userId}`);
         break;
       case "message":
         break;

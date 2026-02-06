@@ -17,7 +17,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import axios from "axios";
-import { toast } from "react-toastify";
+// import { showToast } from "../components/CustomToast"; // Component not found
 import { useUser } from "@clerk/clerk-react";
 import { useTheme } from "../context/ThemeContext";
 
@@ -130,7 +130,7 @@ const PostPage = () => {
       navigate("/Network");
     } catch (err) {
       console.error("Error uploading file:", err);
-      toast.error("Error uploading file. Please try again.");
+      console.error("Error uploading file. Please try again.");
     } finally {
       setIsSubmitting(false);
     }

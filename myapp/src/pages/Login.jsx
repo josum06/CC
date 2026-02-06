@@ -5,8 +5,8 @@ export default function Login() {
   const { isDarkMode } = useTheme();
 
   return (
-    <div className="min-h-screen flex bg-[#040404] text-white overflow-hidden">
-      {/* Left branding panel */}
+    <div className="min-h-screen flex flex-col lg:flex-row bg-[#040404] text-white overflow-hidden">
+      {/* Left branding panel - visible on larger screens */}
       <div className="hidden lg:flex lg:w-1/2 relative items-center justify-center px-10">
         {/* Ambient gradients */}
         <div className="absolute inset-0 pointer-events-none">
@@ -43,12 +43,12 @@ export default function Login() {
 
           <h1 className="text-4xl xl:text-5xl font-semibold leading-tight">
             <span className="block text-white">Pick up</span>
-            <span className="mt-1 inline-block bg-gradient-to-r from-[#ece239] via-[#4790fd] to-[#27dc66] bg-clip-text text.transparent">
+            <span className="mt-1 inline-block bg-gradient-to-r from-[#ece239] via-[#4790fd] to-[#27dc66] bg-clip-text text-transparent">
               where you left off.
             </span>
           </h1>
 
-          <p className="text-sm text:white/70 max-w-sm">
+          <p className="text-sm text-white/70 max-w-sm">
             Jump straight back into your campus feed, chats and projects in a
             single, unified dashboard.
           </p>
@@ -66,14 +66,25 @@ export default function Login() {
         </div>
       </div>
 
-      {/* Right auth panel */}
-      <div className="flex-1 flex items-center justify-center px-4 py-10 sm:px-6 lg:px-10 bg-[#020308] lg:bg-[#040404]">
-        <div className="w-full max-w-md relative">
+      {/* Auth panel - takes full width on mobile, adjusts on larger screens */}
+      <div className="w-full lg:w-1/2 flex flex-col items-center justify-start pt-8 pb-4 px-4 sm:px-6 lg:p-10 bg-[#020308] lg:bg-[#040404]">
+        {/* Mobile logo header */}
+        <div className="lg:hidden flex items-center justify-center mb-6 w-full">
+          <div className="h-12 w-12 rounded-2xl bg-black/40 border border-white/10 flex items-center justify-center shadow-lg shadow-black/60">
+            <img
+              src="/LOGO/CCLOGOTW.avif"
+              alt="Campus Connect Logo"
+              className="h-9 w-9 object-contain"
+            />
+          </div>
+        </div>
+        
+        <div className="w-full max-w-md relative flex-grow flex items-center justify-center">
           {/* Card glow */}
           <div className="absolute inset-0 -z-10 bg-gradient-to-br from-[#4790fd]/30 via-[#c76191]/25 to-[#27dc66]/30 blur-3xl opacity-60" />
 
-          <div className="relative rounded-3xl bg-black/80 border border-white/10 backdrop-blur-2xl shadow-[0_24px_80px_rgba(0,0,0,0.85)] px-5 py-6 sm:px-7 sm:py-8">
-            <div className="mb-6 text-center lg:text-left">
+          <div className="relative rounded-3xl bg-black/80 border border-white/10 backdrop-blur-2xl shadow-[0_24px_80px_rgba(0,0,0,0.85)] px-5 py-6 sm:px-7 sm:py-8 w-full">
+            <div className="mb-6 text-center">
               <p className="text-xs uppercase tracking-[0.2em] text-white/50 mb-1">
                 Sign in
               </p>
@@ -100,13 +111,13 @@ export default function Login() {
                   headerTitle: "hidden",
                   headerSubtitle: "hidden",
                   socialButtonsBlockButton:
-                    "border border-white/10 bg:white/5 text-white hover:bg-white/10 hover:border-white/20",
+                    "border border-white/10 bg-white/5 text-white hover:bg-white/10 hover:border-white/20",
                   socialButtonsBlockButtonText:
                     "text-xs font-medium tracking-wide",
                   formFieldLabel:
                     "text-xs font-medium text-white/70 mb-1.5 tracking-wide",
                   formFieldInput:
-                    "bg-[#050505] border border-white/10 text-sm text-white placeholder:text-white/35 rounded-xl px-3 py-2.5 focus:border-[#4790fd] focus:ring-0",
+                    "bg-[#050505] border border-white/10 text-sm text-white placeholder:text-white/35 rounded-xl px-3 py-2.5 focus:border-[#4790fd] focus:ring-0 w-full",
                   footerActionText: "text-xs text-white/50",
                   footerActionLink:
                     "text-xs text-[#4790fd] hover:text-white font-medium",

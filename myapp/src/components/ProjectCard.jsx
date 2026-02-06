@@ -139,9 +139,9 @@ const ProjectCard = ({
   };
 
   const handleClick = () => {
-    navigate("/NetworkProfile", {
-      state: { userData: { userId } },
-    });
+    // We'll navigate with just the ID first, then the NetworkProfile component
+    // will update the URL to include the name once user data loads
+    navigate(`/NetworkProfile/${userId}`);
   };
 
   return (

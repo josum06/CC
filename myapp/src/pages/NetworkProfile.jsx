@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { extractUserIdFromParams, generateProfileUrl, formatNameForUrl } from "../utils/urlHelpers";
 import {
   X,
   Share2,
@@ -23,7 +24,11 @@ import { useTheme } from "../context/ThemeContext";
 function NetworkProfile() {
   const navigate = useNavigate();
   const location = useLocation();
+  const params = useParams();
   const userData = location.state?.userData;
+  
+  // Extract userId from URL params (handles both /:userId and /:name/:userId formats)
+  const userId = extractUserIdFromParams(params) || userData?.userId;
   const [activeTab, setActiveTab] = useState("posts");
   const [currUserId, setCurrUserId] = useState(null);
   const [selectedPost, setSelectedPost] = useState(null);
@@ -36,27 +41,52 @@ function NetworkProfile() {
   const { user: clerkUser } = useUser();
   const [category, setCategory] = useState("rejected");
   const [projects, setProjects] = useState([]);
+  const [editingPost, setEditingPost] = useState(null);
+  const [editingProject, setEditingProject] = useState(null);
+  const [isEditPostModalOpen, setIsEditPostModalOpen] = useState(false);
+  const [isEditProjectModalOpen, setIsEditProjectModalOpen] = useState(false);
+  const [postCaption, setPostCaption] = useState('');
+  const [projectTitle, setProjectTitle] = useState('');
+  const [projectDescription, setProjectDescription] = useState('');
+  const [projectGithubUrl, setProjectGithubUrl] = useState('');
+  const [projectDemoUrl, setProjectDemoUrl] = useState('');
+  const [projectTechStack, setProjectTechStack] = useState('');
+  const [newPostMedia, setNewPostMedia] = useState(null);
+  const [newProjectMedia, setNewProjectMedia] = useState(null);
   const { isDarkMode } = useTheme();
 
   useEffect(() => {
-    if (userData.userId && clerkUser?.id) {
+    if (userId && clerkUser?.id) {
       fetchuser();
     }
-  }, [userData, clerkUser?.id]);
+  }, [userId, clerkUser?.id]);
+
+  // Update document title (removed user name for privacy)
+  useEffect(() => {
+    document.title = 'Profile - Campus Connect';
+  }, []);
+
+  // Update URL to include user name for better SEO and sharing (name-first format)
+  useEffect(() => {
+    if (user?.fullName && userId && !params.name) {
+      const nameSlug = formatNameForUrl(user.fullName);
+      // Only update URL if we have the name and it's not already in the URL
+      if (nameSlug && window.location.pathname === `/NetworkProfile/${userId}`) {
+        const newUrl = `/NetworkProfile/${nameSlug}/${userId}`;
+        window.history.replaceState({}, '', newUrl);
+      }
+    }
+  }, [user?.fullName, userId, params.name]);
 
   const fetchuser = async () => {
     try {
       const [userResponse, postResponse, userAuthResponse, projectResponse] =
         await Promise.all([
           axios.get(
-            `${import.meta.env.VITE_BACKEND_URL}/api/user/profileById/${
-              userData.userId
-            }`
+            `${import.meta.env.VITE_BACKEND_URL}/api/user/profileById/${userId}`
           ),
           axios.get(
-            `${import.meta.env.VITE_BACKEND_URL}/api/user/posts/${
-              userData.userId
-            }`
+            `${import.meta.env.VITE_BACKEND_URL}/api/user/posts/${userId}`
           ),
           axios.get(
             `${import.meta.env.VITE_BACKEND_URL}/api/user/profile/${
@@ -64,9 +94,7 @@ function NetworkProfile() {
             }`
           ),
           axios.get(
-            `${import.meta.env.VITE_BACKEND_URL}/api/project/get-project/${
-              userData.userId
-            }`
+            `${import.meta.env.VITE_BACKEND_URL}/api/project/get-project/${userId}`
           ),
         ]);
       const data = userResponse.data;
@@ -80,6 +108,141 @@ function NetworkProfile() {
     } catch (error) {
       console.error("Error fetching profile:", error);
       toast.error("Failed to load profile.");
+    }
+};
+
+  const handleEditPost = (post) => {
+    setEditingPost(post);
+    setPostCaption(post.caption || '');
+    setIsEditPostModalOpen(true);
+  };
+
+  const handleEditProject = (project) => {
+    setEditingProject(project);
+    setProjectTitle(project.title || '');
+    setProjectDescription(project.description || '');
+    setProjectGithubUrl(project.githubUrl || '');
+    setProjectDemoUrl(project.projectUrl || '');
+    setProjectTechStack(Array.isArray(project.TechStack) ? project.TechStack.join(',') : project.TechStack || '');
+    setIsEditProjectModalOpen(true);
+  };
+
+  const handleDeletePost = async (postId) => {
+    if (window.confirm("Are you sure you want to delete this post?")) {
+      try {
+        await axios.delete(`${import.meta.env.VITE_BACKEND_URL}/api/post/delete-post/${postId}`, {
+          data: { author: currUserId }
+        });
+        // Update local state to remove the deleted post
+        setPosts(posts.filter(post => post._id !== postId));
+        toast.success("Post deleted successfully!");
+      } catch (error) {
+        console.error("Error deleting post:", error);
+        toast.error("Failed to delete post.");
+      }
+    }
+  };
+
+  const handleDeleteProject = async (projectId) => {
+    if (window.confirm("Are you sure you want to delete this project?")) {
+      try {
+        await axios.delete(`${import.meta.env.VITE_BACKEND_URL}/api/project/delete-project/${projectId}`, {
+          data: { userId: currUserId }
+        });
+        // Update local state to remove the deleted project
+        setProjects(projects.filter(project => project._id !== projectId));
+        toast.success("Project deleted successfully!");
+      } catch (error) {
+        console.error("Error deleting project:", error);
+        toast.error("Failed to delete project.");
+      }
+    }
+  };
+
+  const updatePost = async () => {
+    try {
+      const formData = new FormData();
+      formData.append('caption', postCaption);
+      formData.append('author', currUserId);
+      
+      if (newPostMedia) {
+        formData.append('file', newPostMedia);
+      }
+      
+      await axios.patch(`${import.meta.env.VITE_BACKEND_URL}/api/post/update-post/${editingPost._id}`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      
+      // Update the post in local state
+      const updatedPosts = posts.map(post => {
+        if (post._id === editingPost._id) {
+          return { ...post, caption: postCaption, mediaUrl: newPostMedia ? URL.createObjectURL(newPostMedia) : post.mediaUrl };
+        }
+        return post;
+      });
+      
+      setPosts(updatedPosts);
+      setIsEditPostModalOpen(false);
+      setEditingPost(null);
+      setPostCaption('');
+      setNewPostMedia(null);
+      toast.success("Post updated successfully!");
+    } catch (error) {
+      console.error("Error updating post:", error);
+      toast.error("Failed to update post.");
+    }
+  };
+
+  const updateProject = async () => {
+    try {
+      const formData = new FormData();
+      formData.append('title', projectTitle);
+      formData.append('description', projectDescription);
+      formData.append('githubUrl', projectGithubUrl);
+      formData.append('projectUrl', projectDemoUrl);
+      formData.append('TechStack', JSON.stringify(projectTechStack.split(',').map(tech => tech.trim()).filter(tech => tech)));
+      formData.append('userId', currUserId);
+      
+      if (newProjectMedia) {
+        formData.append('image', newProjectMedia);
+      }
+      
+      await axios.patch(`${import.meta.env.VITE_BACKEND_URL}/api/project/update-project/${editingProject._id}`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      
+      // Update the project in local state
+      const updatedProjects = projects.map(project => {
+        if (project._id === editingProject._id) {
+          return { 
+            ...project, 
+            title: projectTitle, 
+            description: projectDescription, 
+            githubUrl: projectGithubUrl, 
+            projectUrl: projectDemoUrl,
+            TechStack: projectTechStack.split(',').map(tech => tech.trim()).filter(tech => tech)
+          };
+        }
+        return project;
+      });
+      
+      setProjects(updatedProjects);
+      setIsEditProjectModalOpen(false);
+      setEditingProject(null);
+      setProjectTitle('');
+      setProjectDescription('');
+      setProjectGithubUrl('');
+      setProjectDemoUrl('');
+      setProjectTechStack('');
+      setNewProjectMedia(null);
+      toast.success("Project updated successfully!");
+    } catch (error) {
+      console.error("Error updating project:", error);
+      toast.error("Failed to update project.");
     }
   };
 
@@ -136,6 +299,19 @@ function NetworkProfile() {
       toast.success("Connection sent successfully!");
     } catch (err) {
       toast.error(err.response.data.message || "Something went wrong");
+    }
+  };
+
+  const handleShareProfile = async () => {
+    try {
+      // Generate URL with user's name if available
+      const profileUrl = user?.fullName 
+        ? `${window.location.origin}${generateProfileUrl(userId, user.fullName)}`
+        : `${window.location.origin}/NetworkProfile/${userId}`;
+      await navigator.clipboard.writeText(profileUrl);
+      toast.success("Profile link copied to clipboard!");
+    } catch (err) {
+      toast.error("Failed to copy link to clipboard");
     }
   };
 
@@ -216,7 +392,7 @@ function NetworkProfile() {
         <div className="relative group mb-8">
           {/* Gradient blur background */}
           <div className="absolute inset-0 bg-gradient-to-br from-[#4790fd]/10 via-[#c76191]/5 to-[#27dc66]/10 rounded-3xl blur-xl opacity-50"></div>
-          
+                      
           {/* Card */}
           <div className="relative bg-[#040404]/80 backdrop-blur-2xl rounded-3xl border border-[#4790fd]/20 p-6 sm:p-8 shadow-xl">
             <div className="flex flex-col md:flex-row items-start gap-8">
@@ -240,7 +416,7 @@ function NetworkProfile() {
                 </div>
                 <div className="absolute -bottom-2 -right-2 w-6 h-6 bg-[#27dc66] rounded-full border-4 border-[#040404] shadow-lg"></div>
               </div>
-
+        
               {/* Profile Info */}
               <div className="flex-1 w-full">
                 <div className="flex flex-col md:flex-row md:items-center gap-4 mb-6">
@@ -264,12 +440,16 @@ function NetworkProfile() {
                         {category === "rejected" && "Connect"}
                       </button>
                     )}
-                    <button className="p-3 hover:bg-[#4790fd]/10 rounded-xl transition-all duration-300 border border-[#4790fd]/20 hover:border-[#4790fd]/30 text-[#4790fd]">
+                    <button 
+                      onClick={handleShareProfile}
+                      className="p-3 hover:bg-[#4790fd]/10 rounded-xl transition-all duration-300 border border-[#4790fd]/20 hover:border-[#4790fd]/30 text-[#4790fd]"
+                      title="Share profile link"
+                    >
                       <Share2 size={20} />
                     </button>
                   </div>
                 </div>
-
+        
                 {/* Stats */}
                 <div className="flex gap-8 mb-6">
                   <div className="text-center">
@@ -285,26 +465,93 @@ function NetworkProfile() {
                     <div className="text-sm text-[#a0a0a0]">Projects</div>
                   </div>
                 </div>
-
+        
                 {/* Bio and Details */}
-                <div className="space-y-3 mb-6">
+                <div className="space-y-4 mb-6">
                   <p className="text-[#c0c0c0] leading-relaxed">
-                    {user?.aboutMe}
+                    {user?.aboutMe ? user.aboutMe.split(' ').slice(0, 10).join(' ') + (user.aboutMe.split(' ').length > 10 ? '...' : '') : ''}
                   </p>
-
-                  <div className="flex items-center gap-2 text-[#4790fd]">
-                    <LinkIcon size={16} />
-                    <a
-                      href={user?.website ? user.website : "/NetworkProfile"}
-                      target="_self"
-                      rel="noopener noreferrer"
-                      className="hover:underline transition-colors"
-                    >
-                      {user?.website || "No website to show"}
-                    </a>
+        
+                  {/* Personal URL */}
+                  {user?.personalUrl && (
+                    <div className="flex items-center gap-2 text-[#4790fd]">
+                      <LinkIcon size={16} />
+                      <a
+                        href={user?.personalUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="hover:underline transition-colors"
+                      >
+                        {user?.personalUrl}
+                      </a>
+                    </div>
+                  )}
+        
+                  {/* Department/Batch Information */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {user?.department && (
+                      <div className="flex items-center gap-2 text-[#a0a0a0]">
+                        <Briefcase size={16} />
+                        <span className="text-sm">
+                          {user.department}
+                        </span>
+                      </div>
+                    )}
+        
+                    {user?.enrollmentNumber && (
+                      <div className="flex items-center gap-2 text-[#a0a0a0]">
+                        <span className="text-[#4790fd]">
+                          {"Batch: 20" + user.enrollmentNumber.substring(9, 11)}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+        
+                  {/* Status Indicators */}
+                  <div className="flex flex-wrap gap-3 pt-2">
+                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                      user?.role === "faculty" || user?.role === "admin" ? "bg-[#c76191]/20 text-[#c76191] border border-[#c76191]/30" : "bg-[#4790fd]/20 text-[#4790fd] border border-[#4790fd]/30"
+                    }`}>
+                      {user?.role?.charAt(0).toUpperCase() + user?.role?.slice(1) || "Student"}
+                    </span>
+                                
+                    {user?.status && (
+                      <span className="px-3 py-1 bg-[#27dc66]/20 text-[#27dc66] rounded-full text-xs font-medium border border-[#27dc66]/30">
+                        Verified
+                      </span>
+                    )}
+                  </div>
+        
+                  {/* Social Links */}
+                  <div className="flex gap-3 pt-2">
+                    {user?.githubUrl && (
+                      <a
+                        href={user.githubUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2 text-[#4790fd] hover:underline transition-colors text-sm"
+                      >
+                        <Github size={16} />
+                        <span>GitHub</span>
+                      </a>
+                    )}
+                                
+                    {user?.linkedinUrl && (
+                      <a
+                        href={user.linkedinUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2 text-[#4790fd] hover:underline transition-colors text-sm"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" className="text-[#4790fd]">
+                          <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm-7 8.536c-.823 0-1.494-.68-1.494-1.516 0-.836.671-1.516 1.494-1.516s1.494.68 1.494 1.516c0 .836-.671 1.516-1.494 1.516z"/>
+                        </svg>
+                        <span>LinkedIn</span>
+                      </a>
+                    )}
                   </div>
                 </div>
-
+        
                 {/* Skills */}
                 <div className="flex flex-wrap gap-2">
                   {user?.skills?.map((skill, index) => (
@@ -411,58 +658,128 @@ function NetworkProfile() {
                             </svg>
                           </div>
                         )}
+
+                      {/* Edit/Delete buttons for owner */}
+                      {user?._id === currUserId && (
+                        <div className="absolute top-3 left-3 flex gap-2">
+                          <button
+                            className="p-2 bg-[#070707]/70 rounded-full backdrop-blur-sm hover:bg-[#070707]/90 transition-all"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              // Open edit modal
+                              handleEditPost(post);
+                            }}
+                            title="Edit post"
+                          >
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+                              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                            </svg>
+                          </button>
+                          <button
+                            className="p-2 bg-[#070707]/70 rounded-full backdrop-blur-sm hover:bg-[#ff4757]/70 transition-all"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              // Confirm and delete post
+                              handleDeletePost(post._id);
+                            }}
+                            title="Delete post"
+                          >
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+                              <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                            </svg>
+                          </button>
+                        </div>
+                      )}
                     </div>
                   ))
                 ) : projects.length > 0 ? (
                   projects.map((project, i) => (
                     <div
                       key={i}
-                      className="bg-[#070707]/50 backdrop-blur-xl p-6 rounded-2xl shadow-xl border border-[#27dc66]/10 hover:border-[#27dc66]/20 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg cursor-pointer"
+                      className="bg-[#070707]/50 backdrop-blur-xl rounded-2xl shadow-xl border border-[#27dc66]/10 hover:border-[#27dc66]/20 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg cursor-pointer overflow-hidden flex flex-col md:flex-row relative"
                       onClick={() => setSelectedProject(project)}
                     >
-                      <h3 className="font-semibold text-[#f5f5f5] text-lg mb-3">
-                        {project.title}
-                      </h3>
-                      <p className="text-[#a0a0a0] text-sm mb-4 leading-relaxed">
-                        {project.description}
-                      </p>
-                      <div className="mb-4">
+                      <div className="md:w-2/5 flex-shrink-0">
                         <img
                           src={project.mediaUrl}
                           alt="Project"
-                          className="w-full h-32 object-cover rounded-xl"
+                          className="w-full h-48 md:h-full object-cover rounded-t-2xl md:rounded-l-2xl md:rounded-t-none"
                         />
                       </div>
-                      <div className="flex flex-wrap gap-2 mb-4">
-                        {project?.TechStack?.map((tech, index) => (
-                          <span
-                            key={index}
-                            className="px-3 py-1 bg-[#27dc66]/10 text-[#27dc66] rounded-lg text-xs border border-[#27dc66]/20"
+                      <div className="p-5 flex-grow">
+                        <h3 className="font-semibold text-[#f5f5f5] text-lg mb-2">
+                          {project.title}
+                        </h3>
+                        <p className="text-[#a0a0a0] text-sm mb-3 line-clamp-2">
+                          {project.description}
+                        </p>
+                        <div className="flex flex-wrap gap-2 mb-3">
+                          {project?.TechStack?.map((tech, index) => (
+                            <span
+                              key={index}
+                              className="px-2.5 py-0.5 bg-[#27dc66]/10 text-[#27dc66] rounded-md text-xs border border-[#27dc66]/20"
+                            >
+                              {tech}
+                            </span>
+                          ))}
+                        </div>
+                        <div className="flex gap-3">
+                          <a
+                            href={project?.githubUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-1.5 text-[#4790fd] hover:text-[#4790fd]/80 transition-colors text-xs"
+                            onClick={(e) => e.stopPropagation()}
                           >
-                            {tech}
-                          </span>
-                        ))}
+                            <Github size={14} />
+                            <span>GitHub</span>
+                          </a>
+                          <a
+                            href={project?.projectUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-1.5 text-[#4790fd] hover:text-[#4790fd]/80 transition-colors text-xs"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <ExternalLink size={14} />
+                            <span>Demo</span>
+                          </a>
+                        </div>
                       </div>
-                      <div className="space-y-2">
-                        <a
-                          href={project?.githubUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center gap-2 text-[#4790fd] hover:text-[#4790fd]/80 transition-colors text-sm"
-                        >
-                          <Github size={16} />
-                          <span>View on GitHub</span>
-                        </a>
-                        <a
-                          href={project?.projectUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center gap-2 text-[#4790fd] hover:text-[#4790fd]/80 transition-colors text-sm"
-                        >
-                          <ExternalLink size={16} />
-                          <span>Live Demo</span>
-                        </a>
-                      </div>
+                      
+                      {/* Edit/Delete buttons for owner */}
+                      {user?._id === currUserId && (
+                        <div className="absolute top-3 right-3 flex gap-2">
+                          <button
+                            className="p-2 bg-[#070707]/70 rounded-full backdrop-blur-sm hover:bg-[#070707]/90 transition-all"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              // Open edit modal
+                              handleEditProject(project);
+                            }}
+                            title="Edit project"
+                          >
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+                              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                            </svg>
+                          </button>
+                          <button
+                            className="p-2 bg-[#070707]/70 rounded-full backdrop-blur-sm hover:bg-[#ff4757]/70 transition-all"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              // Confirm and delete project
+                              handleDeleteProject(project._id);
+                            }}
+                            title="Delete project"
+                          >
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+                              <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                            </svg>
+                          </button>
+                        </div>
+                      )}
                     </div>
                   ))
                 ) : (

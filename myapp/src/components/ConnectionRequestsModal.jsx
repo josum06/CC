@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { toast } from "react-toastify";
+// import { showToast } from "../components/CustomToast"; // Component not found
 import { Bell, Check, X, User, Loader2 } from "lucide-react";
 import { ModalWindow } from "./ModalWindow";
 

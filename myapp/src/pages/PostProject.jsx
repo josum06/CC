@@ -18,7 +18,7 @@ import {
 } from "lucide-react";
 import axios from "axios";
 import { useUser } from "@clerk/clerk-react";
-import { toast } from "react-toastify";
+// import { showToast } from "../components/CustomToast"; // Component not found
 import { useTheme } from "../context/ThemeContext";
 
 const PostProject = () => {

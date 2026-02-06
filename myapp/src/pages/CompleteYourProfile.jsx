@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useUser } from "@clerk/clerk-react";
-import { toast, ToastContainer } from "react-toastify";
+// import { showToast } from "../components/CustomToast"; // Component not found
 import axios from "axios";
 import { useTheme } from "../context/ThemeContext";
 import {
@@ -18,9 +18,10 @@ import {
   AlertCircle,
   Sparkles,
   Loader2,
+  Link as LinkIcon,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import "react-toastify/dist/ReactToastify.css";
+
 
 const CompleteYourProfile = () => {
   const { user } = useUser();
@@ -31,6 +32,7 @@ const CompleteYourProfile = () => {
   const [enrollmentNumber, setEnrollmentNumber] = useState("");
   const [githubUrl, setGithubUrl] = useState("");
   const [linkedinUrl, setLinkedinUrl] = useState("");
+  const [personalUrl, setPersonalUrl] = useState("");
   const [skills, setSkills] = useState([]);
   const [aboutMe, setAboutMe] = useState("");
   const [idCardPhoto, setIdCardPhoto] = useState(null);
@@ -86,6 +88,7 @@ const CompleteYourProfile = () => {
       setEnrollmentNumber(data.enrollmentNumber || "");
       setGithubUrl(data.githubUrl || "");
       setLinkedinUrl(data.linkedinUrl || "");
+      setPersonalUrl(data.personalUrl || "");
       setSkills(data.skills || []);
       setAboutMe(data.aboutMe || "");
       if (data.collegeIDCard) {
@@ -131,6 +134,7 @@ const CompleteYourProfile = () => {
         formData.append("enrollmentNumber", enrollmentNumber);
       if (githubUrl) formData.append("githubUrl", githubUrl);
       if (linkedinUrl) formData.append("linkedinUrl", linkedinUrl);
+      if (personalUrl) formData.append("personalUrl", personalUrl);
       if (aboutMe) formData.append("aboutMe", aboutMe);
       if (skills.length) formData.append("skills", JSON.stringify(skills));
       if (idCardPhoto && typeof idCardPhoto !== "string")
@@ -381,6 +385,20 @@ const CompleteYourProfile = () => {
                       <div className="space-y-3">
                         <div className="relative">
                           <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                            <LinkIcon className="w-5 h-5 text-gray-400 dark:text-[#a0a0a0]" />
+                          </div>
+                          <input
+                            type="url"
+                            disabled={status}
+                            value={personalUrl}
+                            onChange={(e) => setPersonalUrl(e.target.value)}
+                            className="w-full pl-12 pr-4 py-3 text-sm border rounded-xl bg-gray-50 dark:bg-[#070707]/50 backdrop-blur-xl border-gray-200 dark:border-[#4790fd]/20 focus:ring-2 focus:ring-[#4790fd]/50 focus:border-[#4790fd] transition-all duration-300 hover:border-[#4790fd]/30 text-gray-900 dark:text-[#f5f5f5] placeholder-gray-400 dark:placeholder-[#a0a0a0]"
+                            placeholder="Your personal portfolio URL"
+                          />
+                        </div>
+
+                        <div className="relative">
+                          <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                             <Github className="w-5 h-5 text-gray-400 dark:text-[#a0a0a0]" />
                           </div>
                           <input
@@ -497,12 +515,18 @@ const CompleteYourProfile = () => {
                         <textarea
                           value={aboutMe}
                           disabled={status}
-                          onChange={(e) => setAboutMe(e.target.value)}
+                          onChange={(e) => {
+                            const inputValue = e.target.value;
+                            const wordCount = inputValue.trim() ? inputValue.trim().split(/\s+/).length : 0;
+                            if (wordCount <= 10) {
+                              setAboutMe(inputValue);
+                            }
+                          }}
                           className="w-full px-4 py-3 text-sm border rounded-xl bg-gray-50 dark:bg-[#070707]/50 backdrop-blur-xl border-gray-200 dark:border-[#4790fd]/20 focus:ring-2 focus:ring-[#4790fd]/50 focus:border-[#4790fd] transition-all duration-300 h-32 resize-none text-gray-900 dark:text-[#f5f5f5] placeholder-gray-400 dark:placeholder-[#a0a0a0]"
-                          placeholder="Share your story, interests, and what drives you..."
+                          placeholder="Share your story, interests, and what drives you... (max 10 words)"
                         />
                         <div className="absolute bottom-3 right-3 text-xs text-gray-400 dark:text-[#a0a0a0]">
-                          {aboutMe.length}/500
+                          {aboutMe.trim() ? aboutMe.trim().split(/\s+/).length : 0}/10 words
                         </div>
                       </div>
                     </div>

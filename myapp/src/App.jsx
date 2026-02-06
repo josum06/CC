@@ -28,6 +28,7 @@ import FacultyRole from "./pages/FacultyRole";
 import Account from './pages/Account';
 import Search from './pages/Search';
 import HelpSupport from './pages/HelpSupport';
+import ScrollManager from './components/ScrollManager';
 
 const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 
@@ -69,6 +70,7 @@ function App() {
     <ClerkProvider publishableKey={clerkPubKey}>
       <ThemeProvider>
         <BrowserRouter>
+          <ScrollManager />
           <ToastContainer position="top-right" autoClose={3000} />
           <Routes>
           {/* Public Routes */}
@@ -132,6 +134,22 @@ function App() {
               }
             />
              <Route
+              path="/NetworkProfile/:name/:userId"
+              element={
+                <ProtectedRoute>
+                  <NetworkProfile />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/NetworkProfile/:userId"
+              element={
+                <ProtectedRoute>
+                  <NetworkProfile />
+                </ProtectedRoute>
+              }
+            />
+            <Route
               path="/NetworkProfile"
               element={
                 <ProtectedRoute>

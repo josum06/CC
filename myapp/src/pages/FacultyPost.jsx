@@ -12,7 +12,7 @@ import {
   Loader2,
   Sparkles,
 } from "lucide-react";
-import { toast } from "react-toastify";
+// import { showToast } from "../components/CustomToast"; // Component not found
 import { useUser } from "@clerk/clerk-react";
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";

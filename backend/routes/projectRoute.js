@@ -8,6 +8,8 @@ const {
   createCommentProject,
   getProjectComments,
   getProject,
+  updateProject,
+  deleteProject,
 } = require("../controllers/projectController");
 const multer = require("multer");
 
@@ -20,5 +22,9 @@ router.route("/like/:projectId").patch(likeProject).get(getLikes);
 
 router.post("/create-project-comment", createCommentProject);
 router.get("/get-project-comments/:projectId", getProjectComments);
+
+// Routes for updating and deleting projects
+router.patch("/update-project/:projectId", upload.single("image"), updateProject);
+router.delete("/delete-project/:projectId", deleteProject);
 
 module.exports = router;

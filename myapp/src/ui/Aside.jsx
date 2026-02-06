@@ -116,9 +116,8 @@ const Aside = () => {
       setExpanded(null);
       if (item.path) {
         if (item.isUserProfile && mainUser?._id) {
-          navigate("/NetworkProfile", {
-            state: { userData: { userId: mainUser._id } },
-          });
+          // Navigate with ID first, URL will be updated automatically
+          navigate(`/NetworkProfile/${mainUser._id}`);
         } else {
           navigate(item.path);
         }

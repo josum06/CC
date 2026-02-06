@@ -11,6 +11,8 @@ const {
   likePost,
   getLikedUser,
   replyComment,
+  updatePost,
+  deletePost,
 } = require("../controllers/userPostController");
 
 // Rate limiting for post creation/updates
@@ -57,6 +59,10 @@ router.get("/get-comments/:postId", getComments);
 router.patch("/like/:postId/like-toggle", likePost);
 router.get("/like/:postId", getLikedUser);
 router.post("/reply-comment", replyComment);
+
+// Routes for updating and deleting posts
+router.patch("/update-post/:postId", upload.single("file"), updatePost);
+router.delete("/delete-post/:postId", deletePost);
 // router.get("/get-post", getPosts);
 
 module.exports = router;

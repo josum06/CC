@@ -50,9 +50,8 @@ const Navbar = () => {
   };
 
   const handleClick = async (userId) => {
-    navigate("/NetworkProfile", {
-      state: { userData: { userId } },
-    });
+    // Navigate with ID first, URL will be updated automatically with name
+    navigate(`/NetworkProfile/${userId}`);
   };
   return (
     <div className="sticky top-0 left-0 right-0 z-10">

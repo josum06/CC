@@ -141,9 +141,8 @@ const ChatWindow = ({ user, recipient, onMobileBack }) => {
 
   const handleProfileClick = () => {
     if (recipient && recipient._id) {
-      navigate("/NetworkProfile", {
-        state: { userData: { userId: recipient._id } },
-      });
+      // Navigate with ID first, URL will be updated automatically with name
+      navigate(`/NetworkProfile/${recipient._id}`);
     }
   };
 
